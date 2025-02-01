@@ -1,5 +1,5 @@
 let atuin = $env.USERPROFILE | path join .local bin atuin.exe
 
 if not ($atuin | path exists) {
-  http get --raw https://github.com/Magniquick/atuin-win/actions/runs/12970332928/artifacts/2486052128 | save $atuin
+  http get --raw https://github.com/atty303/dotfiles/releases/download/atuin/atuin.exe | save $atuin
 }
