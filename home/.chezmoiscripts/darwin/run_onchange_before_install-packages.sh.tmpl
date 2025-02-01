@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -eufo pipefail
+
+{{ $brews := list
+     "gh"
+     "git"
+     "gnupg"
+     "jq"
+     "pinentry-mac"
+     "xz" -}}
+{{ $casks := list
+     "1password-cli"
+     "karabiner-elements" -}}
+
+brew bundle --no-lock --file=/dev/stdin <<EOF
+{{ range ($brews | sortAlpha | uniq) -}}
+brew "{{ . }}"
+{{ end -}}
+{{ range ($casks | sortAlpha | uniq) -}}
+cask "{{ . }}"
+{{ end -}}
+EOF
