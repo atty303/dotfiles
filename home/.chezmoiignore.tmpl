@@ -1,10 +1,16 @@
-{{ if ne .chezmoi.os "windows" -}}
-/AppData/
-{{ end -}}
 {{ if ne .chezmoi.os "darwin" -}}
 /Library/
 {{ end -}}
+{{ if ne .chezmoi.os "linux" -}}
+/Library/
+{{ end -}}
+{{ if ne .chezmoi.os "windows" -}}
+/AppData/
+{{ end -}}
 
+{{ if not .homebrew }}
+.config/homebrew/
+{{ end }}
 
 {{ if ne .chezmoi.os "darwin" }}
 .chezmoiscripts/darwin/

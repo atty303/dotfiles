@@ -3,6 +3,7 @@
 {{- $work := false -}}{{/* true if this machine is a work machine */}}
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
 {{- $personal := false -}}{{/* true if this machine should have personal secrets */}}
+{{- $homebrew := false -}}
 {{- "" -}}
 
 {{- $osID := .chezmoi.os -}}
@@ -29,10 +30,6 @@
 {{-   end -}}
 {{- end -}}
 
-{{- if eq .chezmoi.os "windows" -}}
-{{-   $ephemeral = true -}}
-{{- end -}}
-
 {{- if not $ephemeral -}}
 {{-   if eq $hostname "legion" -}}
 {{-     $work = true -}}
@@ -54,6 +51,10 @@
 {{-   end -}}
 {{- end -}}
 
+{{- if eq .chezmoi.os "darwin" "linux" -}}
+{{-   $homebrew = true -}}
+{{- end -}}
+
 {{- $email := "twpayne@gmail.com" -}}
 {{- if $work -}}
 {{-   $email = "tom.payne@flarm.com" -}}
@@ -72,6 +73,7 @@
         "vi-mode",
         "zsh-syntax-highlighting",
     ]
+    homebrew = {{ $homebrew }}
 
 [git]
     autoAdd = true

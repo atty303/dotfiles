@@ -1,0 +1,12 @@
+brew "gh"
+brew "git"
+brew "gnupg"
+brew "jq"
+brew "xz"
+
+if OS.mac?
+  brew "pinentry-mac"
+  mas "1Password", id: 443_987_910
+  cask "1password-cli"
+  cask "karabiner-elements"
+end

@@ -2,22 +2,19 @@
 
 set -eufo pipefail
 
-{{ $brews := list
-     "gh"
-     "git"
-     "gnupg"
-     "jq"
-     "pinentry-mac"
-     "xz" -}}
-{{ $casks := list
-     "1password-cli"
-     "karabiner-elements" -}}
+{{ if not .homebrew }}
+exit
+{{ end }}
 
-brew bundle --no-lock --file=/dev/stdin <<EOF
-{{ range ($brews | sortAlpha | uniq) -}}
-brew "{{ . }}"
-{{ end -}}
-{{ range ($casks | sortAlpha | uniq) -}}
-cask "{{ . }}"
-{{ end -}}
-EOF
+if [[ -e /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+if !(type "brew" >/dev/null 2>&1); then
+  echo "Install homebrew"
+fi
+
+if (type "brew" >/dev/null 2>&1); then
+  # Brewfile hash: {{ include "dot_config/homebrew/Brewfile" | sha256sum }}
+  brew bundle --file {{ joinPath .chezmoi.sourceDir "dot_config/homebrew/Brewfile" | quote }}
+fi
