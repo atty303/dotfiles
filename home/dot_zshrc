@@ -5,5 +5,5 @@ fi
 
 # Launch Nushell only in an interactive shell
 if [[ $- == *i* ]]; then
-  XDG_CONFIG_HOME="$HOME/.config" exec nu
+  exec nu
 fi
