@@ -2,8 +2,10 @@ ServerAliveInterval 300
 ServerAliveCountMax 3
 PermitLocalCommand yes
 
+{{ if eq .chezmoi.os "darwin" -}}
 Match Host * exec "[[ -z '$SSH_AUTH_SOCK' ]]"
   IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+{{- end }}
 
 Host *.local
   ForwardAgent yes

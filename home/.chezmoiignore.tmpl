@@ -2,7 +2,6 @@
 /Library/
 {{ end -}}
 {{ if ne .chezmoi.os "linux" -}}
-/Library/
 {{ end -}}
 {{ if ne .chezmoi.os "windows" -}}
 /AppData/
@@ -13,11 +12,11 @@
 {{ end }}
 
 {{ if ne .chezmoi.os "darwin" }}
-.chezmoiscripts/darwin/
+.chezmoiscripts/darwin/**
 {{ end }}
 {{ if ne .chezmoi.os "linux" }}
-.chezmoiscripts/linux/
+.chezmoiscripts/linux/**
 {{ end }}
 {{ if ne .chezmoi.os "windows" }}
-.chezmoiscripts/windows/
+.chezmoiscripts/windows/**
 {{ end }}
