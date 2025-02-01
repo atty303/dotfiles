@@ -5,5 +5,5 @@ fi
 
 # Launch Nushell only in an interactive shell
 if [[ $- == *i* ]]; then
-  exec nu
+  exec nu -i
 fi
