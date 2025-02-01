@@ -1,0 +1,18 @@
+# https://starship.rs/config/
+"$schema" = 'https://starship.rs/config-schema.json'
+
+[directory]
+truncation_length = 8
+truncation_symbol = '…/'
+
+[direnv]
+disabled = false
+
+[os]
+disabled = false
+
+[shlvl]
+disabled = false
+
+[status]
+disabled = false

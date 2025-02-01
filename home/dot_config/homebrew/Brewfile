@@ -2,6 +2,7 @@ brew "gh"
 brew "git"
 brew "gnupg"
 brew "jq"
+brew "starship"
 brew "xz"
 
 if OS.mac?

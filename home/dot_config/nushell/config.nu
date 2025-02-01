@@ -1,1 +1,1 @@
-source atuin.nu
+source conf.d/index.nu
