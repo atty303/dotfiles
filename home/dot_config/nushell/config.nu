@@ -1,6 +1,8 @@
 $env.config.show_banner = false
-$env.config.buffer_editor = "vi"
+$env.EDITOR = "hx"
 
 use std/dirs
+
+alias cz = chezmoi
 
 source conf.d/index.nu
