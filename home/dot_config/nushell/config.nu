@@ -5,7 +5,7 @@ use std/dirs
 
 alias cz = chezmoi
 
-def get-editor[] {
+def get-editor [] {
   [$env.config.buffer-editor, $env.EDITOR, $env.VISUAL] | filter { is-not-empty } | first
 }
 
