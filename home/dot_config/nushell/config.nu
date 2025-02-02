@@ -1,15 +1,22 @@
+$env.EDITOR = "hx"
+
 $env.config.show_banner = false
 $env.config.table.header_on_separator = true
 $env.config.datetime_format.table = "%y-%m-%d %I:%M:%S"
 $env.config.datetime_format.normal = "%y-%m-%d %I:%M:%S"
-$env.EDITOR = "hx"
-
 $env.config.keybindings ++= [
   { name: user, modifier: alt, keycode: char_b, mode: [emacs],
     event: { edit: MoveBigWordLeft } }
   { name: user, modifier: alt, keycode: char_d, mode: [emacs],
     event: { edit: CutBigWordRight } }
+  { name: user, modifier: alt, keycode: char_h, mode: [emacs],
+    event: { edit: CutBigWordLeft } }
 ]
+$env.config.completions.external = {
+  enable: true
+  max_results: 100
+  completer: {|spans| carapace $spans.0 nushell ...$spans | from json }
+}
 
 use std/dirs
 
