@@ -1,2 +1,2 @@
 source atuin.nu
-source starship.nu
+source oh-my-posh.nu
