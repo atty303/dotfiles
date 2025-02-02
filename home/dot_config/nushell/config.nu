@@ -13,7 +13,8 @@ $env.config.keybindings ++= [
 
 use std/dirs
 
-alias cz = chezmoi
+alias ch = chezmoi
+alias che = chezmoi --watch --apply
 
 def get-editor [] {
   [$env.config.buffer-editor, $env.EDITOR, $env.VISUAL] | filter { is-not-empty } | first
