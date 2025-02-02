@@ -1,22 +1,79 @@
-{{ if ne .chezmoi.os "darwin" -}}
+# ignored source
+/README.md
+
+# ignored target
+/.Trash/
+/.android/
+/.cache/
+/.cargo/
+/.datadog-agent/
+/.docker/
+/.dropbox/
+/.ecr/
+/.gradle/
+/.ivy2/
+/.local/
+/.m2/
+/.mill/
+/.npm/
+/.nuget/
+/.sbt/
+/.slack/
+/.terraform.d/
+/.rustup/
+/.wakatime/
+/.yarn/
+/.vite-plugin-mkcert/
+/src/
+
+/.CFUserTextEncoding
+/.ssh/known_hosts
+/.vim/
+/.viminfo
+/.yarnrc
+/.wakatime.cfg
+/.config/chezmoi/
+/.config/github-copilot/
+/.config/op/
+/.config/zellij/config.kdl.bak*
+/.lesshst
+/.javacpp/
+/.cups/
+
+.aws/boto/
+.aws/cli
+
+# ignored by os
+{{ if eq .chezmoi.os "darwin" }}
+!/Library/Application Support/nushell/
 /Library/
-{{ end -}}
-{{ if ne .chezmoi.os "linux" -}}
-{{ end -}}
-{{ if ne .chezmoi.os "windows" -}}
+/Applications/
+/Desktop/
+/Documents/
+/Downloads/
+/Dropbox/
+/Movies/
+/Music/
+/Pictures/
+/Public/
+{{ end }}
+{{ if ne .chezmoi.os "darwin" }}
+.chezmoiscripts/darwin/**
+/Library/
+{{ end }}
+
+{{ if ne .chezmoi.os "linux" }}
+.chezmoiscripts/linux/**
+{{ end }}
+
+{{ if ne .chezmoi.os "windows" }}
+.chezmoiscripts/windows/**
 /AppData/
-{{ end -}}
+{{ end }}
 
 {{ if not .homebrew }}
 .config/homebrew/
 {{ end }}
 
-{{ if ne .chezmoi.os "darwin" }}
-.chezmoiscripts/darwin/**
-{{ end }}
-{{ if ne .chezmoi.os "linux" }}
-.chezmoiscripts/linux/**
-{{ end }}
-{{ if ne .chezmoi.os "windows" }}
-.chezmoiscripts/windows/**
-{{ end }}
+# global
+**/.DS_Store
