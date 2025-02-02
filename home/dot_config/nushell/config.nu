@@ -7,6 +7,8 @@ $env.EDITOR = "hx"
 $env.config.keybindings ++= [
   { name: user, modifier: alt, keycode: char_b, mode: [emacs],
     event: { edit: MoveBigWordLeft } }
+  { name: user, modifier: alt, keycode: char_d, mode: [emacs],
+    event: { edit: CutBigWordRight } }
 ]
 
 use std/dirs
