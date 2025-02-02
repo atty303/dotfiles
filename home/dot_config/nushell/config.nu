@@ -1,4 +1,5 @@
 $env.config.show_banner = false
+$env.config.table.header_on_separator = true
 $env.EDITOR = "hx"
 
 use std/dirs
