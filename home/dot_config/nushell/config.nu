@@ -1,3 +1,4 @@
+$env.XDG_CONFIG_HOME = $"('~/.config' | path expand)"
 $env.EDITOR = "hx"
 
 $env.config.show_banner = false
