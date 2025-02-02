@@ -24,6 +24,7 @@ use std/dirs
 
 alias ch = chezmoi
 alias che = chezmoi --watch --apply
+alias vi = hx
 
 def get-editor [] {
   [$env.config.buffer-editor, $env.EDITOR, $env.VISUAL] | filter { is-not-empty } | first
