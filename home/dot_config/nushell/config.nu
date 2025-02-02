@@ -4,6 +4,11 @@ $env.config.datetime_format.table = "%y-%m-%d %I:%M:%S"
 $env.config.datetime_format.normal = "%y-%m-%d %I:%M:%S"
 $env.EDITOR = "hx"
 
+$env.config.keybindings ++= [
+  { name: user, modifier: alt, keycode: char_b, mode: [emacs],
+    event: { edit: MoveBigWordLeft } }
+]
+
 use std/dirs
 
 alias cz = chezmoi
