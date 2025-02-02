@@ -14,7 +14,7 @@ $env.config.keybindings ++= [
 ]
 
 $env.CARAPACE_BRIDGES = 'zsh,fish,bash,inshellisense' # optional
-$env.BASH_COMPLETION_USER_DIR = ~/.config/bash-completion
+$env.BASH_COMPLETION_USER_DIR = "~/.config/bash-completion"
 mkdir ~/.cache/carapace
 carapace _carapace nushell | save --force ~/.cache/carapace/init.nu
 source ~/.cache/carapace/init.nu
