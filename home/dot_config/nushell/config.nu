@@ -2,6 +2,7 @@ $env.XDG_CONFIG_HOME = $"('~/.config' | path expand)"
 $env.EDITOR = "hx"
 
 $env.config.show_banner = false
+$env.config.history.file_format = "sqlite"
 $env.config.table.header_on_separator = true
 $env.config.datetime_format.table = "%y-%m-%d %I:%M:%S"
 $env.config.datetime_format.normal = "%y-%m-%d %I:%M:%S"
@@ -14,8 +15,7 @@ $env.config.keybindings ++= [
     event: { edit: CutBigWordLeft } }
 ]
 
-$env.CARAPACE_BRIDGES = 'zsh,fish,bash,inshellisense' # optional
-$env.BASH_COMPLETION_USER_DIR = "~/.config/bash-completion"
+$env.CARAPACE_BRIDGES = 'zsh,inshellisense'
 mkdir ~/.cache/carapace
 carapace _carapace nushell | save --force ~/.cache/carapace/init.nu
 source ~/.cache/carapace/init.nu
