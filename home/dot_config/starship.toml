@@ -1,4 +1,4 @@
-# version: 1.0.0
+"$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = true
 continuation_prompt = "[▸▹ ](dimmed white)"
@@ -12,7 +12,7 @@ $env_var\
 $jobs\
 $sudo\
 $username\
-$character"""
+\n$character"""
 
 right_format = """
 $singularity\
