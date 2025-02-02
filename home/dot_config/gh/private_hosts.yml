@@ -1,0 +1,5 @@
+github.com:
+    git_protocol: ssh
+    users:
+        atty303:
+    user: atty303
