@@ -1,0 +1,2 @@
+[editor]
+clipboard-provider = "termcode"
