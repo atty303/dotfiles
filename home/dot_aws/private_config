@@ -1,0 +1,26 @@
+[default]
+credential_process = sh -c "perman-aws-vault print"
+
+[profile glaze-dev]
+region=ap-northeast-1
+
+[profile glaze-stg]
+region=ap-northeast-1
+
+[profile glaze-prd]
+region=ap-northeast-1
+
+[profile glaze-shared]
+region=ap-northeast-1
+
+[profile atty303]
+region=ap-northeast-1
+
+[profile a13400]
+region=ap-northeast-1
+
+[profile a13400-amp]
+region=us-west-2
+
+[profile s4-glaze]
+region=us-east-1
