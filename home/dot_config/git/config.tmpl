@@ -15,3 +15,19 @@
 [user]
   name = Koji AGAWA
   email = atty303@gmail.com
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINKUh+slvUgc8IyKQeBB8frvrg0uw3jTzLLVWwHRzy1J
+
+[gpg]
+  format = ssh
+
+[gpg "ssh"]
+{{ if eq .chezmoi.os "windows" -}}
+  program = "C:/Users/atty/AppData/Local/1Password/app/8/op-ssh-sign.exe"
+{{- end }}
+{{ if eq .chezmoi.os "darwin" -}}
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+{{- end }}
+
+[commit]
+  gpgsign = true
+
