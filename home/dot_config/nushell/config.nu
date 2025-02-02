@@ -42,3 +42,6 @@ if $env.ZELLIJ? != "0" {
   zellij attach -c
   exit
 }
+
+mkdir ($nu.data-dir | path join "vendor/autoload")
+starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
