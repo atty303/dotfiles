@@ -1,5 +1,7 @@
 $env.config.show_banner = false
 $env.config.table.header_on_separator = true
+$env.config.datetime_format.table = "%y-%m-%d %I:%M:%S%p"
+$env.config.datetime_format.normal = "%y-%m-%d %I:%M:%S%p"
 $env.EDITOR = "hx"
 
 use std/dirs
