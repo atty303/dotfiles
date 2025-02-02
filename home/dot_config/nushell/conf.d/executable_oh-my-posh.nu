@@ -4,9 +4,9 @@ if ($env.config? | is-not-empty) {
 }
 
 $env.POWERLINE_COMMAND = 'oh-my-posh'
-$env.POSH_THEME = (echo '')
+$env.POSH_THEME = (echo "/Users/a13400/.cache/oh-my-posh/config.da2b9f49de3e33954a43728e6c8fc342bb75a389fe1f730ec52ebdac0e1b7b58.omp.json")
 $env.PROMPT_INDICATOR = ""
-$env.POSH_SESSION_ID = (echo "b01cb37d-b4c9-4080-9fe4-d9ff5cf2f3d7")
+$env.POSH_SESSION_ID = (echo "7fd6cf9e-36f4-4af3-8e8f-c3b3fa01ee33")
 $env.POSH_SHELL = "nu"
 $env.POSH_SHELL_VERSION = (version | get version)
 
@@ -67,4 +67,3 @@ $env.PROMPT_COMMAND = {||
 
 $env.PROMPT_COMMAND_RIGHT = {|| _omp_get_prompt right }
 
-$env.TRANSIENT_PROMPT_COMMAND = {|| _omp_get_prompt transient }
