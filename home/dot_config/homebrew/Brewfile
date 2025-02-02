@@ -1,5 +1,6 @@
 tap "jandedobbeleer/oh-my-posh"
 
+brew "rage"
 brew "carapace"
 brew "gh"
 brew "git"
