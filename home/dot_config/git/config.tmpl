@@ -1,7 +1,17 @@
 [url "git@github.com:"]
   insteadOf = https://github.com/
 
-{{ if eq .chezmoi.os "windows" -}}
 [core]
+  autocrlf = input
+{{ if eq .chezmoi.os "windows" -}}
   sshCommand = C:/Windows/System32/OpenSSH/ssh.exe
 {{- end }}
+
+[includeIf "gitdir:~/src/github.com/CyberAgent/"]
+  path = ~/.config/git/cyberagent
+[includeIf "gitdir:~/src/github.com/CyberAgentAI/"]
+  path = ~/.config/git/cyberagent
+
+[user]
+  name = Koji AGAWA
+  email = atty303@gmail.com
