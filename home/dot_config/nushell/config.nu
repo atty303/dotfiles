@@ -27,3 +27,8 @@ def get-editor [] {
 # }
 
 source conf.d/index.nu
+
+if not $env.ZELLIJ {
+  zellij attach -c
+  exit
+}
