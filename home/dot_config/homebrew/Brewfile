@@ -1,3 +1,5 @@
+tap "jandedobbeleer/oh-my-posh"
+
 brew "gh"
 brew "git"
 brew "gnupg"
