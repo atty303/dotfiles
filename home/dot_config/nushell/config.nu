@@ -12,11 +12,11 @@ $env.config.keybindings ++= [
   { name: user, modifier: alt, keycode: char_h, mode: [emacs],
     event: { edit: CutBigWordLeft } }
 ]
-$env.config.completions.external = {
-  enable: true
-  max_results: 100
-  completer: {|spans| carapace $spans.0 nushell ...$spans | from json }
-}
+
+$env.CARAPACE_BRIDGES = 'zsh,fish,bash,inshellisense' # optional
+mkdir ~/.cache/carapace
+carapace _carapace nushell | save --force ~/.cache/carapace/init.nu
+source ~/.cache/carapace/init.nu
 
 use std/dirs
 
