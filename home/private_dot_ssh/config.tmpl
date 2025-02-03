@@ -6,7 +6,7 @@ PermitLocalCommand yes
 
 # If the SSH agent is not forwarded from the remote host, use the local 1Password
 {{ if eq .chezmoi.os "darwin" -}}
-Match Host * exec "[[ -z '$SSH_AUTH_SOCK' ]]"
+Match Host * exec "[[ ! '$SSH_AUTH_SOCK' == /private/tmp/com.apple.launchd.*/Listeners ]]"
   # https://developer.1password.com/docs/ssh/get-started#step-4-configure-your-ssh-or-git-client
   IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 {{- end }}
