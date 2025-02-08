@@ -1,0 +1,26 @@
+
+[packages.windows.winget]
+list = """
+AutoHotkey.AutoHotkey
+Docker.DockerDesktop
+Zoom.Zoom
+Google.Chrome
+Dropbox.Dropbox
+AgileBits.1Password
+AgileBits.1Password.CLI
+Discord.Discord
+JetBrains.Toolbox
+Bandisoft.Honeyview
+Krisp.Krisp
+Microsoft.PowerToys
+SlackTechnologies.Slack
+Nushell.Nushell
+Starship.Starship
+Helix.Helix
+Obsidian.Obsidian
+jdx.mise
+CharlesMilette.TranslucentTB
+Wakatime.DesktopWakatime
+Git.Git
+"""
+# VB-Audio.Voicemeeter.Potato
