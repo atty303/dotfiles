@@ -2,9 +2,7 @@
 java = "corretto-21"
 node = "lts"
 rust = "latest"
-taplo = "latest"
 usage = "latest"
-github-cli = "latest"
 
 # clang
 # cmake

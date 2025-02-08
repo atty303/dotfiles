@@ -1,26 +1,33 @@
 [default]
+output = yaml-stream
+
+[profile glaze-developer]
+output = yaml-stream
+region = ap-northeast-1
 credential_process = sh -c "perman-aws-vault print"
 
 [profile glaze-dev]
-region=ap-northeast-1
+output = yaml-stream
+source_profile = glaze-developer
 
 [profile glaze-stg]
-region=ap-northeast-1
+output = yaml-stream
+source_profile = glaze-developer
 
 [profile glaze-prd]
-region=ap-northeast-1
+output = yaml-stream
+source_profile = glaze-developer
 
 [profile glaze-shared]
-region=ap-northeast-1
+output = yaml-stream
+source_profile = glaze-developer
+
+[profile glaze-s4]
+output = yaml-stream
+region = us-east-1
+credential_process = nu -c "op item get --format=json --fields=label=AWS_ACCESS_KEY_ID,label=AWS_SECRET_ACCESS_KEY lnyycjzafse35yi353zw7ayiqm | from json | reduce -f {Version: 1} {|it, acc| let key = if $it.label == 'AWS_ACCESS_KEY_ID' { 'AccessKeyId' } else { 'SecretAccessKey' }; $acc | merge {($key): $it.value}} | to json"
 
 [profile atty303]
-region=ap-northeast-1
-
-[profile a13400]
-region=ap-northeast-1
-
-[profile a13400-amp]
-region=us-west-2
-
-[profile s4-glaze]
-region=us-east-1
+output = yaml-stream
+region = ap-northeast-1
+credential_process = nu -c "op item get --format=json --fields=label=AWS_ACCESS_KEY_ID,label=AWS_SECRET_ACCESS_KEY pwlu7iwrkhg65sug6bkviqupoq | from json | reduce -f {Version: 1} {|it, acc| let key = if $it.label == 'AWS_ACCESS_KEY_ID' { 'AccessKeyId' } else { 'SecretAccessKey' }; $acc | merge {($key): $it.value}} | to json"
