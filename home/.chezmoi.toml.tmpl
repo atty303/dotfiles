@@ -30,27 +30,6 @@
 {{-   end -}}
 {{- end -}}
 
-{{- if not $ephemeral -}}
-{{-   if eq $hostname "legion" -}}
-{{-     $work = true -}}
-{{-   else if eq $hostname "thinkpad" -}}
-{{-     $personal = true -}}
-{{-   else if eq $hostname "toms-laptop" -}}
-{{-     $personal = true -}}
-{{-   else if eq $hostname "toms-mba" -}}
-{{-     $personal = true -}}
-{{-   else if eq $hostname "ubuntu" -}}
-{{-     $headless = true -}}
-{{-     $personal = true -}}
-{{-   else if stdinIsATTY -}}
-{{-     $headless = promptBoolOnce . "headless" "headless" -}}
-{{-     $ephemeral = promptBoolOnce . "ephemeral" "ephemeral" -}}
-{{-   else -}}
-{{-     $ephemeral = true -}}
-{{-     $headless = true -}}
-{{-   end -}}
-{{- end -}}
-
 {{- if eq .chezmoi.os "darwin" "linux" -}}
 {{-   $homebrew = true -}}
 {{- end -}}
@@ -92,12 +71,14 @@ encryption = "age"
 [github]
     refreshPeriod = "12h"
 
+{{ if eq .chezmoi.os "windows" }}
 [interpreters.ps1]
-    command = "pwsh"
+    command = {{ joinPath (env "PROGRAMFILES") "PowerShell/7/pwsh.exe" | toToml }}
     args = ["-NoLogo"]
+{{ end }}
 
 [hooks.read-source-state.pre]
 {{ if eq .chezmoi.os "windows" }}
-    command = "pwsh"
-    args = ["-NoLogo", "{{ .chezmoi.sourceDir }}/.chezmoiscripts/.install-init.ps1"]
+    command = {{ joinPath (env "SystemRoot") "System32/WindowsPowerShell/v1.0/powershell.exe" | toToml }}
+    args = ["-NoLogo", {{ joinPath .chezmoi.sourceDir ".chezmoiscripts/.install-init.ps1" | toToml }}]
 {{ end }}
