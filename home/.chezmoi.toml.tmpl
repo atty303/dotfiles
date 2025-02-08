@@ -91,3 +91,13 @@ encryption = "age"
 
 [github]
     refreshPeriod = "12h"
+
+[interpreters.ps1]
+    command = "pwsh"
+    args = ["-NoLogo"]
+
+[hooks.read-source-state.pre]
+{{ if eq .chezmoi.os "windows" }}
+    command = "pwsh"
+    args = ["-NoLogo", "{{ .chezmoi.sourceDir }}/.chezmoiscripts/.install-init.ps1"]
+{{ end }}
