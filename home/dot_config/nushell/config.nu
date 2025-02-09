@@ -1,7 +1,13 @@
+# Load order:
+# 1. env.nu (deprecated)
+# 2. config.nu
+# 3. $nu.vendor-autoload-dirs
+# 4. $nu.user-autoload-dirs
+
 $env.XDG_CONFIG_HOME = $"('~/.config' | path expand)"
 $env.EDITOR = "hx"
 
-$env.config.show_banner = false
+$env.config.show_banner = "short"
 $env.config.history.file_format = "sqlite"
 $env.config.table.header_on_separator = true
 $env.config.datetime_format.table = "%y-%m-%d %I:%M:%S"
@@ -14,11 +20,6 @@ $env.config.keybindings ++= [
   { name: user, modifier: alt, keycode: char_h, mode: [emacs],
     event: { edit: CutBigWordLeft } }
 ]
-
-$env.CARAPACE_BRIDGES = 'zsh,inshellisense'
-mkdir ~/.cache/carapace
-carapace _carapace nushell | save --force ~/.cache/carapace/init.nu
-source ~/.cache/carapace/init.nu
 
 use std/dirs
 
@@ -37,6 +38,22 @@ def get-editor [] {
 # }
 
 source conf.d/index.nu
+
+
+# Generate vendor/autoload scripts
+if (which carapace | is-not-empty) {
+    $env.CARAPACE_BRIDGES = 'zsh,inshellisense'
+
+    const init_path = $nu.data-dir | path join vendor autoload carapace.nu
+    if ($init_path | path type | $in != "file") {
+        ^carapace _carapace nushell | save $init_path --force
+    }
+}
+
+if (which mise | is-not-empty) {
+    const init_path = $nu.data-dir | path join vendor autoload mise.nu
+    ^mise activate nu | lines | filter {$in =~ ^set,Path,} | to text | save $init_path --force
+}
 
 #if $env.ZELLIJ? != "0" {
 #  zellij attach -c

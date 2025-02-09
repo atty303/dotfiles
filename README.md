@@ -28,3 +28,11 @@
 - Ensure all commands are executed in order
 - Administrative privileges may be required
 - Wait for each command to complete before proceeding to the next
+
+# Memo
+
+- [Windows Sandbox](https://learn.microsoft.com/ja-jp/windows/security/application-security/application-isolation/windows-sandbox/) for testing bootstrap
+- [winget configure](https://learn.microsoft.com/ja-jp/windows/package-manager/winget/configure) for ensure configuration
+
+## ToDo
+- [ ] Configure AHK
