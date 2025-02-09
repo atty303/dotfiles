@@ -4,7 +4,7 @@
 add_newline = false
 
 format = """
-$username\
+$username
 \n\
 $character"""
 
@@ -27,6 +27,9 @@ palette = "me"
 [palettes.me]
 line-1-bg = "#e29578"
 line-1-fg = "#000000"
+
+[character]
+disabled = false
 
 [username]
 style_user = "fg:line-1-fg bold"
