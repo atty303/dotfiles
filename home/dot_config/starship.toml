@@ -3,7 +3,6 @@
 add_newline = false
 
 format = """
-\n\
 [](pl-1)[ ](bg:pl-1)\
 $os\
 $hostname\
