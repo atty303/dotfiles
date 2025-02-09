@@ -1,18 +1,3 @@
-
-export-env {
-    load-env {
-#        TRANSIENT_PROMPT_COMMAND: $env.PROMPT_COMMAND
-#  TRANSIENT_PROMPT_COMMAND_RIGHT: $env.PROMPT_COMMAND_RIGHT
-#  TRANSIENT_PROMPT_INDICATOR: $env.PROMPT_INDICATOR
-#  TRANSIENT_PROMPT_INDICATOR_VI_NORMAL: $env.PROMPT_INDICATOR_VI_NORMAL
-#  TRANSIENT_PROMPT_INDICATOR_VI_INSERT: $env.PROMPT_INDICATOR_VI_INSERT
-#  TRANSIENT_PROMPT_MULTILINE_INDICATOR: $env.PROMPT_MULTILINE_INDICATOR
-    }
-}
-
-
-# $env.config.render_right_prompt_on_last_line = false
-$env.TRANSIENT_PROMPT_COMMAND = null
-$env.TRANSIENT_PROMPT_COMMAND_RIGHT = null
-#$env.PROMPT_COMMAND = {|| ^starship module character }
-#$env.PROMPT_COMMAND_RIGHT = ""
+$env.config.render_right_prompt_on_last_line = false
+$env.TRANSIENT_PROMPT_COMMAND = {|| ^starship module character }
+$env.TRANSIENT_PROMPT_COMMAND_RIGHT = ""
