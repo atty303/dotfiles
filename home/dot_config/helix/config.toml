@@ -1,2 +1,8 @@
 [editor]
+shell = ["nu", "-c"]
+bufferline = "multiple"
+color-modes = true
+text-width = 120
+default-line-ending = "lf"
 clipboard-provider = "termcode"
+auto-pairs = false
