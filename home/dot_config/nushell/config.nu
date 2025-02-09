@@ -37,22 +37,29 @@ def get-editor [] {
 #   run-external sh ...$args
 # }
 
-source conf.d/index.nu
-
-
 # Generate vendor/autoload scripts
+const vendor_autoload = $nu.data-dir | path join vendor autoload
+mkdir $vendor_autoload
+
 if (which carapace | is-not-empty) {
     $env.CARAPACE_BRIDGES = 'zsh,inshellisense'
 
-    const init_path = $nu.data-dir | path join vendor autoload carapace.nu
+    const init_path = $vendor_autoload | path join carapace.nu
     if ($init_path | path type | $in != "file") {
         ^carapace _carapace nushell | save $init_path --force
     }
 }
 
 if (which mise | is-not-empty) {
-    const init_path = $nu.data-dir | path join vendor autoload mise.nu
+    const init_path = $vendor_autoload | path join mise.nu
     ^mise activate nu | lines | filter {$in =~ ^set,Path,} | to text | save $init_path --force
+}
+
+if (which starship | is-not-empty) {
+    const init_path = $vendor_autoload | path join starship.nu
+    if ($init_path | path type | $in != "file") {
+        ^starship init nu | save $init_path --force
+    }
 }
 
 #if $env.ZELLIJ? != "0" {

@@ -1,5 +1,3 @@
-tap "jandedobbeleer/oh-my-posh"
-
 brew "rage"
 brew "carapace"
 brew "gh"
@@ -8,7 +6,6 @@ brew "gnupg"
 brew "jq"
 brew "starship"
 brew "xz"
-brew "jandedobbeleer/oh-my-posh/oh-my-posh"
 
 if OS.mac?
   brew "pinentry-mac"
