@@ -4,7 +4,7 @@ output = yaml-stream
 [profile glaze-developer]
 output = yaml-stream
 region = ap-northeast-1
-credential_process = sh -c "perman-aws-vault print"
+credential_process = sh -c "perman-aws-vault print -p ~/src/github.com/CyberAgentAI/glaze/.perman-aws-vault"
 
 [profile glaze-dev]
 output = yaml-stream
