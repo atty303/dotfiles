@@ -1,0 +1,10 @@
+[fonts]
+google = [
+    "IBM Plex Sans Condensed",
+    "IBM Plex Sans JP",
+
+]
+zip = [
+    "https://github.com/yuru7/udev-gothic/releases/download/v2.1.0/UDEVGothic_v2.1.0.zip",
+    "https://github.com/yuru7/udev-gothic/releases/download/v2.1.0/UDEVGothic_NF_v2.1.0.zip",
+]
