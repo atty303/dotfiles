@@ -58,17 +58,17 @@
 
 # ignored by os
 {{ if eq .chezmoi.os "darwin" }}
-!/Library/Application Support/nushell/
-/Library/
-/Applications/
-/Desktop/
-/Documents/
-/Downloads/
-/Dropbox/
-/Movies/
-/Music/
-/Pictures/
-/Public/
+!Library/Application Support/nushell/
+Library/
+Applications/
+Desktop/
+Documents/
+Downloads/
+Dropbox/
+Movies/
+Music/
+Pictures/
+Public/
 {{ end }}
 {{ if ne .chezmoi.os "darwin" }}
 .chezmoiscripts/darwin/**
