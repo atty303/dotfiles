@@ -1,0 +1,16 @@
+[window]
+decorations = "Transparent"
+opacity = 0.75
+blur = true
+
+[font]
+normal = { family = "UDEV Gothic NF", style = "Regular" }
+builtin_box_drawing = false
+size = 13
+
+[selection]
+save_to_clipboard = true
+
+[terminal]
+osc52 = "CopyPaste"
+

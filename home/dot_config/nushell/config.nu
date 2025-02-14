@@ -52,7 +52,7 @@ if (which carapace | is-not-empty) {
 
 if (which mise | is-not-empty) {
     const init_path = $vendor_autoload | path join mise.nu
-    ^mise activate nu | lines | filter {$in =~ ^set,Path,} | to text | save $init_path --force
+    ^mise activate nu | lines | filter {$in !~ ^set,Path,} | to text | save $init_path --force
 }
 
 if (which starship | is-not-empty) {
