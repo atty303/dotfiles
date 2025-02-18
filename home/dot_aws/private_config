@@ -8,18 +8,22 @@ credential_process = sh -c "perman-aws-vault print -p ~/src/github.com/CyberAgen
 
 [profile glaze-dev]
 output = yaml-stream
+region = ap-northeast-1
 source_profile = glaze-developer
 
 [profile glaze-stg]
 output = yaml-stream
+region = ap-northeast-1
 source_profile = glaze-developer
 
 [profile glaze-prd]
 output = yaml-stream
+region = ap-northeast-1
 source_profile = glaze-developer
 
 [profile glaze-shared]
 output = yaml-stream
+region = ap-northeast-1
 source_profile = glaze-developer
 
 [profile glaze-s4]
