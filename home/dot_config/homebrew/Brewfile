@@ -2,10 +2,8 @@ brew "rage"
 brew "carapace"
 brew "gh"
 brew "git"
-brew "gnupg"
-brew "jq"
 brew "starship"
-brew "xz"
+brew "atuin"
 
 if OS.mac?
   brew "pinentry-mac"
