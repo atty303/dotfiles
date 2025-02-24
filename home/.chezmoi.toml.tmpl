@@ -97,7 +97,7 @@ encryption = "age"
 [hooks.read-source-state.pre]
 {{ if eq .chezmoi.os "linux" }}
     command = "/usr/bin/env"
-    args = ["sh", {{ joinPath .chezmoi.sourceDir ".chezmoiscripts/.linux-init.bash" | toToml }}]
+    args = ["sh", {{ joinPath .chezmoi.sourceDir ".chezmoiscripts/linux/.init.bash" | toToml }}]
 {{ end }}
 {{ if eq .chezmoi.os "windows" }}
     command = {{ joinPath (env "SystemRoot") "System32/WindowsPowerShell/v1.0/powershell.exe" | toToml }}
