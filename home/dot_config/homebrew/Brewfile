@@ -4,6 +4,7 @@ brew "gh"
 brew "git"
 brew "starship"
 brew "atuin"
+brew "mise"
 
 if OS.mac?
   brew "pinentry-mac"
