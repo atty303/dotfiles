@@ -39,6 +39,11 @@
 {{-   $email = "tom.payne@flarm.com" -}}
 {{- end -}}
 
+{{- if (env "CODESPACES") -}}
+# GitHub Codespaces clone the repository to a this directory
+sourceDir = "/workspaces/.codespaces/.persistedshare/dotfiles"
+{{- end -}}
+
 encryption = "age"
 
 [age]
