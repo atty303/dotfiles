@@ -21,6 +21,17 @@ $env.config.keybindings ++= [
     event: { edit: CutBigWordLeft } }
 ]
 
+use std path
+
+if $nu.os-info.name == "linux" {
+    path add $path "/home/linuxbrew/.linuxbrew/bin"
+    path add $path "/home/linuxbrew/.linuxbrew/sbin"
+    $env.HOMEBREW_PREFIX = "/home/linuxbrew/.linuxbrew"
+    $env.HOMEBREW_CELLAR = "/home/linuxbrew/.linuxbrew/Cellar"
+    $env.HOMEBREW_REPOSITORY = "/home/linuxbrew/.linuxbrew/Homebrew"
+    $env.INFOPATH = ($env.INFOPATH | split row (char esep) | append "/home/linuxbrew/.linuxbrew/share/info")
+}
+
 use std/dirs
 
 alias ch = chezmoi
@@ -41,6 +52,13 @@ def get-editor [] {
 const vendor_autoload = $nu.data-dir | path join vendor autoload
 mkdir $vendor_autoload
 
+if (which atuin | is-not-empty) {
+    const init_path = $vendor_autoload | path join atuin.nu
+    if ($init_path | path type | $in != "file") {
+        ^atuin init nu | save $init_path --force
+    }
+}
+
 if (which carapace | is-not-empty) {
     $env.CARAPACE_BRIDGES = 'zsh,inshellisense'
 
@@ -60,6 +78,9 @@ if (which starship | is-not-empty) {
     if ($init_path | path type | $in != "file") {
         ^starship init nu | save $init_path --force
     }
+    $env.config.render_right_prompt_on_last_line = false
+    $env.TRANSIENT_PROMPT_COMMAND = {|| ^starship module character }
+    $env.TRANSIENT_PROMPT_COMMAND_RIGHT = ""
 }
 
 #if $env.ZELLIJ? != "0" {
