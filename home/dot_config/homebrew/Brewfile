@@ -6,7 +6,7 @@ brew "starship"
 brew "atuin"
 brew "mise"
 
-if OS.mac?
+if OS.mac? and !ENV["HEADLESS"]
   brew "pinentry-mac"
   mas "1Password", id: 443_987_910
   cask "1password-cli"
