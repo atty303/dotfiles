@@ -15,6 +15,10 @@ Match Host * exec "[[ ! '$SSH_AUTH_SOCK' == /private/tmp/com.apple.launchd.*/Lis
 Host *.local
   ForwardAgent yes
 
-# codespaces
+# GitHub Codespaces
 Match All
   Include ~/.ssh/codespaces
+
+# Gitpod Flex CLI SSH Integration
+Include "gitpod\config"
+# End of Gitpod Flex CLI SSH Integration
