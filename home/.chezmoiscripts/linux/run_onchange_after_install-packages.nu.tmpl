@@ -1,4 +1,5 @@
 #!/usr/bin/env nu
+$env.PATH = ($env.PATH | append ["/home/linuxbrew/.linuxbrew/bin" "/home/linuxbrew/.linuxbrew/sbin"])
 
 if (which brew | is-not-empty) {
   # Brewfile hash: {{ include "dot_config/homebrew/Brewfile" | sha256sum }}
