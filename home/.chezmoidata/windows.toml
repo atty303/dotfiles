@@ -11,7 +11,6 @@ AgileBits.1Password.CLI
 Discord.Discord
 JetBrains.Toolbox
 Bandisoft.Honeyview
-Krisp.Krisp
 Microsoft.PowerToys
 SlackTechnologies.Slack
 Nushell.Nushell
@@ -28,5 +27,7 @@ tamasfe.taplo
 jqlang.jq
 rsteube.Carapace
 Anysphere.Cursor
+Microsoft.VisualStudioCode
+Google.GoogleDrive
 """
 # VB-Audio.Voicemeeter.Potato
