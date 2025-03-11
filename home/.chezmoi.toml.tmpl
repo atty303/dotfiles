@@ -41,7 +41,7 @@
 
 {{- if stat (joinPath .chezmoi.homeDir "dotfiles") -}}
 # Gitpod clone the repository to a this directory
-sourceDir ={{ (joinPath .chezmoi.homeDir "dotfiles") }}
+sourceDir = {{ (joinPath .chezmoi.homeDir "dotfiles") | toToml }}
 {{- else if (env "CODESPACES") -}}
 # GitHub Codespaces clone the repository to a this directory
 sourceDir = "/workspaces/.codespaces/.persistedshare/dotfiles"
