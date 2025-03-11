@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e # -e: exit on error
+set -ex # -e: exit on error
 
 if [ ! "$(command -v chezmoi)" ]; then
   bin_dir="$HOME/.local/bin"
