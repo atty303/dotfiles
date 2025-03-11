@@ -14,6 +14,10 @@ Match Host * exec "[[ ! '$SSH_AUTH_SOCK' == /private/tmp/com.apple.launchd.*/Lis
 # LAN hosts are trusted
 Host *.local
   ForwardAgent yes
+Host *.gitpod.environment
+  ForwardAgent yes
+Host *.gitpod.remote
+  ForwardAgent yes
 
 # GitHub Codespaces
 Match All
@@ -22,3 +26,8 @@ Match All
 # Gitpod Flex CLI SSH Integration
 Include "gitpod\config"
 # End of Gitpod Flex CLI SSH Integration
+
+## START Gitpod Flex VS Code INTEGRATION
+## This section is managed by Gitpod. Any manual changes will be lost.
+Include "code_gitpod_flex.d/config"
+## END Gitpod Flex VS Code INTEGRATION
