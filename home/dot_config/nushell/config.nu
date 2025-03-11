@@ -78,6 +78,7 @@ if (which starship | is-not-empty) {
     $env.config.render_right_prompt_on_last_line = false
     $env.TRANSIENT_PROMPT_COMMAND = {|| ^starship module character }
     $env.TRANSIENT_PROMPT_COMMAND_RIGHT = ""
+    $env.STARSHIP_CONFIG = "~/.config/starship.toml" | path expand
 }
 
 #if $env.ZELLIJ? != "0" {
