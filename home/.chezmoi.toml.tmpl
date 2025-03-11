@@ -39,7 +39,10 @@
 {{-   $email = "tom.payne@flarm.com" -}}
 {{- end -}}
 
-{{- if (env "CODESPACES") -}}
+{{- if stat (joinPath .chezmoi.homeDir "dotfiles") -}}
+# Gitpod clone the repository to a this directory
+sourceDir ={{ (joinPath .chezmoi.homeDir "dotfiles") }}
+{{- else if (env "CODESPACES") -}}
 # GitHub Codespaces clone the repository to a this directory
 sourceDir = "/workspaces/.codespaces/.persistedshare/dotfiles"
 {{- end }}
@@ -97,7 +100,7 @@ encryption = "age"
 [hooks.read-source-state.pre]
 {{ if eq .chezmoi.os "linux" }}
     command = "/usr/bin/env"
-    args = ["sh", {{ joinPath .chezmoi.sourceDir ".chezmoiscripts/linux/.init.bash" | toToml }}]
+    args = ["bash", {{ joinPath .chezmoi.sourceDir ".chezmoiscripts/linux/.init.bash" | toToml }}]
 {{ end }}
 {{ if eq .chezmoi.os "windows" }}
     command = {{ joinPath (env "SystemRoot") "System32/WindowsPowerShell/v1.0/powershell.exe" | toToml }}
