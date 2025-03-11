@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -ex
 
 #mkdir -p ~/.ssh
 #chmod 700 ~/.ssh
@@ -11,7 +12,7 @@
 #  fi
 #done
 
-if ! command -v brew >/dev/null 2>&1; then
+if [ -f /home/linuxbrew/.linuxbrew/bin/brew ]; then
   NONINTERACTIVE=1 /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
   brew install nushell
