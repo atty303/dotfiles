@@ -12,7 +12,7 @@ set -ex
 #  fi
 #done
 
-if [ -f /home/linuxbrew/.linuxbrew/bin/brew ]; then
+if [ ! -f /home/linuxbrew/.linuxbrew/bin/brew ]; then
   NONINTERACTIVE=1 /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
   brew install nushell
