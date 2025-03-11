@@ -5,6 +5,7 @@ brew "git"
 brew "starship"
 brew "atuin"
 brew "mise"
+brew "helix"
 
 if OS.mac? and !ENV["HEADLESS"]
   brew "pinentry-mac"
