@@ -9,6 +9,7 @@ mkdir -p ~/.local/bin
 if [ ! -f ~/.local/bin/nu ]; then
   curl -L "$NU_URL" -o /tmp/nu.tar.gz
   tar -xzf /tmp/nu.tar.gz -C /tmp
-  mv /tmp/nu* ~/.local/bin
+  mv /tmp/nu-${NU_VERSION}-*/nu* ~/.local/bin
   chmod +x ~/.local/bin/nu*
+  rm -rf /tmp/nu-${NU_VERSION}-*
 fi
