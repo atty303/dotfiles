@@ -1,9 +1,6 @@
 [tools]
-java = "corretto-21"
 node = "lts"
-rust = "latest"
 usage = "latest"
-python = "latest"
 
 # clang
 # cmake
