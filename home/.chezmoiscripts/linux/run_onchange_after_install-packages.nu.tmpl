@@ -3,7 +3,7 @@ const homebrew_nu = {{ joinPath .chezmoi.sourceDir "dot_config/nushell/homebrew.
 source $homebrew_nu
 
 if (which brew | is-empty) {
-  NONINTERACTIVE=1 /usr/bin/env bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  http get https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | NONINTERACTIVE=1 bash -s
   source $homebrew_nu
 }
 
