@@ -4,7 +4,8 @@ if [[ -f /opt/homebrew/bin/brew ]]; then
 fi
 
 # https://intellij-support.jetbrains.com/hc/en-us/articles/15268184143890-Shell-Environment-Loading
-if [[ -z "$INTELLIJ_ENVIRONMENT_READER" ]]; then
+# https://code.visualstudio.com/docs/editor/command-line#_how-do-i-detect-when-a-shell-was-launched-by-vs-code
+if [[ -z "$INTELLIJ_ENVIRONMENT_READER" ]] && [[ -z "$VSCODE_RESOLVING_ENVIRONMENT" ]]; then
   # Launch Nushell only in an interactive shell
   if [[ $- == *i* ]]; then
     exec nu -i
