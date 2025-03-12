@@ -41,10 +41,10 @@
 
 {{- if stat (joinPath .chezmoi.homeDir "dotfiles") -}}
 # Gitpod clone the repository to a this directory
-sourceDir = {{ (joinPath .chezmoi.homeDir "dotfiles") | toToml }}
+sourceDir = {{ (joinPath .chezmoi.homeDir "dotfiles/home") | toToml }}
 {{- else if (env "CODESPACES") -}}
 # GitHub Codespaces clone the repository to a this directory
-sourceDir = "/workspaces/.codespaces/.persistedshare/dotfiles"
+sourceDir = "/workspaces/.codespaces/.persistedshare/dotfiles/home"
 {{- end }}
 
 encryption = "age"
