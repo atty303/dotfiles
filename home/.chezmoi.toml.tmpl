@@ -81,7 +81,7 @@ encryption = "age"
 
 [interpreters.nu]
 {{ if eq .chezmoi.os "linux" }}
-    command = "/home/linuxbrew/.linuxbrew/bin/nu"
+    command = {{ joinPath (env "HOME") ".local/bin/nu" | toToml }}
 {{ else if eq .chezmoi.os "darwin" }}
     command = "/opt/homebrew/bin/nu"
 {{ else if eq .chezmoi.os "windows" }}
