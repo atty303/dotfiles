@@ -3,5 +3,5 @@ if $nu.os-info.name == "linux" {
     $env.HOMEBREW_PREFIX = "/home/linuxbrew/.linuxbrew"
     $env.HOMEBREW_CELLAR = "/home/linuxbrew/.linuxbrew/Cellar"
     $env.HOMEBREW_REPOSITORY = "/home/linuxbrew/.linuxbrew/Homebrew"
-    $env.INFOPATH = ($env.INFOPATH | split row (char esep) | append "/home/linuxbrew/.linuxbrew/share/info")
+    $env.INFOPATH = (if ($env.INFOPATH? | is-not-empty) { $env.INFOPATH | split row (char esep) } else { [] }) | append "/home/linuxbrew/.linuxbrew/share/info" | str join (char esep)
 }
