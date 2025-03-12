@@ -1,5 +1,5 @@
 #!/usr/bin/env nu
-let homebrew_nu = {{ joinPath .chezmoi.sourceDir "dot_config/nushell/homebrew.nu" | quote }}
+const homebrew_nu = {{ joinPath .chezmoi.sourceDir "dot_config/nushell/homebrew.nu" | quote }}
 source $homebrew_nu
 
 if (which brew | is-empty) {
