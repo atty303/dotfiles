@@ -15,6 +15,7 @@
     "files.autoSave": "onFocusChange",
     "files.eol": "\n",
     "files.trimTrailingWhitespace": true,
+    "git.confirmSync": false,
     "git.enableCommitSigning": true,
     "remote.SSH.remotePlatform": {
         "*.gitpod.local": "linux",
