@@ -1,72 +1,25 @@
 {
+    "editor.cursorStyle": "block",
+    "editor.fontFamily": "\"UDEV Gothic NFLG\", Cica, Consolas, monospace",
+    "editor.fontSize": 14,
+    "editor.formatOnSave": true,
     "editor.rulers": [
         80,
-        100
+        120
     ],
-    "terminal.integrated.shellArgs.windows": [
-        "-l"
-    ],
-    "files.autoSave": "afterDelay",
-    "explorer.confirmDragAndDrop": false,
-    "git.enableSmartCommit": true,
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "**/.cache": true,
-        "node_modules/": true
+    "extensions.supportUntrustedWorkspaces": {
+        "tuttieee.emacs-mcx": {
+            "supported": true
+        }
     },
-    "editor.cursorStyle": "block",
-    "editor.cursorBlinking": "smooth",
-    "editor.acceptSuggestionOnCommitCharacter": false,
+    "files.autoSave": "onFocusChange",
     "files.eol": "\n",
     "files.trimTrailingWhitespace": true,
-    "editor.dragAndDrop": false,
-    "workbench.statusBar.feedback.visible": false,
-    "sync.gist": "b27999213198893c572832c5ac2aaaba",
-    "sync.quietSync": false,
-    "sync.removeExtensions": true,
-    "sync.syncExtensions": true,
-    "sync.forceDownload": false,
-    "gist.oauth_token": "b90b437da3a804d08df0ed853ec432d9111f19a4",
-    "npm.enableScriptExplorer": true,
-    "npm.packageManager": "yarn",
-    "terminal.integrated.scrollback": 10000,
-    "cmake.generator": "Visual Studio 15 2017",
-    "cmake.configureOnOpen": true,
-    "cmake.cmakePath": "C:/Program Files/CMake/bin/cmake",
-    "explorer.confirmDelete": false,
-    "editor.accessibilitySupport": "off",
-    "terminal.integrated.shell.windows": "C:\\Program Files\\Git\\bin\\bash.exe",
-    "editor.fontFamily": "Cica, Consolas, 'Courier New', monospace",
-    "editor.fontSize": 16,
-    "terminal.integrated.env.windows": {
-        "TERM": "cygwin",
-        "LANG": "ja_JP.UTF-8"
+    "git.enableCommitSigning": true,
+    "remote.SSH.remotePlatform": {
+        "*.gitpod.local": "linux",
+        "*.gitpod.remote": "linux"
     },
-    "terminal.integrated.fontSize": 16,
-    "breadcrumbs.enabled": true,
-    "window.zoomLevel": 0,
-    "editor.multiCursorModifier": "ctrlCmd",
-    "C_Cpp.updateChannel": "Insiders",
-    "files.watcherExclude": {
-        "**/.bloop": true,
-        "**/.metals": true,
-        "**/.ammonite": true
-    },
-    "metals.javaHome": "C:\\Users\\atty\\.jabba\\jdk\\adopt@1.11.0-11",
-    "workbench.colorTheme": "Dracula",
-    "git.confirmSync": false,
-    "git.ignoreRebaseWarning": true,
-    "editor.minimap.enabled": false,
-    "editor.formatOnSave": true,
-    "[typescript]": {
-        "editor.defaultFormatter": "denoland.vscode-deno"
-    },
-    "editor.largeFileOptimizations": false,
-    "settingsSync.ignoredSettings": [
-        
-    ]
+    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.sendKeybindingsToShell": true
 }
