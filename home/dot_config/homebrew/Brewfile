@@ -13,4 +13,5 @@ if OS.mac? and !ENV["HEADLESS"]
   mas "1Password", id: 443_987_910
   cask "1password-cli"
   cask "karabiner-elements"
+  cask "visual-studio-code"
 end

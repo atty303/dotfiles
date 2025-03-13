@@ -1,17 +1,14 @@
 [tools]
-java = "corretto-21"
 node = "lts"
-rust = "latest"
 usage = "latest"
-python = "latest"
 
 # clang
 # cmake
 # ninja
 
-[env]
-_.python.venv = { path = "{{ xdg_state_home }}/venv/default", create = true }
+#[env]
+#_.python.venv = { path = "{{ xdg_state_home }}/venv/default", create = true }
 
 [settings]
 experimental = true
-python.default_packages_file = "{{ xdg_config_home }}/mise/default-python-packages"
+#python.default_packages_file = "{{ xdg_config_home }}/mise/default-python-packages"

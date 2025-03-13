@@ -1,5 +1,11 @@
 #!/usr/bin/env nu
-$env.PATH = ($env.PATH | append ["/home/linuxbrew/.linuxbrew/bin" "/home/linuxbrew/.linuxbrew/sbin"])
+const homebrew_nu = {{ joinPath .chezmoi.sourceDir "dot_config/nushell/homebrew.nu" | quote }}
+source $homebrew_nu
+
+if (which brew | is-empty) {
+  http get https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | NONINTERACTIVE=1 bash -s
+  source $homebrew_nu
+}
 
 if (which brew | is-not-empty) {
   # Brewfile hash: {{ include "dot_config/homebrew/Brewfile" | sha256sum }}
