@@ -85,7 +85,7 @@ encryption = "age"
 {{ else if eq .chezmoi.os "darwin" }}
     command = "/opt/homebrew/bin/nu"
 {{ else if eq .chezmoi.os "windows" }}
-    command = {{ joinPath (env "USERPROFILE") "Local/Programs/nu/bin/nu.exe" | toToml }}
+    command = {{ joinPath (env "LOCALAPPDATA") "Programs/nu/bin/nu.exe" | toToml }}
 {{ else }}
     command = "nu"
 {{ end }}
