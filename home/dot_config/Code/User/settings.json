@@ -1,12 +1,31 @@
 {
+    "custom-ui-style.font.monospace": "'UDEV Gothic NLFG'",
+    "custom-ui-style.font.sansSerif": "'IBM Plex Sans Condensed'",
+    "diffEditor.experimental.showMoves": true,
+    "diffEditor.experimental.useTrueInlineView": true,
+    "diffEditor.hideUnchangedRegions.enabled": true,
+    "diffEditor.renderSideBySide": true,
+    "editor.codeLensFontFamily": "\"IBM Plex Sans Condensed\"",
+    "editor.cursorBlinking": "phase",
+    "editor.cursorSmoothCaretAnimation": "on",
     "editor.cursorStyle": "block",
     "editor.fontFamily": "\"UDEV Gothic NFLG\", Cica, Consolas, monospace",
     "editor.fontSize": 14,
-    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.guides.bracketPairs": "active",
+    "editor.inlayHints.fontFamily": "\"IBM Plex Sans Condensed\"",
+    "editor.linkedEditing": true,
+    "editor.minimap.maxColumn": 80,
+    "editor.renderLineHighlight": "all",
     "editor.rulers": [
         80,
         120
     ],
+    "editor.smoothScrolling": true,
+    "editor.wordSegmenterLocales": "ja",
+    "emacs-mcx.cursorMoveOnFindWidget": true,
+    "emacs-mcx.emacsLikeTab": true,
+    "emacs-mcx.enableDigitArgument": false,
     "extensions.supportUntrustedWorkspaces": {
         "tuttieee.emacs-mcx": {
             "supported": true
@@ -15,12 +34,36 @@
     "files.autoSave": "onFocusChange",
     "files.eol": "\n",
     "files.trimTrailingWhitespace": true,
+    "git.blame.editorDecoration.enabled": true,
+    "git.closeDiffOnOperation": true,
     "git.confirmSync": false,
     "git.enableCommitSigning": true,
+    "git.fetchOnPull": true,
+    "git.pruneOnFetch": true,
+    "git.rebaseWhenSync": true,
+    "githubPullRequests.experimental.notificationsView": true,
+    "json.format.keepLines": true,
     "remote.SSH.remotePlatform": {
         "*.gitpod.local": "linux",
         "*.gitpod.remote": "linux"
     },
+    "scm.alwaysShowRepositories": true,
+    "scm.defaultViewMode": "tree",
+    "scm.inputFontFamily": "editor",
+    "search.showLineNumbers": true,
+    "terminal.integrated.allowChords": false,
+    "terminal.integrated.defaultProfile.windows": "Nu",
+    "terminal.integrated.enableImages": true,
     "terminal.integrated.fontSize": 14,
-    "terminal.integrated.sendKeybindingsToShell": true
+    "terminal.integrated.minimumContrastRatio": 1,
+    "terminal.integrated.profiles.windows": {
+        "Nu": {
+            "path": "nu.exe"
+        }
+    },
+    "terminal.integrated.scrollback": 10000,
+    "workbench.editor.closeOnFileDelete": true,
+    "workbench.editor.showTabs": "single",
+    "workbench.list.smoothScrolling": true,
+    "workbench.view.alwaysShowHeaderActions": true
 }
