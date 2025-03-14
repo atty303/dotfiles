@@ -1,124 +1,55 @@
 [
+    // Emacs bindings on input (not editor)
     {
         "key": "ctrl+f",
-        "command": "emacs-mcx.forwardChar",
+        "command": "",
         "when": "inputFocus && !editorFocus"
     },
     {
         "key": "ctrl+b",
-        "command": "emacs-mcx.backwardChar",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "ctrl+p",
-        "command": "emacs-mcx.previousLine",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "ctrl+n",
-        "command": "emacs-mcx.nextLine",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "ctrl+a",
-        "command": "emacs-mcx.moveBeginningOfLine",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "ctrl+e",
-        "command": "emacs-mcx.moveEndOfLine",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "alt+f",
-        "command": "emacs-mcx.forwardWord",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "alt+b",
-        "command": "emacs-mcx.backwardWord",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "ctrl+v",
-        "command": "emacs-mcx.scrollUpCommand",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "alt+v",
-        "command": "emacs-mcx.scrollDownCommand",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "ctrl+d",
-        "command": "emacs-mcx.deleteForwardChar",
+        "command": "",
         "when": "inputFocus && !editorFocus"
     },
     {
         "key": "ctrl+h",
-        "command": "emacs-mcx.deleteBackwardChar",
+        "command": "",
         "when": "inputFocus && !editorFocus"
     },
     {
-        "key": "alt+d",
-        "command": "emacs-mcx.killWord",
+        "key": "ctrl+d",
+        "command": "",
+        "when": "inputFocus && !editorFocus"
+    },
+    {
+        "key": "ctrl+a",
+        "command": "",
+        "when": "inputFocus && !editorFocus"
+    },
+    {
+        "key": "ctrl+e",
+        "command": "",
         "when": "inputFocus && !editorFocus"
     },
     {
         "key": "ctrl+k",
-        "command": "emacs-mcx.killLine",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "ctrl+w",
-        "command": "emacs-mcx.killRegion",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "alt+w",
-        "command": "emacs-mcx.copyRegion",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "ctrl+y",
-        "command": "emacs-mcx.yank",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "alt+y",
-        "command": "emacs-mcx.yank-pop",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "ctrl+o",
-        "command": "lineBreakInsert",
+        "command": "",
         "when": "inputFocus && !editorFocus"
     },
     {
         "key": "ctrl+m",
-        "command": "emacs-mcx.newLine",
+        "command": "",
         "when": "inputFocus && !editorFocus"
     },
-    {
-        "key": "ctrl+/",
-        "command": "undo",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "ctrl+space",
-        "command": "emacs-mcx.setMarkCommand",
-        "when": "inputFocus && !editorFocus"
-    },
-    {
-        "key": "ctrl+i",
-        "command": "tab",
-        "when": "inputFocus && !editorFocus"
-    },
-    // JetBrains
+    // JetBrains compatible
     {
         "key": "alt+;",
         "command": "editor.action.commentLine",
         "when": "editorFocus && !editorReadonly"
+    },
+    {
+        "key": "ctrl-x ctrl-b",
+        "command": "workbench.action.showAllEditorsByMostRecentlyUsed",
+        "when": "!terminalFocus"
     },
     // disable
     {

@@ -1,4 +1,7 @@
 {
+    "custom-ui-style.external.imports": [
+        "file://${userHome}/.config/Code/User/custom.js",
+    ],
     "custom-ui-style.font.monospace": "'UDEV Gothic NLFG'",
     "custom-ui-style.font.sansSerif": "'IBM Plex Sans Condensed'",
     "diffEditor.experimental.showMoves": true,
