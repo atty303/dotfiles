@@ -4,6 +4,17 @@
 # 3. $nu.vendor-autoload-dirs
 # 4. $nu.user-autoload-dirs
 
+$env.ENV_CONVERSIONS = {
+    PATH : {
+        from_string: { |s| $s | split row (char esep) | path expand --no-symlink }
+        to_string: { |v| $v | path expand --no-symlink | str join (char esep) }
+    }
+}
+
+$env.PATH = $env.PATH | prepend [
+    "~/.local/bin"
+]
+
 $env.XDG_CONFIG_HOME = $"('~/.config' | path expand)"
 $env.EDITOR = "hx"
 
@@ -21,7 +32,7 @@ $env.config.keybindings ++= [
     event: { edit: CutBigWordLeft } }
 ]
 
-source homebrew.nu
+source conf.d/homebrew.nu
 
 use std/dirs
 
