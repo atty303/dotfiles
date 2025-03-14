@@ -2,12 +2,10 @@ $list = @'
 {{ .packages.windows.winget.list }}
 '@
 
-$list -split "\r?\n" | gsudo {
-     $input | ForEach-Object {
-        $app = $_.Trim()
-        if ($app) {
-            Write-Host "Installing: $app" -ForegroundColor Green
-            winget install --silent --no-upgrade --accept-source-agreements --exact --id $app
-        }
+$list -split "\r?\n" | ForEach-Object {
+    $app = $_.Trim()
+    if ($app) {
+        Write-Host "Installing: $app" -ForegroundColor Green
+        winget install --silent --no-upgrade --accept-source-agreements --exact --id $app
     }
 }

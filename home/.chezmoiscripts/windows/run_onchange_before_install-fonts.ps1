@@ -9,6 +9,9 @@ $zipFontsToInstall = @(
 
 # ----------
 
+Install-PSResource -Name Fonts -TrustRepository -Version 1.1.18
+Import-Module -Name Fonts -Version 1.0.15
+
 function Install-ZipFont {
     [CmdletBinding(
             DefaultParameterSetName = 'ByName',
