@@ -42,3 +42,4 @@
 
 - [Windows Sandbox](https://learn.microsoft.com/ja-jp/windows/security/application-security/application-isolation/windows-sandbox/) for testing bootstrap
 - [winget configure](https://learn.microsoft.com/ja-jp/windows/package-manager/winget/configure) for ensure configuration
+- https://github.com/ChrisTitusTech/winutil
