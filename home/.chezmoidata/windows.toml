@@ -1,31 +1,37 @@
-
 [packages.windows.winget]
-list = """
-AutoHotkey.AutoHotkey
-Docker.DockerDesktop
-Zoom.Zoom
-Google.Chrome
-Dropbox.Dropbox
-AgileBits.1Password
-AgileBits.1Password.CLI
-Discord.Discord
-JetBrains.Toolbox
-Bandisoft.Honeyview
-Microsoft.PowerToys
-SlackTechnologies.Slack
-Nushell.Nushell
-Starship.Starship
-Helix.Helix
-Obsidian.Obsidian
-jdx.mise
-CharlesMilette.TranslucentTB
-Wakatime.DesktopWakatime
-Git.Git
-GitHub.cli
-tamasfe.taplo
-rsteube.Carapace
-Anysphere.Cursor
-Microsoft.VisualStudioCode
-abbodi1406.vcredist
-"""
-# VB-Audio.Voicemeeter.Potato
+# TOOD: Intel.IntelDriverAndSupportAssistant if platform is Intel based (not AMD)
+essentials = [
+    "AutoHotkey.AutoHotkey",
+    "Google.Chrome",
+    "Zoom.Zoom",
+    "Dropbox.Dropbox",
+    "AgileBits.1Password",
+    "AgileBits.1Password.CLI",
+    "Discord.Discord",
+    "Bandisoft.Honeyview",
+    "Microsoft.PowerToys",
+    "SlackTechnologies.Slack",
+    "Nushell.Nushell",
+    "Starship.Starship",
+    "Helix.Helix",
+    "Obsidian.Obsidian",
+    "CharlesMilette.TranslucentTB",
+    "Wakatime.DesktopWakatime",
+    "rsteube.Carapace",
+    "REALiX.HWiNFO",
+    # "abbodi1406.vcredist",
+    # "VB-Audio.Voicemeeter.Potato",
+]
+gaming = [
+    "Valve.Steam",
+]
+development = [
+    "Docker.DockerDesktop",
+    "JetBrains.Toolbox",
+    "jdx.mise",
+    "Git.Git",
+    "GitHub.cli",
+    "tamasfe.taplo",
+    "Anysphere.Cursor",
+    "Microsoft.VisualStudioCode",
+]

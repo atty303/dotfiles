@@ -73,7 +73,7 @@ encryption = "age"
     homebrew = {{ $homebrew }}
 
 {{- if eq .chezmoi.os "windows" -}}
-{{- $allProfiles := list "gaming" "development" -}}
+{{- $allProfiles := list "essentials" "gaming" "development" -}}
 {{ $profiles := promptMultichoiceOnce . "profiles" "What profiles enable" $allProfiles }}
     profiles = {{- $profiles | toToml -}}
 {{ else }}

@@ -11,4 +11,5 @@ usage = "latest"
 
 [settings]
 experimental = true
+windows_shim_mode = "symlink"
 #python.default_packages_file = "{{ xdg_config_home }}/mise/default-python-packages"

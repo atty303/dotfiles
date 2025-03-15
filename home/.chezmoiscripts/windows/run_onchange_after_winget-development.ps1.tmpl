@@ -1,0 +1,11 @@
+{{ if has "development" .profiles }}
+$packages = @(
+{{ range $index, $element := .packages.windows.winget.development }}
+    "{{ $element }}"
+{{ end }}
+)
+$packages | ForEach-Object {
+    Write-Host "Installing: $_" -ForegroundColor Green
+    winget install --silent --no-upgrade --accept-source-agreements --exact --id $_
+}
+{{ end }}
