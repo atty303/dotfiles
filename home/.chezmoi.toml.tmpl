@@ -72,6 +72,14 @@ encryption = "age"
     ]
     homebrew = {{ $homebrew }}
 
+{{- if eq .chezmoi.os "windows" -}}
+{{- $allProfiles := list "gaming" "development" -}}
+{{ $profiles := promptMultichoiceOnce . "profiles" "What profiles enable" $allProfiles }}
+    profiles = {{- $profiles | toToml -}}
+{{ else }}
+    profiles = []
+{{ end }}
+
 [git]
     autoAdd = true
     autoCommit = true
@@ -104,5 +112,5 @@ encryption = "age"
 {{ end }}
 {{ if eq .chezmoi.os "windows" }}
     command = {{ joinPath (env "SystemRoot") "System32/WindowsPowerShell/v1.0/powershell.exe" | toToml }}
-    args = ["-NoLogo", {{ joinPath .chezmoi.sourceDir ".chezmoiscripts/.install-init.ps1" | toToml }}]
+    args = ["-NoLogo", {{ joinPath .chezmoi.sourceDir ".chezmoiscripts/windows/.init.ps1" | toToml }}]
 {{ end }}
