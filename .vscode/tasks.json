@@ -10,8 +10,7 @@
                 "reveal": "always",
                 "focus": false,
                 "panel": "dedicated",
-                "showReuseMessage": false,
-                "clear": false
+                "clear": true
             },
             "problemMatcher": []
         }
