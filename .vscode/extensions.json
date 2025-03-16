@@ -1,5 +1,6 @@
 {
     "recommendations": [
-        "jinliming2.vscode-go-template"
+        "jinliming2.vscode-go-template",
+        "appulate.filewatcher"
     ]
 }

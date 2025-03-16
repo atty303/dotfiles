@@ -8,5 +8,12 @@
     "go-template.languages": [
         "toml",
         "powershell"
+    ],
+    "filewatcher.commands": [
+        {
+            "match": "home",
+            "vscodeTask": ["workbench.action.tasks.runTask", "chezmoi apply"],
+            "event": "onFolderChange"
+        }
     ]
 }

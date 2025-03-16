@@ -44,8 +44,23 @@
     "git.fetchOnPull": true,
     "git.pruneOnFetch": true,
     "git.rebaseWhenSync": true,
+    "github.copilot.chat.codesearch.enabled": true,
+    "github.copilot.chat.editor.temporalContext.enabled": true,
+    "github.copilot.chat.edits.temporalContext.enabled": true,
+    "github.copilot.chat.generateTests.codeLens": true,
+    "github.copilot.chat.languageContext.typescript.enabled": true,
+    "github.copilot.chat.localeOverride": "ja",
+    "github.copilot.chat.search.semanticTextResults": true,
+    "github.copilot.enable": {
+        "markdown": true,
+        "scminput": true
+    },
+    "github.copilot.nextEditSuggestions.enabled": true,
+    "github.copilot.selectedCompletionModel": "gpt-4o-copilot",
     "githubPullRequests.experimental.notificationsView": true,
     "json.format.keepLines": true,
+    "mise.configureExtensionsAutomatically": false,
+    "mise.configureExtensionsUseSymLinks": true,
     "remote.SSH.remotePlatform": {
         "*.gitpod.local": "linux",
         "*.gitpod.remote": "linux"
@@ -55,6 +70,13 @@
     "scm.inputFontFamily": "editor",
     "search.showLineNumbers": true,
     "terminal.integrated.allowChords": false,
+    "terminal.integrated.automationProfile.windows": {
+        "args": [
+            "-NoLogo",
+            "-NoProfile"
+        ],
+        "path": "pwsh.exe"
+    },
     "terminal.integrated.defaultProfile.windows": "Nu",
     "terminal.integrated.enableImages": true,
     "terminal.integrated.fontSize": 14,
@@ -65,6 +87,7 @@
         }
     },
     "terminal.integrated.scrollback": 10000,
+    "terminal.integrated.sendKeybindingsToShell": true,
     "workbench.editor.closeOnFileDelete": true,
     "workbench.editor.showTabs": "single",
     "workbench.list.smoothScrolling": true,
