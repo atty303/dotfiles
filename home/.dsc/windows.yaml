@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/PowerShell/DSC/refs/heads/main/schemas/v3/bundled/config/document.vscode.json
+$schema: https://raw.githubusercontent.com/PowerShell/DSC/refs/heads/main/schemas/v3/config/document.json
+resources:
+  - name: Windows only
+    type: Microsoft.DSC/Assertion
+    properties:
+      $schema: https://aka.ms/dsc/schemas/v3/bundled/config/document.json
+      resources:
+        - name: os
+          type: Microsoft/OSInfo
+          properties:
+            family: Windows
+
+  # - name: example key value
+  #   type: Microsoft.Windows/Registry
+  #   properties:
+  #     keyPath: HKCU\example\key
+  #     valueName: Example
+  #     valueData:
+  #       String: This is an example.
+

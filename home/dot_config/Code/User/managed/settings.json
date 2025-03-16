@@ -29,6 +29,7 @@
     "emacs-mcx.cursorMoveOnFindWidget": true,
     "emacs-mcx.emacsLikeTab": true,
     "emacs-mcx.enableDigitArgument": false,
+    "explorer.confirmDragAndDrop": false,
     "extensions.supportUntrustedWorkspaces": {
         "tuttieee.emacs-mcx": {
             "supported": true
