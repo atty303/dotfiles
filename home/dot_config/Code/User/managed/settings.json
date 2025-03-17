@@ -1,9 +1,18 @@
 {
     "custom-ui-style.external.imports": [
-        "file://${userHome}/.config/Code/User/custom.js",
+        "file://${userHome}/.config/Code/User/custom.js"
     ],
     "custom-ui-style.font.monospace": "'UDEV Gothic NLFG'",
     "custom-ui-style.font.sansSerif": "'IBM Plex Sans Condensed'",
+    "custom-ui-style.stylesheet": {
+        ".monaco-list": {
+            "zoom": "1.2"
+        },
+        ".sidebar .content": {
+            "font-size": "16px !important"
+        }
+    },
+    "custom-ui-style.webview.enable": false,
     "diffEditor.experimental.showMoves": true,
     "diffEditor.experimental.useTrueInlineView": true,
     "diffEditor.hideUnchangedRegions.enabled": true,
@@ -82,7 +91,7 @@
     },
     "terminal.integrated.defaultProfile.windows": "Nu",
     "terminal.integrated.enableImages": true,
-    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.fontSize": 16,
     "terminal.integrated.minimumContrastRatio": 1,
     "terminal.integrated.profiles.windows": {
         "Nu": {
