@@ -1,107 +1,125 @@
 {
-    "custom-ui-style.external.imports": [
-        "file://${userHome}/.config/Code/User/custom.js"
+  "custom-ui-style.external.imports": [
+    "file://${userHome}/.config/Code/User/custom.js"
+  ],
+  "custom-ui-style.font.monospace": "'UDEV Gothic NLFG'",
+  "custom-ui-style.font.sansSerif": "'IBM Plex Sans Condensed'",
+  "custom-ui-style.stylesheet": {
+    ".monaco-list": {
+      "zoom": "1.2"
+    },
+    ".sidebar .content": {
+      "font-size": "16px !important"
+    }
+  },
+  "custom-ui-style.webview.enable": false,
+  "diffEditor.experimental.showMoves": true,
+  "diffEditor.experimental.useTrueInlineView": true,
+  "diffEditor.hideUnchangedRegions.enabled": true,
+  "diffEditor.renderSideBySide": false,
+  "editor.codeLensFontFamily": "\"IBM Plex Sans Condensed\"",
+  "editor.cursorBlinking": "phase",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.cursorStyle": "block",
+  "editor.fontFamily": "\"UDEV Gothic NFLG\", Cica, Consolas, monospace",
+  "editor.fontSize": 14,
+  "editor.formatOnType": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.inlayHints.fontFamily": "\"IBM Plex Sans Condensed\"",
+  "editor.linkedEditing": true,
+  "editor.minimap.maxColumn": 80,
+  "editor.renderLineHighlight": "all",
+  "editor.rulers": [
+    80,
+    120
+  ],
+  "editor.smoothScrolling": true,
+  "editor.wordSegmenterLocales": "ja",
+  "emacs-mcx.cursorMoveOnFindWidget": true,
+  "emacs-mcx.emacsLikeTab": true,
+  "emacs-mcx.enableDigitArgument": false,
+  "explorer.confirmDragAndDrop": false,
+  "extensions.supportUntrustedWorkspaces": {
+    "tuttieee.emacs-mcx": {
+      "supported": true
+    }
+  },
+  "files.autoSave": "onFocusChange",
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "git.blame.editorDecoration.enabled": true,
+  "git.closeDiffOnOperation": true,
+  "git.confirmSync": false,
+  "git.enableCommitSigning": true,
+  "git.fetchOnPull": true,
+  "git.openRepositoryInParentFolders": "never",
+  "git.pruneOnFetch": true,
+  "git.rebaseWhenSync": true,
+  "github.copilot.chat.codesearch.enabled": true,
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Use conventional commit message format. Written in English."
+    }
+  ],
+  "github.copilot.chat.editor.temporalContext.enabled": true,
+  "github.copilot.chat.edits.temporalContext.enabled": true,
+  "github.copilot.chat.generateTests.codeLens": true,
+  "github.copilot.chat.languageContext.typescript.enabled": true,
+  "github.copilot.chat.localeOverride": "ja",
+  "github.copilot.chat.search.semanticTextResults": true,
+  "github.copilot.enable": {
+    "markdown": true,
+    "scminput": true
+  },
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "github.copilot.selectedCompletionModel": "gpt-4o-copilot",
+  "githubPullRequests.experimental.notificationsView": true,
+  "json.format.keepLines": true,
+  "mise.configureExtensionsAutomatically": false,
+  "mise.configureExtensionsUseSymLinks": true,
+  "redhat.telemetry.enabled": false,
+  "remote.SSH.remotePlatform": {
+    "*.gitpod.local": "linux",
+    "*.gitpod.remote": "linux",
+    "0195a1a8-e9e9-7173-acf4-e8a84938d3dc.gitpod.remote": "linux"
+  },
+  "scm.alwaysShowRepositories": true,
+  "scm.defaultViewMode": "tree",
+  "scm.inputFontFamily": "editor",
+  "search.showLineNumbers": true,
+  "terminal.integrated.allowChords": false,
+  "terminal.integrated.automationProfile.windows": {
+    "args": [
+      "-NoLogo",
+      "-NoProfile"
     ],
-    "custom-ui-style.font.monospace": "'UDEV Gothic NLFG'",
-    "custom-ui-style.font.sansSerif": "'IBM Plex Sans Condensed'",
-    "custom-ui-style.stylesheet": {
-        ".monaco-list": {
-            "zoom": "1.2"
-        },
-        ".sidebar .content": {
-            "font-size": "16px !important"
-        }
+    "path": "pwsh.exe"
+  },
+  "terminal.integrated.defaultProfile.windows": "Nu",
+  "terminal.integrated.enableImages": true,
+  "terminal.integrated.fontSize": 16,
+  "terminal.integrated.minimumContrastRatio": 1,
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "icon": "terminal-bash",
+      "path": "bash"
     },
-    "custom-ui-style.webview.enable": false,
-    "diffEditor.experimental.showMoves": true,
-    "diffEditor.experimental.useTrueInlineView": true,
-    "diffEditor.hideUnchangedRegions.enabled": true,
-    "diffEditor.renderSideBySide": true,
-    "editor.codeLensFontFamily": "\"IBM Plex Sans Condensed\"",
-    "editor.cursorBlinking": "phase",
-    "editor.cursorSmoothCaretAnimation": "on",
-    "editor.cursorStyle": "block",
-    "editor.fontFamily": "\"UDEV Gothic NFLG\", Cica, Consolas, monospace",
-    "editor.fontSize": 14,
-    "editor.formatOnType": true,
-    "editor.guides.bracketPairs": "active",
-    "editor.inlayHints.fontFamily": "\"IBM Plex Sans Condensed\"",
-    "editor.linkedEditing": true,
-    "editor.minimap.maxColumn": 80,
-    "editor.renderLineHighlight": "all",
-    "editor.rulers": [
-        80,
-        120
-    ],
-    "editor.smoothScrolling": true,
-    "editor.wordSegmenterLocales": "ja",
-    "emacs-mcx.cursorMoveOnFindWidget": true,
-    "emacs-mcx.emacsLikeTab": true,
-    "emacs-mcx.enableDigitArgument": false,
-    "explorer.confirmDragAndDrop": false,
-    "extensions.supportUntrustedWorkspaces": {
-        "tuttieee.emacs-mcx": {
-            "supported": true
-        }
+    "nu": {
+      "path": "nu"
     },
-    "files.autoSave": "onFocusChange",
-    "files.eol": "\n",
-    "files.trimTrailingWhitespace": true,
-    "git.blame.editorDecoration.enabled": true,
-    "git.closeDiffOnOperation": true,
-    "git.confirmSync": false,
-    "git.enableCommitSigning": true,
-    "git.fetchOnPull": true,
-    "git.openRepositoryInParentFolders": "never",
-    "git.pruneOnFetch": true,
-    "git.rebaseWhenSync": true,
-    "github.copilot.chat.codesearch.enabled": true,
-    "github.copilot.chat.editor.temporalContext.enabled": true,
-    "github.copilot.chat.edits.temporalContext.enabled": true,
-    "github.copilot.chat.generateTests.codeLens": true,
-    "github.copilot.chat.languageContext.typescript.enabled": true,
-    "github.copilot.chat.localeOverride": "ja",
-    "github.copilot.chat.search.semanticTextResults": true,
-    "github.copilot.enable": {
-        "markdown": true,
-        "scminput": true
-    },
-    "github.copilot.nextEditSuggestions.enabled": true,
-    "github.copilot.selectedCompletionModel": "gpt-4o-copilot",
-    "githubPullRequests.experimental.notificationsView": true,
-    "json.format.keepLines": true,
-    "mise.configureExtensionsAutomatically": false,
-    "mise.configureExtensionsUseSymLinks": true,
-    "redhat.telemetry.enabled": false,
-    "remote.SSH.remotePlatform": {
-        "*.gitpod.local": "linux",
-        "*.gitpod.remote": "linux"
-    },
-    "scm.alwaysShowRepositories": true,
-    "scm.defaultViewMode": "tree",
-    "scm.inputFontFamily": "editor",
-    "search.showLineNumbers": true,
-    "terminal.integrated.allowChords": false,
-    "terminal.integrated.automationProfile.windows": {
-        "args": [
-            "-NoLogo",
-            "-NoProfile"
-        ],
-        "path": "pwsh.exe"
-    },
-    "terminal.integrated.defaultProfile.windows": "Nu",
-    "terminal.integrated.enableImages": true,
-    "terminal.integrated.fontSize": 16,
-    "terminal.integrated.minimumContrastRatio": 1,
-    "terminal.integrated.profiles.windows": {
-        "Nu": {
-            "path": "nu.exe"
-        }
-    },
-    "terminal.integrated.scrollback": 10000,
-    "terminal.integrated.sendKeybindingsToShell": true,
-    "workbench.editor.closeOnFileDelete": true,
-    "workbench.editor.showTabs": "single",
-    "workbench.list.smoothScrolling": true,
-    "workbench.view.alwaysShowHeaderActions": true
+    "zsh": {
+      "path": "zsh"
+    }
+  },
+  "terminal.integrated.profiles.windows": {
+    "Nu": {
+      "path": "nu.exe"
+    }
+  },
+  "terminal.integrated.scrollback": 10000,
+  "terminal.integrated.sendKeybindingsToShell": true,
+  "workbench.editor.closeOnFileDelete": true,
+  "workbench.editor.showTabs": "single",
+  "workbench.list.smoothScrolling": true,
+  "workbench.view.alwaysShowHeaderActions": true
 }
