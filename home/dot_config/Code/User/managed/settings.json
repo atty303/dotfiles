@@ -43,6 +43,7 @@
     "git.confirmSync": false,
     "git.enableCommitSigning": true,
     "git.fetchOnPull": true,
+    "git.openRepositoryInParentFolders": "never",
     "git.pruneOnFetch": true,
     "git.rebaseWhenSync": true,
     "github.copilot.chat.codesearch.enabled": true,
@@ -62,6 +63,7 @@
     "json.format.keepLines": true,
     "mise.configureExtensionsAutomatically": false,
     "mise.configureExtensionsUseSymLinks": true,
+    "redhat.telemetry.enabled": false,
     "remote.SSH.remotePlatform": {
         "*.gitpod.local": "linux",
         "*.gitpod.remote": "linux"
