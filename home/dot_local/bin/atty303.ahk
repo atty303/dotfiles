@@ -1,4 +1,5 @@
 ;;; configuration
+GroupAdd("NoEmacs", "ahk_exe Obsidian.exe")
 GroupAdd("NoEmacs", "ahk_exe WindowsTerminal.exe")
 GroupAdd("NoEmacs", "ahk_class SunAwtFrame") ; JetBrains IDE
 GroupAdd("NoEmacs", "ahk_exe Code.exe") ; Microsoft Visual Studio Code
@@ -9,7 +10,7 @@ ProcessSetPriority "High"
 ;;; キーが単独で押されたときコールバックを実行する
 StandaloneHotKey(key, callback) {
     static enabled := false
-    
+
     down() {
         enabled := true
         ; https://github.com/karakaram/alt-ime-ahk/issues/2

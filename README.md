@@ -3,9 +3,8 @@
 ## Windows Setup Guide
 
 ### Prerequisites
-- Windows 10 or later
+- Windows 11 24H2 or later
 - PowerShell 5.1 or later
-- Internet connection
 
 ### Installation Steps
 
@@ -19,10 +18,11 @@
 
 2. Open Windows Terminal:
     - Press `Windows + X`
-    - Select "Windows Terminal"
+    - Select "Windows Terminal (Administrator)"
 
 3. Install and configure chezmoi:
    ```powershell
+   New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Sudo" -Name "Enabled" -Value 3 -PropertyType DWORD -Force
    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
    iex "&{$(irm 'https://get.chezmoi.io/ps1')} -b ~/.local/bin -- init --apply atty303"
    ```

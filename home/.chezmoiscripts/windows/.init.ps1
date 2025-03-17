@@ -4,8 +4,3 @@
 if (-not (Get-Command pwsh -ErrorAction SilentlyContinue)) {
     winget install --id Microsoft.PowerShell --source winget
 }
-
-# https://gerardog.github.io/gsudo/
-if (-not (Get-Command gsudo -ErrorAction SilentlyContinue)) {
-    PowerShell -Command "Set-ExecutionPolicy RemoteSigned -scope Process; [Net.ServicePointManager]::SecurityProtocol = 'Tls12'; iwr -useb https://raw.githubusercontent.com/gerardog/gsudo/25d89fcac99b25534108804cb843fcbebe05a872/installgsudo.ps1 | iex"
-}

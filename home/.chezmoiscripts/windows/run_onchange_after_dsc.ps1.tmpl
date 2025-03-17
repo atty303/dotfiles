@@ -1,7 +1,7 @@
 {{ range $index, $file := glob (print .chezmoi.sourceDir "/.dsc/**/*.yaml") }}
-{{   $file | include | sha256sum | comment "# " }}
+# {{ $file }}: {{   $file | include | sha256sum }}
 {{ end }}
 
 winget install --silent --nowarn --no-upgrade --exact  --accept-package-agreements --id 9NVTPZWRC6KQ
 
-dsc config set --file {{.chezmoi.sourceDir}}/.dsc/windows.yaml
+sudo --disable-input dsc config set --file {{.chezmoi.sourceDir}}/.dsc/windows.dsc.yaml
