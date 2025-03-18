@@ -5,7 +5,7 @@
   "custom-ui-style.font.monospace": "'UDEV Gothic NLFG'",
   "custom-ui-style.font.sansSerif": "'IBM Plex Sans Condensed'",
   "custom-ui-style.stylesheet": {
-    ".monaco-list": {
+    ".sidebar .monaco-list": {
       "zoom": "1.2"
     },
     ".sidebar .content": {
@@ -121,5 +121,5 @@
   "workbench.editor.closeOnFileDelete": true,
   "workbench.editor.showTabs": "single",
   "workbench.list.smoothScrolling": true,
-  "workbench.view.alwaysShowHeaderActions": true
+"workbench.view.alwaysShowHeaderActions": true
 }
