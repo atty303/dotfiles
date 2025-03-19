@@ -1,13 +1,29 @@
 #!/usr/bin/env nu
 
 const packages = [
-  {{ range $index, $element := .packages.linux.ubi.essentials }}
-  "{{ $element }}"
-  {{ end }}
+  {{- range $index, $element := .packages.linux.ubi.essentials }}
+  { project: {{ $element.project | toJson }}, exe: {{ $element.exe | toJson }}, exclude: {{ get $element "exclude" | toJson }}, all: {{ default false (get $element "all") | toJson }} }
+  {{- end }}
 ]
 
+const bin = ("~/.local/bin" | path expand)
+mkdir $bin
+
 $packages | each {|p|
-  if (which $p | is-empty) {
-    ubi -p $p.project
+  let install = if not ((($bin | path join $p.exe) | path exists) or (which $p.exe | is-not-empty)) {
+    print -e $"Installing ($p.exe) from ($p.project) to ($bin)"
+    if ($p.all) {
+      let temp = mktemp -d
+      ubi --in $temp --project $p.project --extract-all
+      # Exclude specified files if they exist
+      ($p.exclude | default []) | each {|file| rm -f ($temp | path join $file) }
+      mv -u ($"($temp)/*" | into glob) $bin
+    } else {
+      ubi --in $bin --project $p.project --exe $p.exe
+    }
+    true
+  } else {
+    false
   }
+  { exe: $p.exe, install: $install }
 }
