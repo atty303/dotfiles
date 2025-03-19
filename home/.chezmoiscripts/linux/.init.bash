@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
+if ! [ -x "$(command -v ubi)" ]; then
+  curl -sL https://raw.githubusercontent.com/houseabsolute/ubi/master/bootstrap/bootstrap-ubi.sh | TARGET=$HOME/.local/bin sh
+fi
+
 NU_VERSION=0.102.0
 NU_LIBC=gnu
 NU_URL="https://github.com/nushell/nushell/releases/download/${NU_VERSION}/nu-${NU_VERSION}-$(uname -m)-unknown-linux-${NU_LIBC}.tar.gz"

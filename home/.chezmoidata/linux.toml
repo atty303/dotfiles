@@ -1,0 +1,4 @@
+[packages.linux.ubi]
+essentials = [
+  { project = "https://github.com/starship/starship" }
+]
