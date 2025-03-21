@@ -3,7 +3,6 @@
 essentials = [
     "gerardog.gsudo",
     "AutoHotkey.AutoHotkey",
-    "Google.Chrome",
     "Zoom.Zoom",
     "Dropbox.Dropbox",
     "AgileBits.1Password",
@@ -20,8 +19,7 @@ essentials = [
     "Wakatime.DesktopWakatime",
     "rsteube.Carapace",
     "REALiX.HWiNFO",
-    # "abbodi1406.vcredist",
-    # "VB-Audio.Voicemeeter.Potato",
+    "RamenSoftware.Windhawk",
 ]
 gaming = [
     "Valve.Steam",
