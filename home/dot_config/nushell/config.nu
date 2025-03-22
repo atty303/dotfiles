@@ -50,6 +50,8 @@ def get-editor [] {
 #   run-external sh ...$args
 # }
 
+use conf.d/gh.nu *
+
 # Generate vendor/autoload scripts
 const vendor_autoload = $nu.data-dir | path join vendor autoload
 mkdir $vendor_autoload
