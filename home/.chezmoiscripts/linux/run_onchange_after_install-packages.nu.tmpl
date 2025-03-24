@@ -14,12 +14,12 @@ $packages | each {|p|
     print -e $"Installing ($p.exe) from ($p.project) to ($bin)"
     if ($p.all) {
       let temp = mktemp -d
-      ubi ...([--in $temp --project $p.project --extract-all, ...($p.matching | default [])])
+      ubi ...([--in $temp --project $p.project --extract-all, ...(if $p.matching != null { [--matching, $p.matching] } else { [] })])
       # Exclude specified files if they exist
       ($p.exclude | default []) | each {|file| rm -f ($temp | path join $file) }
       mv -u ($"($temp)/*" | into glob) $bin
     } else {
-      ubi ...([--in $bin --project $p.project --exe $p.exe, ...($p.matching | default [])])
+      ubi ...([--in $bin --project $p.project --exe $p.exe, ...(if $p.matching != null { [--matching, $p.matching] } else { [] })])
     }
     true
   } else {
