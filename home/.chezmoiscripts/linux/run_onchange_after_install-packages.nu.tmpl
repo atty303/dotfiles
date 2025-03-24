@@ -2,7 +2,7 @@
 
 const packages = [
   {{- range $index, $element := .packages.linux.ubi.essentials }}
-  { project: {{ $element.project | toJson }}, exe: {{ $element.exe | toJson }}, exclude: {{ get $element "exclude" | toJson }}, all: {{ default false (get $element "all") | toJson }} }
+  { project: {{ $element.project | toJson }}, exe: {{ $element.exe | toJson }}, matching: {{ get $element "matching" | toJson }}, exclude: {{ get $element "exclude" | toJson }}, all: {{ default false (get $element "all") | toJson }} }
   {{- end }}
 ]
 
@@ -14,12 +14,12 @@ $packages | each {|p|
     print -e $"Installing ($p.exe) from ($p.project) to ($bin)"
     if ($p.all) {
       let temp = mktemp -d
-      ubi --in $temp --project $p.project --extract-all
+      ubi ...([--in $temp --project $p.project --extract-all, ...($p.matching | default [])])
       # Exclude specified files if they exist
       ($p.exclude | default []) | each {|file| rm -f ($temp | path join $file) }
       mv -u ($"($temp)/*" | into glob) $bin
     } else {
-      ubi --in $bin --project $p.project --exe $p.exe
+      ubi ...([--in $bin --project $p.project --exe $p.exe, ...($p.matching | default [])])
     }
     true
   } else {
