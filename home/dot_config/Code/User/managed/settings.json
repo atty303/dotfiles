@@ -5,11 +5,11 @@
   "custom-ui-style.font.monospace": "'UDEV Gothic NLFG'",
   "custom-ui-style.font.sansSerif": "'IBM Plex Sans Condensed'",
   "custom-ui-style.stylesheet": {
-    ".sidebar .monaco-list": {
-      "zoom": "1.2"
-    },
     ".sidebar .content": {
       "font-size": "16px !important"
+    },
+    ".sidebar .monaco-list": {
+      "zoom": "1.2"
     }
   },
   "custom-ui-style.webview.enable": false,
@@ -47,7 +47,8 @@
   "files.autoSave": "onFocusChange",
   "files.eol": "\n",
   "files.trimTrailingWhitespace": true,
-  "git.blame.editorDecoration.enabled": true,
+  "git.allowForcePush": true,
+  "git.blame.editorDecoration.enabled": false,
   "git.closeDiffOnOperation": true,
   "git.confirmSync": false,
   "git.enableCommitSigning": true,
@@ -121,5 +122,5 @@
   "workbench.editor.closeOnFileDelete": true,
   "workbench.editor.showTabs": "single",
   "workbench.list.smoothScrolling": true,
-"workbench.view.alwaysShowHeaderActions": true
+  "workbench.view.alwaysShowHeaderActions": true
 }
