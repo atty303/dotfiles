@@ -4,7 +4,7 @@ essentials = [
   { project = "https://github.com/starship/starship", exe = "starship" },
   { project = "https://github.com/helix-editor/helix", exe = "hx" },
   { project = "https://github.com/atuinsh/atuin", exe = "atuin", matching = ".tar.gz" },
-  { project = "https://github.com/jdx/misen", exe = "mise" },
+  { project = "https://github.com/jdx/mise", exe = "mise" },
   { project = "https://github.com/carapace-sh/carapace-bin", exe = "carapace" },
   { project = "https://github.com/zellij-org/zellij", exe = "zellij" },
 ]
