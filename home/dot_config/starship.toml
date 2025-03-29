@@ -74,7 +74,7 @@ format = "[$hostname$ssh_symbol ](pl-fg bg:pl-1)"
 
 [container]
 format = "[$symbol $name ]($style)"
-style = "pl-fg bg:pl-3"
+style = "pl-fg bg:pl-2"
 
 # --------------------------------
 
