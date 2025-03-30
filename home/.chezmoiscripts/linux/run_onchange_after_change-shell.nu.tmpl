@@ -5,7 +5,7 @@ let shell = "/home/me/.local/bin/nu"
 if not (open /etc/shells | lines | any {|l| $l == $shell}) {
   if (sudo -n true | complete | get exit_code) == 0 {
     sudo sh -c $"echo ($shell) >>/etc/shells"
-    open /dev/null | sudo chsh -s $shell
+    open /dev/null | sudo chsh -s $shell (whoami)
   } else if whoami == "root" {
     $shell | save --append /etc/shells
     open /dev/null | chsh -s $shell
