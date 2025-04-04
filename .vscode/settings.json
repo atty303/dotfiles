@@ -1,6 +1,6 @@
 {
     "debug.javascript.defaultRuntimeExecutable": {
-        "pwa-node": "${workspaceFolder}\\.vscode\\mise-tools\\node"
+        "pwa-node": "/Users/a13400/.local/share/mise/shims/node"
     },
     "files.associations": {
         "*.ps1.tmpl": "powershell"

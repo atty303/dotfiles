@@ -86,7 +86,7 @@
     "0195cf70-e035-7a4a-b3e5-824b657cc1c4.gitpod.remote": "linux",
     "0195cf84-289e-7c8c-a1e3-a1be94b56059.gitpod.remote": "linux",
     "0195cf91-37bf-7c96-a055-1c6c7ba1db91.gitpod.remote": "linux"
-  },
+},
   "scm.alwaysShowRepositories": true,
   "scm.defaultViewMode": "tree",
   "scm.inputFontFamily": "editor",

@@ -1,16 +1,15 @@
 [window]
-decorations = "Buttonless"
-opacity = 0.75
+decorations = "Full"
+opacity = 0.5
 blur = true
 
 [font]
 normal = { family = "UDEV Gothic NF", style = "Regular" }
 builtin_box_drawing = false
-size = 13
+size = 14
 
 [selection]
 save_to_clipboard = true
 
 [terminal]
 osc52 = "CopyPaste"
-
