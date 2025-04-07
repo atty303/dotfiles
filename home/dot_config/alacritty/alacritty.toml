@@ -1,7 +1,8 @@
 [window]
 decorations = "Full"
-opacity = 0.5
+opacity = 0.9
 blur = true
+padding = { x = 4, y = 4 }
 
 [font]
 normal = { family = "UDEV Gothic NF", style = "Regular" }
@@ -12,4 +13,5 @@ size = 14
 save_to_clipboard = true
 
 [terminal]
+shell = { program = "nu" }
 osc52 = "CopyPaste"

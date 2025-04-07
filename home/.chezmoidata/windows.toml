@@ -33,4 +33,6 @@ development = [
     "tamasfe.taplo",
     "Anysphere.Cursor",
     "Microsoft.VisualStudioCode",
+    "wez.wezterm",
+    "Alacritty.Alacritty",
 ]
