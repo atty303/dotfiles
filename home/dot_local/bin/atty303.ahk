@@ -1,6 +1,7 @@
 ;;; configuration
 GroupAdd("NoEmacs", "ahk_exe Obsidian.exe")
 GroupAdd("NoEmacs", "ahk_exe WindowsTerminal.exe")
+GroupAdd("NoEmacs", "ahk_exe alacritty.exe")
 GroupAdd("NoEmacs", "ahk_class SunAwtFrame") ; JetBrains IDE
 GroupAdd("NoEmacs", "ahk_exe Code.exe") ; Microsoft Visual Studio Code
 
