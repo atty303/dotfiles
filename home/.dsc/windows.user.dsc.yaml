@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/PowerShell/DSC/refs/heads/main/schemas/v3/bundled/config/document.vscode.json
+$schema: https://raw.githubusercontent.com/PowerShell/DSC/main/schemas/v3/bundled/config/document.json
+metadata:
+  Microsoft.DSC:
+    securityContext: elevated
+resources:
+  - name: Validate the OS is Windows
+    type: Microsoft.DSC/Assertion
+    properties:
+      $schema: https://raw.githubusercontent.com/PowerShell/DSC/main/schemas/v3/bundled/config/document.json
+      resources:
+        - name: os
+          type: Microsoft/OSInfo
+          properties:
+            family: Windows
+
+  - name: Registry checks
+    type: Microsoft.DSC/Group
+    dependsOn:
+      - "[resourceId('Microsoft.DSC/Assertion','Validate the OS is Windows')]"
+    properties:
+      $schema: https://aka.ms/dsc/schemas/v3/bundled/config/document.json
+      resources:
+        - name: Dark Mode
+          type: Microsoft.Windows/Registry
+          properties:
+            keyPath: HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize
+            valueName: AppsUseLightTheme
+            valueData: { DWord: 0 }
+        # https://learn.microsoft.com/ja-jp/windows/apps/develop/settings/settings-windows-11
+        - name: Disable Open GameBar by controller
+          type: Microsoft.Windows/Registry
+          properties:
+            keyPath: HKCU\SOFTWARE\Microsoft\GameBar
+            valueName: UseNexusForGameBarEnabled
+            valueData: { DWord: 0 }
+        - name : Disable ヒント、ショートカット、新しいアプリなどの推奨事項を表示するかどうかを指定します。
+          type: Microsoft.Windows/Registry
+          properties:
+            keyPath: HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced
+            valueName: Start_IrisRecommendations
+            valueData: { DWord: 0 }
+        - name: Disable show TaskBar on all displays
+          type: Microsoft.Windows/Registry
+          properties:
+            keyPath: HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced
+            valueName: MMTaskbarEnabled
+            valueData: { DWord: 0 }
+        # - name: Disable タスクバーで [ウィジェット] ボタンを表示または非表示にするかを指定します。
+        #   type: Microsoft.Windows/Registry
+        #   properties:
+        #     keyPath: HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDa
+        #     valueName: SystemSettings_DesktopTaskbar_Da
+        #     valueData: { String: "0" }
+        # - name: Set Downloads folder location
+        #   type: Microsoft.Windows/Registry
+        #   properties:
+        #     keyPath: HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders
+        #     valueName: "{374DE290-123F-4565-9164-39C4925E467B}"
+        #     valueData: { ExpandString: "C:\\Dropbox\\download" }
+        # - name: Set My Pictures folder location
+        #   type: Microsoft.Windows/Registry
+        #   properties:
+        #     keyPath: HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders
+        #     valueName: My Pictures
+        #     valueData: { ExpandString: "C:\\Dropbox\\media\\picture" }
+        # - name: Set My Music folder location
+        #   type: Microsoft.Windows/Registry
+        #   properties:
+        #     keyPath: HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders
+        #     valueName: My Music
+        #     valueData: { ExpandString: "C:\\Dropbox\\media\\music" }
+        # - name: Set My Video folder location
+        #   type: Microsoft.Windows/Registry
+        #   properties:
+        #     keyPath: HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders
+        #     valueName: My Video
+        #     valueData: { ExpandString: "C:\\Dropbox\\media\\video" }
+        # - name: Set My Document folder location
+        #   type: Microsoft.Windows/Registry
+        #   properties:
+        #     keyPath: HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders
+        #     valueName: Personal
+        #     valueData: { ExpandString: "C:\\Dropbox\\windows\\documents" }
+
+
+# Desktop
+# Favorites
+# Documents

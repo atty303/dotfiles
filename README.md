@@ -33,6 +33,14 @@
    atuin sync
    ```
 
+## Out-of-scope of chezmoi
+
+- 1Password
+   - Configure manually
+- Zen
+   - Sync with Mozilla Account
+- ATOK
+
 ### Notes
 - Ensure all commands are executed in order
 - Administrative privileges may be required

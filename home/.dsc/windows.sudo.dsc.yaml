@@ -53,9 +53,6 @@ resources:
               DWord: 4 # Disabled
         - name: Scan Removeable Drives
           type: Microsoft.Windows/Registry
-          metadata:
-            area: Services
-            severity: Critical
           properties:
             keyPath: HKLM\SOFTWARE\Policies\Microsoft\Windows Defender
             valueName: DisableRemovableDriveScanning
