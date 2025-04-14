@@ -1,7 +1,16 @@
+EXEC_NUSHELL=1
+
 # https://intellij-support.jetbrains.com/hc/en-us/articles/15268184143890-Shell-Environment-Loading
+if [[ -n "$INTELLIJ_ENVIRONMENT_READER" ]]; then EXEC_NUSHELL=0; fi
+
 # https://code.visualstudio.com/docs/editor/command-line#_how-do-i-detect-when-a-shell-was-launched-by-vs-code
-if [[ -z "$INTELLIJ_ENVIRONMENT_READER" ]] && [[ -z "$VSCODE_RESOLVING_ENVIRONMENT" ]]; then
-  # Launch Nushell only in an interactive shell
+if [[ -n "$VSCODE_RESOLVING_ENVIRONMENT" ]]; then EXEC_NUSHELL=0; fi
+
+# If running in OpenHands (I'm not using tmux)
+if [[ -n "$TMUX" ]]; then EXEC_NUSHELL=0; fi
+
+# Launch Nushell only in an interactive shell
+if [[ $EXEC_NUSHELL == "1" ]]; then
   if [[ $- == *i* ]]; then
     exec nu -i
   fi
