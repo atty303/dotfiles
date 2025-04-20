@@ -17,6 +17,7 @@ $env.PATH = $env.PATH | prepend [
 
 $env.XDG_CONFIG_HOME = $"('~/.config' | path expand)"
 $env.EDITOR = "hx"
+$env.SRC_ROOT = (if $nu.os-info.name == "windows" { "D:/src" } else { "~/src" }) | path expand
 
 $env.config.show_banner = "short"
 $env.config.history.file_format = "sqlite"
@@ -24,6 +25,8 @@ $env.config.table.header_on_separator = true
 $env.config.datetime_format.table = "%y-%m-%d %I:%M:%S"
 $env.config.datetime_format.normal = "%y-%m-%d %I:%M:%S"
 $env.config.keybindings ++= [
+  # alacritty on windows, Control-h sends Control+Backspace
+  { name: user, modifier: control, keycode: Backspace, mode: [emacs], event: { edit: Backspace } },
   { name: user, modifier: alt, keycode: char_b, mode: [emacs],
     event: { edit: MoveBigWordLeft } }
   { name: user, modifier: alt, keycode: char_d, mode: [emacs],

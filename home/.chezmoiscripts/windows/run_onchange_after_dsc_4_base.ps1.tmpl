@@ -1,0 +1,5 @@
+{{ range $index, $file := glob (print .chezmoi.sourceDir "/.dsc/windows/base.yaml") }}
+# {{ $file }}: {{   $file | include | sha256sum }}
+{{ end }}
+
+sudo --disable-input dsc config set --file {{.chezmoi.sourceDir}}/.dsc/windows/base.yaml

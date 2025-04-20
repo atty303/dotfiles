@@ -83,7 +83,8 @@ Public/
 
 {{ if ne .chezmoi.os "windows" }}
 .chezmoiscripts/windows/**
-/AppData/
+AppData/
+.config/alacritty/windows.toml
 {{ end }}
 
 {{ if not .homebrew }}

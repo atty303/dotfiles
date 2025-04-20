@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/PowerShell/DSC/refs/heads/main/schemas/v3/bundled/config/document.vscode.json
+$schema: https://raw.githubusercontent.com/PowerShell/DSC/main/schemas/v3/bundled/config/document.json
+metadata:
+  Microsoft.DSC:
+    securityContext: elevated
+resources:
+  - name: Validate the OS is Windows
+    type: Microsoft.DSC/Assertion
+    properties:
+      $schema: https://raw.githubusercontent.com/PowerShell/DSC/main/schemas/v3/bundled/config/document.json
+      resources:
+        - name: os
+          type: Microsoft/OSInfo
+          properties:
+            family: Windows
+  - name: PSDSC resources
+    type: Microsoft.Windows/WindowsPowerShell
+    properties:
+      resources:
+        # https://github.com/dsccommunity/ComputerManagementDsc/wiki
+        - name: Remote desktop
+          type: PSDesiredStateConfiguration/ComputerManagementDsc
+          properties:
+            name: ComputerManagementDsc
+            IsSingleInstance: true
+            Ensure: Present
+            UserAuthentication: Secure
+

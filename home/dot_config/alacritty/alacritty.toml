@@ -1,17 +1,42 @@
+[general]
+import = [
+    "windows.toml",
+]
+
 [window]
+padding = { x = 4, y = 4 }
 decorations = "Full"
 opacity = 0.9
 blur = true
-padding = { x = 4, y = 4 }
+
+[scrolling]
+history = 100000
 
 [font]
 normal = { family = "UDEV Gothic NF", style = "Regular" }
+size = 13
 builtin_box_drawing = false
-size = 14
 
 [selection]
 save_to_clipboard = true
 
+[cursor]
+style = { shape = "Block", blinking = "On" }
+blink_timeout = 0
+
 [terminal]
-shell = { program = "nu" }
+shell = { program = "nu", args = ["-l"] }
 osc52 = "CopyPaste"
+
+[mouse]
+hide_when_typing = true
+bindings = [
+    # { mouse = "Right", action = "Paste" },
+]
+
+[keyboard]
+bindings = [
+    { key = "Insert", mods = "Shift", action = "Paste" },
+    { key = "N", mods = "Super", action = "CreateNewWindow" },
+    { key = "N", mods = "Control|Shift", action = "CreateNewWindow" },
+]
