@@ -12,11 +12,15 @@ def check-local-ssh-agent [] {
     })
 }
 
+def save-ssh-agent-env [sock: string] {
+    $"IdentityAgent ($sock)" | save --force ~/.ssh/agent-local
+    $sock | save --force ~/.ssh/SSH_AUTH_SOCK
+}
+
 do --env {
     # If SSH_AUTH_SOCK is set, we assume the user has already started an SSH agent or forwarding is set up
     if ($env.SSH_AUTH_SOCK? | is-not-empty) {
-        $"IdentityAgent ($env.SSH_AUTH_SOCK)" | save --force ~/.ssh/agent-local
-        $env.SSH_AUTH_SOCK | save --force ~/.ssh/SSH_AUTH_SOCK
+        save-ssh-agent-env $env.SSH_AUTH_SOCK
         return
     }
 
@@ -34,6 +38,7 @@ do --env {
         let ssh_agent_env = open ($ssh_agent_file)
         if ($"/proc/($ssh_agent_env.SSH_AGENT_PID)" | path exists) {
             load-env $ssh_agent_env
+            save-ssh-agent-env $ssh_agent_env.SSH_AUTH_SOCK
             return
         } else {
             rm $ssh_agent_file
@@ -48,9 +53,7 @@ do --env {
         | into record
     load-env $ssh_agent_env
     $ssh_agent_env | save --force $ssh_agent_file
-
-    $"IdentityAgent ($ssh_agent_env.SSH_AUTH_SOCK)" | save --force ~/.ssh/agent-local
-    $ssh_agent_env.SSH_AUTH_SOCK | save --force ~/.ssh/SSH_AUTH_SOCK
+    save-ssh-agent-env $ssh_agent_env.SSH_AUTH_SOCK
 
     # Load the key
     if ($env.SSH_PRIVATE_KEY? | is-not-empty) {

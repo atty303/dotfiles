@@ -30,10 +30,9 @@
 {{ if eq .chezmoi.os "darwin" -}}
   program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 {{- end }}
-{{ if eq .chezmoi.os "linux" -}}
-  program = "~/.local/bin/ssh-keygen-force-agent"
+{{ if eq .chezmoi.os "linux" }}
+  program = "{{ .chezmoi.destDir }}/.local/bin/ssh-keygen-force-agent"
 {{- end }}
 
 [commit]
   gpgsign = true
-
