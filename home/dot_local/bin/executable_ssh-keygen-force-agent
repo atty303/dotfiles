@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+if [[ -z "$SSH_AUTH_SOCK" ]]; then
+  if [[ -f "$HOME/.ssh/SSH_AUTH_SOCK" ]]; then
+    SSH_AUTH_SOCK=$(cat "$HOME/.ssh/SSH_AUTH_SOCK")
+    export SSH_AUTH_SOCK
+  else
+    echo "SSH_AUTH_SOCK not set and no file found at $HOME/.ssh/SSH_AUTH_SOCK" 1>&2
+  fi
+fi
+
+exec ssh-keygen "$@"
