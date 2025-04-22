@@ -19,5 +19,6 @@ if [[ $EXEC_NUSHELL == "1" ]]; then
   if [[ $RESOLVING_ENVIRONMENT == "1" ]]; then
     export RESOLVING_ENVIRONMENT
     eval $(nu)
+    unset RESOLVING_ENVIRONMENT
   fi
 fi
