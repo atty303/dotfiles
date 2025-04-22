@@ -96,3 +96,8 @@ if (which starship | is-not-empty) {
 #  zellij attach -c
 #  exit
 #}
+
+if ($env.RESOLVING_ENVIRONMENT? | is-not-empty) {
+    $env | transpose key value | filter { $in.key != "config" } | each { $"($in.key)=\"($in.value)\"" }
+    exit 0
+}
