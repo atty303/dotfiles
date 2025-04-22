@@ -49,6 +49,10 @@ def get-editor [] {
   [$env.config.buffer-editor, $env.EDITOR, $env.VISUAL] | filter { is-not-empty } | first
 }
 
+def bash_quote [s: string] {
+  $s | str replace -a "'" "'\"'\"'" | $"'($in)'"
+}
+
 # def chezmoi-edit-apply[name?: path]: nothing -> any {
 #   let editor = if name | is-empty { }  $"(get-editor) "
 #   let args = [-c $'nu -c "watch \"(chezmoi source-path)\" {|| chezmoi apply --no-tty}" & apply=$! ; hx . ; kill $apply']
@@ -98,7 +102,12 @@ if (which starship | is-not-empty) {
 #  exit
 #}
 
-if ($env.RESOLVING_ENVIRONMENT? | is-not-empty) {
-    $env | transpose key value | filter { $in.key != "config" } | each { $"($in.key)=\"($in.value)\"" }
+# If we are called by envinronment resolver, print the environment variables for parent shell
+if ($env.RESOLVING_ENVIRONMENT? == "1") {
+    $env | transpose name value | filter { not ($in.name in ["config" "ENV_CONVERSIONS"]) } | each { |e|
+        let conversion = $env.ENV_CONVERSIONS | get -i $e.name
+        let value = if ($conversion | is-not-empty) { $e.value | do $conversion.to_string $e.value } else { $e.value }
+        print $"export ($e.name)=(bash_quote ($value | to text))"
+    }
     exit 0
 }
