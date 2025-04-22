@@ -10,15 +10,13 @@ if [[ -n "$VSCODE_RESOLVING_ENVIRONMENT" ]]; then RESOLVING_ENVIRONMENT=1; fi
 # If running in OpenHands (I'm not using tmux)
 if [[ -n "$TMUX" ]]; then EXEC_NUSHELL=0; fi
 
-# Launch Nushell only in an interactive shell
 if [[ $EXEC_NUSHELL == "1" ]]; then
-  if [[ $- == *i* ]]; then
-    exec nu -i
-  fi
   # If launched by IDEs, set the environment variables from nushell
   if [[ $RESOLVING_ENVIRONMENT == "1" ]]; then
     export RESOLVING_ENVIRONMENT
     eval $(nu)
     unset RESOLVING_ENVIRONMENT
+  elif [[ $- == *i* ]]; then
+    exec nu -i
   fi
 fi

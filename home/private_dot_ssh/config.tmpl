@@ -11,6 +11,9 @@ Match Host * exec "[[ ! '$SSH_AUTH_SOCK' == /private/tmp/com.apple.launchd.*/Lis
   IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 {{- end }}
 
+# If the SSH agent is present by nushell startup script, use it
+Include ~/.ssh/agent-local
+
 # LAN hosts are trusted
 Host *.local
   ForwardAgent yes
