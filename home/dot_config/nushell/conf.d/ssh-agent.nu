@@ -25,7 +25,7 @@ do --env {
 
     # There is no SSH agent running, so we need to start one
     let ssh_agent_file = (
-        $nu.temp-path | path join $"ssh-agent-($env.USER? | default $env.USERNAME).nuon"
+        $nu.temp-path | path join $"ssh-agent-($env.USER? | default $env.USERNAME?).nuon"
     )
 
     if ($ssh_agent_file | path exists) {
