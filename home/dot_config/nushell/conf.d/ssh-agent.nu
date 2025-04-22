@@ -2,11 +2,11 @@ def check-local-ssh-agent [] {
      return (match $nu.os-info.name {
         "macos" => {
             # 1Password agent
-            `~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock` | path exists
+            "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" | path exists
         }
         "windows" => {
             # Bundled OpenSSH agent and 1Password agent use the same socket
-            `\\.\pipe\openssh-ssh-agent` | path exists
+            '\\.\pipe\openssh-ssh-agent' | path exists
         }
         _ => false
     })

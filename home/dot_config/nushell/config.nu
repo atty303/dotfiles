@@ -36,6 +36,7 @@ $env.config.keybindings ++= [
 ]
 
 source conf.d/homebrew.nu
+source conf.d/ssh-agent.nu
 
 use std/dirs
 
