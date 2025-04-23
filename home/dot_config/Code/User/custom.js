@@ -1,7 +1,7 @@
 // Add event listener for keyboard navigation in input fields
 document.body.addEventListener('keydown', function(event) {
   // Check if an input element is focused
-  if ((document.activeElement.tagName === 'INPUT' && document.activeElement.type === 'text') || document.activeElement.tagName === 'TEXTAREA') {
+  if (document.activeElement.tagName === 'INPUT' && document.activeElement.type === 'text') {
     const input = document.activeElement;
     const cursorPosition = input.selectionStart;
 
