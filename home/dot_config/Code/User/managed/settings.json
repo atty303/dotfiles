@@ -1,4 +1,10 @@
 {
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
   "custom-ui-style.external.imports": [
     "file://${userHome}/.config/Code/User/custom.js"
   ],
@@ -13,10 +19,14 @@
     }
   },
   "custom-ui-style.webview.enable": false,
+  "deno.codeLens.implementations": true,
+  "deno.codeLens.references": true,
+  "deno.codeLens.referencesAllFunctions": true,
   "diffEditor.experimental.showMoves": true,
   "diffEditor.experimental.useTrueInlineView": true,
   "diffEditor.hideUnchangedRegions.enabled": true,
   "diffEditor.renderSideBySide": false,
+  "editor.autoIndent": "advanced",
   "editor.codeLensFontFamily": "\"IBM Plex Sans Condensed\"",
   "editor.cursorBlinking": "phase",
   "editor.cursorSmoothCaretAnimation": "on",
@@ -34,6 +44,7 @@
     120
   ],
   "editor.smoothScrolling": true,
+  "editor.wordBasedSuggestions": "off",
   "editor.wordSegmenterLocales": "ja",
   "emacs-mcx.cursorMoveOnFindWidget": true,
   "emacs-mcx.emacsLikeTab": true,
@@ -47,6 +58,11 @@
   "files.autoSave": "onFocusChange",
   "files.eol": "\n",
   "files.trimTrailingWhitespace": true,
+  "files.watcherExclude": {
+    "**/.ammonite": true,
+    "**/.bloop": true,
+    "**/.metals": true
+  },
   "git.allowForcePush": true,
   "git.blame.editorDecoration.enabled": false,
   "git.closeDiffOnOperation": true,
@@ -76,6 +92,7 @@
   "github.copilot.selectedCompletionModel": "gpt-4o-copilot",
   "githubPullRequests.experimental.notificationsView": true,
   "json.format.keepLines": true,
+  "mise.autoDetectMiseBinPath": false,
   "mise.configureExtensionsAutomatically": false,
   "mise.configureExtensionsUseSymLinks": true,
   "redhat.telemetry.enabled": false,
@@ -131,11 +148,6 @@
   "workbench.editor.closeOnFileDelete": true,
   "workbench.editor.showTabs": "single",
   "workbench.list.smoothScrolling": true,
-  "workbench.view.alwaysShowHeaderActions": true,
-  "files.watcherExclude": {
-    "**/.bloop": true,
-    "**/.metals": true,
-    "**/.ammonite": true
-  },
-  "mise.autoDetectMiseBinPath": false
+  "workbench.tree.indent": 16,
+  "workbench.view.alwaysShowHeaderActions": true
 }
