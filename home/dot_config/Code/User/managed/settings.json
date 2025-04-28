@@ -67,7 +67,6 @@
   "git.blame.editorDecoration.enabled": false,
   "git.closeDiffOnOperation": true,
   "git.confirmSync": false,
-  "git.enableCommitSigning": true,
   "git.fetchOnPull": true,
   "git.openRepositoryInParentFolders": "never",
   "git.pruneOnFetch": true,
