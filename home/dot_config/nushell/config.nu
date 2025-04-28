@@ -59,18 +59,12 @@ def bash_quote [s: string] {
 #   run-external sh ...$args
 # }
 
-use conf.d/gh.nu *
-
 # Generate vendor/autoload scripts
 const vendor_autoload = $nu.data-dir | path join vendor autoload
 mkdir $vendor_autoload
 
-if (which atuin | is-not-empty) {
-    const init_path = $vendor_autoload | path join atuin.nu
-    if ($init_path | path type | $in != "file") {
-        ^atuin init nu | save $init_path --force
-    }
-}
+use conf.d/gh.nu *
+use conf.d/atuin.nu *
 
 if (which carapace | is-not-empty) {
     $env.CARAPACE_BRIDGES = 'zsh,inshellisense'
