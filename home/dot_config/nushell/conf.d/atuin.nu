@@ -11,12 +11,12 @@ export-env {
         # - ATUIN_LOGIN: {"username":"<username>","password":"<password>","key":"<key>"}
         # Codespaces: https://github.com/settings/codespaces/secrets/new
         # Gitpod: https://app.gitpod.io/settings/secrets
-        if not (null | atuin login | complete | $in.stdout =~ "You are already logged in!") {
+        if (^atuin status) =~ "You are not logged in to a sync server" {
             let login = if ($env.ATUIN_LOGIN? | is-not-empty) {
                 $env.ATUIN_LOGIN | from json
             }
-            if ($login != null) {
-                let login = $env.ATUIN_LOGIN | from json
+            if $login != null {
+                print -e "✅ Automatically logging in to Atuin and syncing your shell history"
                 ^atuin login -u $login.username -p $login.password -k $login.key
                 ^atuin sync
             } else {
