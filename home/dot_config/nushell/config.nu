@@ -15,7 +15,14 @@ $env.PATH = $env.PATH | prepend [
     "~/.local/bin"
 ]
 
-$env.XDG_CONFIG_HOME = $"('~/.config' | path expand)"
+# ⚠ Doesn't set XDG_CONFIG_HOME !
+# The default configuration directories are different across Windows, Mac, and Linux.
+# Setting environment variables in the shell works when launching from the shell,
+# but GUI applications do not inherit the shell's environment variables,
+# causing the configuration directory to differ depending on how the application is launched.
+# In chezmoi, files are placed under ~/.config, and symbolic links are created from
+# the OS-specific directories to this location to standardize the configuration path.
+
 $env.EDITOR = "hx"
 $env.SRC_ROOT = (if $nu.os-info.name == "windows" { "D:/src" } else { "~/src" }) | path expand
 
