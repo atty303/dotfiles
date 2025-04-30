@@ -8,24 +8,22 @@ export-env {
         }
 
         # Automatically log in and sync if running in a Cloud Development Environment
-        # - ATUIN_LOGIN: {"username":"<username>","password":"<password>","key":"<key>"}
+        # - CDE_PERSONAL_SECRETS: {"atuin": {"username":"<username>","password":"<password>","key":"<key>"}}
         # Codespaces: https://github.com/settings/codespaces/secrets/new
         # Gitpod: https://app.gitpod.io/settings/secrets
         if (^atuin status) =~ "You are not logged in to a sync server" {
-            let login = if ($env.ATUIN_LOGIN? | is-not-empty) {
-                 # Gitpod quote string
-                 if $env.ATUIN_LOGIN =~ "^'.*'$" {
-                    $env.ATUIN_LOGIN | str replace -r "^'(.*)'$" "${1}" | from json
-                } else {
-                    $env.ATUIN_LOGIN | from json
-                }
+            let secrets = if ($env.CDE_PERSONAL_SECRETS? | is-not-empty) {
+                try { $env.CDE_PERSONAL_SECRETS | from json } catch { null }
+            } else if ("/usr/local/secrets/CDE_PERSONAL_SECRETS" | path exists) {
+                try { open "/usr/local/secrets/CDE_PERSONAL_SECRETS" | from json } catch { null }
             }
+            let login = $secrets.atuin
             if $login != null {
                 print -e "✅ Automatically logging in to Atuin and syncing your shell history"
                 ^atuin login -u $login.username -p $login.password -k $login.key
                 ^atuin sync
             } else {
-                print -e "⚠ No ATUIN_LOGIN environment variable found. Please login manually."
+                print -e "⚠ No CDE_PERSONAL_SECRETS found. Please login manually."
             }
         }
     }

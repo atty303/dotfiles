@@ -1,0 +1,4 @@
+{{- with (includeTemplate "cde_personal_secrets" ".wakatime" | fromJson) -}}
+[settings]
+api_key = {{ .api_key }}
+{{- end }}

@@ -3,7 +3,8 @@
         "pwa-node": "/Users/a13400/.local/share/mise/shims/node"
     },
     "files.associations": {
-        "*.ps1.tmpl": "powershell"
+        "*.ps1.tmpl": "powershell",
+        ".chezmoiscripts/*": "go-template"
     },
     "go-template.languages": [
         "toml",

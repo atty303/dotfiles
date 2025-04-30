@@ -46,8 +46,20 @@
 - Administrative privileges may be required
 - Wait for each command to complete before proceeding to the next
 
-# Memo
+## Memo
 
 - [Windows Sandbox](https://learn.microsoft.com/ja-jp/windows/security/application-security/application-isolation/windows-sandbox/) for testing bootstrap
 - [winget configure](https://learn.microsoft.com/ja-jp/windows/package-manager/winget/configure) for ensure configuration
 - https://github.com/ChrisTitusTech/winutil
+
+## chezmoi templates cheatsheet
+
+https://www.chezmoi.io/reference/templates/
+
+- Trimming: `"{{23 -}} < {{- 45}}"` -> `23<45`
+- Conditionals: `{{if pipeline}} T1 {{end}}`, `{{if pipeline}} T1 {{else}} T0 {{end}}`, `{{if pipeline}} T1 {{else if pipeline}} T0 {{end}}`
+- Iteration: `{{range pipeline}} {{.}} {{end}}`, `{{range pipeline}} T1 {{else}} T0 {{end}}`
+- `{{with pipeline}} T1 {{end}}`: `if (pipeline) { . = pipeline; T1 }`
+- Functions:
+   - https://pkg.go.dev/text/template
+   - https://masterminds.github.io/sprig/
