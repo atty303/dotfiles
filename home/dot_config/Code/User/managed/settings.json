@@ -107,7 +107,8 @@
     "0196134d-63a8-74a3-8c8d-e1c244411526.gitpod.remote": "linux",
     "01961384-f871-73c9-9ecc-7beea4d4e413.gitpod.remote": "linux",
     "01961e49-fb7c-7664-aa08-2bf83c6c4b79.gitpod.remote": "linux",
-    "01963cea-cf33-7211-a3a4-0f28f7297d68.gitpod.remote": "linux"
+    "01963cea-cf33-7211-a3a4-0f28f7297d68.gitpod.remote": "linux",
+    "019685de-1701-7166-94f3-39c4d3ae79f7.gitpod.remote": "linux"
   },
   "scm.alwaysShowRepositories": true,
   "scm.defaultViewMode": "tree",

@@ -13,7 +13,12 @@ export-env {
         # Gitpod: https://app.gitpod.io/settings/secrets
         if (^atuin status) =~ "You are not logged in to a sync server" {
             let login = if ($env.ATUIN_LOGIN? | is-not-empty) {
-                $env.ATUIN_LOGIN | from json
+                 # Gitpod quote string
+                 if $env.ATUIN_LOGIN =~ "^'.*'$" {
+                    $env.ATUIN_LOGIN | str replace -r "^'(.*)'$" "${1}" | from json
+                } else {
+                    $env.ATUIN_LOGIN | from json
+                }
             }
             if $login != null {
                 print -e "✅ Automatically logging in to Atuin and syncing your shell history"
