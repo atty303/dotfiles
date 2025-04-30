@@ -33,4 +33,5 @@ development = [
     "tamasfe.taplo",
     "Microsoft.VisualStudioCode",
     "Alacritty.Alacritty",
+    "Microsoft.VisualStudio.2022.BuildTools",
 ]

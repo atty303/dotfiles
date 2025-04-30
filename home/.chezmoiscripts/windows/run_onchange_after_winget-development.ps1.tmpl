@@ -9,3 +9,5 @@ $packages | ForEach-Object {
     winget install --silent --no-upgrade --accept-source-agreements --exact --id $_
 }
 {{ end }}
+
+winget install --silent --no-upgrade --exact --id Microsoft.VisualStudio.2022.BuildTools --override "--wait --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
