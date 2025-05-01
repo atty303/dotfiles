@@ -17,7 +17,7 @@ export-env {
             } else if ("/usr/local/secrets/CDE_PERSONAL_SECRETS" | path exists) {
                 try { open "/usr/local/secrets/CDE_PERSONAL_SECRETS" | from json } catch { null }
             }
-            let login = $secrets.atuin
+            let login = $secrets.atuin?
             if $login != null {
                 print -e "✅ Automatically logging in to Atuin and syncing your shell history"
                 ^atuin login -u $login.username -p $login.password -k $login.key
