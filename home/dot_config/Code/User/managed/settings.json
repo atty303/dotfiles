@@ -1,4 +1,7 @@
 {
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
@@ -92,6 +95,11 @@
   "github.copilot.selectedCompletionModel": "gpt-4o-copilot",
   "githubPullRequests.experimental.notificationsView": true,
   "json.format.keepLines": true,
+  "metals.defaultBspToBuildTool": true,
+  "metals.inlayHints.hintsInPatternMatch.enable": true,
+  "metals.inlayHints.implicitConversions.enable": true,
+  "metals.inlayHints.inferredTypes.enable": true,
+  "metals.inlayHints.typeParameters.enable": true,
   "mise.autoDetectMiseBinPath": false,
   "mise.configureExtensionsAutomatically": false,
   "mise.configureExtensionsUseSymLinks": true,
