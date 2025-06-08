@@ -1,4 +1,4 @@
-{{if (includeTemplate "cde_personal_secrets" ".wakatime" | fromJson)}}
+{{if (includeTemplate "cde_personal_secrets" ".wakatime")}}
 {{- with (includeTemplate "cde_personal_secrets" ".wakatime" | fromJson) -}}
 [settings]
 api_key = {{ .api_key }}
