@@ -1,3 +1,5 @@
+export PATH="$HOME/.local/bin:$PATH"
+
 EXEC_NUSHELL=1
 RESOLVING_ENVIRONMENT=0
 
