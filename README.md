@@ -3,7 +3,7 @@
 ## Linux Setup
 
 ```
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply atty303
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin init --apply atty303
 ```
 
 ## Windows Setup Guide
