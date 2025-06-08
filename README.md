@@ -1,5 +1,11 @@
 # Bootstrap Instructions
 
+## Linux Setup
+
+```
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply atty303
+```
+
 ## Windows Setup Guide
 
 ### Prerequisites
