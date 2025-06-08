@@ -92,7 +92,6 @@
     "scminput": true
   },
   "github.copilot.nextEditSuggestions.enabled": true,
-  "github.copilot.selectedCompletionModel": "gpt-4o-copilot",
   "githubPullRequests.experimental.notificationsView": true,
   "json.format.keepLines": true,
   "metals.defaultBspToBuildTool": true,
@@ -107,7 +106,9 @@
   "remote.SSH.remotePlatform": {
     "*.gitpod.local": "linux",
     "*.gitpod.remote": "linux",
-    "01968945-01dc-73bb-ba89-36cc9c6c88b3.gitpod.remote": "linux"
+    "01968945-01dc-73bb-ba89-36cc9c6c88b3.gitpod.remote": "linux",
+    "0197454c-e83b-7e8b-8975-a10b85afdbaa.gitpod.remote": "linux",
+    "0197456c-bb94-7989-8de8-46827467ac42.gitpod.remote": "linux"
   },
   "scm.alwaysShowRepositories": true,
   "scm.defaultViewMode": "tree",
@@ -311,5 +312,16 @@
   "workbench.editor.showTabs": "single",
   "workbench.list.smoothScrolling": true,
   "workbench.tree.indent": 16,
-  "workbench.view.alwaysShowHeaderActions": true
+  "workbench.view.alwaysShowHeaderActions": true,
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "git.replaceTagsWhenPull": true,
+  "github.copilot.nextEditSuggestions.fixes": true,
+  "github.copilot.chat.agent.thinkingTool": true,
+  "docker.extension.enableComposeLanguageServer": false,
+  "security.allowedUNCHosts": [
+    "wsl.localhost"
+  ]
 }

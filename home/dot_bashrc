@@ -10,6 +10,10 @@ if [[ -n "$VSCODE_RESOLVING_ENVIRONMENT" ]]; then RESOLVING_ENVIRONMENT=1; fi
 # If running in OpenHands (I'm not using tmux)
 if [[ -n "$TMUX" ]]; then EXEC_NUSHELL=0; fi
 
+if ! command -v nu &> /dev/null; then
+  EXEC_NUSHELL=0
+fi
+
 if [[ $EXEC_NUSHELL == "1" ]]; then
   # If launched by IDEs, set the environment variables from nushell
   if [[ $RESOLVING_ENVIRONMENT == "1" ]]; then

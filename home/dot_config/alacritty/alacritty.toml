@@ -5,7 +5,7 @@ import = [
 
 [window]
 padding = { x = 4, y = 4 }
-decorations = "Full"
+decorations = "full"
 opacity = 0.9
 blur = true
 
@@ -14,7 +14,7 @@ history = 100000
 
 [font]
 normal = { family = "UDEV Gothic NF", style = "Regular" }
-size = 13
+size = 13.0
 builtin_box_drawing = false
 
 [selection]
