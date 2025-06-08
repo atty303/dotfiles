@@ -16,13 +16,13 @@ $directory\
 $cmd_duration\
 $status\
 [](pl-5)\
-\n\
+[ ]()$all\
 $character"""
 
-right_format = """$all"""
+right_format = """"""
 
 # https://coolors.co/palettes/popular/5%20colors
-palette = "me3"
+palette = "me5"
 
 [palettes.me]
 pl-fg = "black"
@@ -59,6 +59,14 @@ pl-3 = "#EFEBCE"
 pl-4 = "#D8A48F"
 pl-5 = "#BB8588"
 
+[palettes.me5]
+pl-fg = "black"
+pl-1 = "#005e10"
+pl-2 = "#328031"
+pl-3 = "#56a351"
+pl-4 = "#7ac772"
+pl-5 = "#9eec95"
+
 # --------------------------------
 
 [os]
@@ -89,7 +97,7 @@ truncate_to_repo = false
 use_os_path_sep = false
 fish_style_pwd_dir_length = 2
 style = "pl-fg bg:pl-4"
-repo_root_style = "pl-fg bg:pl-4 bold"
+repo_root_style = "pl-fg bg:pl-4"
 repo_root_format = '[ $repo_root ]($repo_root_style)[󰉋 $path ]($style)'
 format = "[󰉋 $path ]($style)"
 
@@ -110,6 +118,10 @@ success_symbol = " "
 signal_symbol = "󱐋 "
 style = "pl-fg bg:pl-5"
 format = "[$symbol$status$signal_name$maybe_int ]($style)"
+
+# --------------------------------
+[mise]
+disabled = false
 
 # --------------------------------
 # Nerd Font Symbols Preset
