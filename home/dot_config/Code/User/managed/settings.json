@@ -8,6 +8,9 @@
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
+  "[typescript]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
   "custom-ui-style.external.imports": [
     "file://${userHome}/.config/Code/User/custom.js"
   ],
@@ -29,6 +32,7 @@
   "diffEditor.experimental.useTrueInlineView": true,
   "diffEditor.hideUnchangedRegions.enabled": true,
   "diffEditor.renderSideBySide": false,
+  "docker.extension.enableComposeLanguageServer": false,
   "editor.autoIndent": "advanced",
   "editor.codeLensFontFamily": "\"IBM Plex Sans Condensed\"",
   "editor.cursorBlinking": "phase",
@@ -75,6 +79,8 @@
   "git.openRepositoryInParentFolders": "never",
   "git.pruneOnFetch": true,
   "git.rebaseWhenSync": true,
+  "git.replaceTagsWhenPull": true,
+  "github.copilot.chat.agent.thinkingTool": true,
   "github.copilot.chat.codesearch.enabled": true,
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
@@ -92,6 +98,7 @@
     "scminput": true
   },
   "github.copilot.nextEditSuggestions.enabled": true,
+  "github.copilot.nextEditSuggestions.fixes": true,
   "githubPullRequests.experimental.notificationsView": true,
   "json.format.keepLines": true,
   "metals.defaultBspToBuildTool": true,
@@ -108,12 +115,16 @@
     "*.gitpod.remote": "linux",
     "01968945-01dc-73bb-ba89-36cc9c6c88b3.gitpod.remote": "linux",
     "0197454c-e83b-7e8b-8975-a10b85afdbaa.gitpod.remote": "linux",
-    "0197456c-bb94-7989-8de8-46827467ac42.gitpod.remote": "linux"
+    "0197456c-bb94-7989-8de8-46827467ac42.gitpod.remote": "linux",
+    "01975797-cccf-717e-b031-02c0fda892fe.gitpod.remote": "linux"
   },
   "scm.alwaysShowRepositories": true,
   "scm.defaultViewMode": "tree",
   "scm.inputFontFamily": "editor",
   "search.showLineNumbers": true,
+  "security.allowedUNCHosts": [
+    "wsl.localhost"
+  ],
   "terminal.integrated.allowChords": false,
   "terminal.integrated.automationProfile.windows": {
     "args": [
@@ -308,20 +319,10 @@
     }
   },
   "terminal.integrated.scrollback": 10000,
+  "typescript.updateImportsOnFileMove.enabled": "always",
   "workbench.editor.closeOnFileDelete": true,
   "workbench.editor.showTabs": "single",
   "workbench.list.smoothScrolling": true,
   "workbench.tree.indent": 16,
-  "workbench.view.alwaysShowHeaderActions": true,
-  "[typescript]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
-  },
-  "typescript.updateImportsOnFileMove.enabled": "always",
-  "git.replaceTagsWhenPull": true,
-  "github.copilot.nextEditSuggestions.fixes": true,
-  "github.copilot.chat.agent.thinkingTool": true,
-  "docker.extension.enableComposeLanguageServer": false,
-  "security.allowedUNCHosts": [
-    "wsl.localhost"
-  ]
+  "workbench.view.alwaysShowHeaderActions": true
 }

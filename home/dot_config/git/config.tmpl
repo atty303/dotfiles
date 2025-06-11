@@ -3,8 +3,10 @@
 
 [core]
   autocrlf = input
-{{ if (or (eq .chezmoi.os "windows") .wsl ) -}}
-  sshCommand = ssh.exe
+{{ if (eq .chezmoi.os "windows") -}}
+  sshCommand = "C:/Windows/System32/OpenSSH/ssh.exe"
+{{ else if (.wsl) }}
+  sshCommand = "//mnt/c/Windows/System32/OpenSSH/ssh.exe"
 {{- end }}
 
 [includeIf "gitdir:~/src/github.com/CyberAgent/"]
