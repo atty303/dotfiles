@@ -51,6 +51,7 @@ alias ch = chezmoi
 alias che = chezmoi --watch --apply
 alias vi = hx
 alias r = mise run
+alias c = br
 
 def get-editor [] {
   [$env.config.buffer-editor, $env.EDITOR, $env.VISUAL] | filter { is-not-empty } | first
@@ -96,6 +97,13 @@ if (which starship | is-not-empty) {
     $env.TRANSIENT_PROMPT_COMMAND = {|| ^starship module character }
     $env.TRANSIENT_PROMPT_COMMAND_RIGHT = ""
     $env.STARSHIP_CONFIG = "~/.config/starship.toml" | path expand
+}
+
+if (which broot | is-not-empty) {
+    const init_path = $vendor_autoload | path join broot.nu
+    if ($init_path | path type | $in != "file") {
+        ^broot --print-shell-function nushell | save $init_path --force
+    }
 }
 
 #if $env.ZELLIJ? != "0" {
