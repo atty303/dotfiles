@@ -51,7 +51,6 @@ alias ch = chezmoi
 alias che = chezmoi --watch --apply
 alias vi = hx
 alias r = mise run
-alias c = br
 
 def get-editor [] {
   [$env.config.buffer-editor, $env.EDITOR, $env.VISUAL] | filter { is-not-empty } | first
@@ -105,6 +104,8 @@ if (which broot | is-not-empty) {
         ^broot --print-shell-function nushell | save $init_path --force
     }
 }
+
+alias c = br
 
 #if $env.ZELLIJ? != "0" {
 #  zellij attach -c
