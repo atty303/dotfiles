@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch %t/X11-unix for create/delete
+
+[Path]
+PathChanged=%t/X11-unix
+Unit=x11-unix-link.service
+
+[Install]
+WantedBy=default.target
