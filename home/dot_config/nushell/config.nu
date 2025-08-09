@@ -15,6 +15,10 @@ $env.PATH = $env.PATH | prepend [
     "~/.local/bin"
 ]
 
+if ("/var/lib/flatpak/exports/bin" | path exists) {
+    $env.PATH = $env.PATH | prepend "/var/lib/flatpak/exports/bin"
+}
+
 # ⚠ Doesn't set XDG_CONFIG_HOME !
 # The default configuration directories are different across Windows, Mac, and Linux.
 # Setting environment variables in the shell works when launching from the shell,
@@ -53,7 +57,7 @@ alias vi = hx
 alias r = mise run
 
 def get-editor [] {
-  [$env.config.buffer-editor, $env.EDITOR, $env.VISUAL] | filter { is-not-empty } | first
+  [$env.config.buffer-editor, $env.EDITOR, $env.VISUAL] | where { is-not-empty } | first
 }
 
 def bash_quote [s: string] {
@@ -84,7 +88,7 @@ if (which carapace | is-not-empty) {
 
 if (which mise | is-not-empty) {
     const init_path = $vendor_autoload | path join mise.nu
-    ^mise activate nu | lines | filter {$in !~ ^set,Path,} | to text | save $init_path --force
+    ^mise activate nu | lines | where {$in !~ ^set,Path,} | to text | save $init_path --force
 }
 
 if (which starship | is-not-empty) {
@@ -114,7 +118,7 @@ alias c = br
 
 # If we are called by envinronment resolver, print the environment variables for parent shell
 if ($env.RESOLVING_ENVIRONMENT? == "1") {
-    $env | transpose name value | filter { not (($in.name in ["config" "ENV_CONVERSIONS"]) or ($in.name | str contains "PROMPT")) } | each { |e|
+    $env | transpose name value | where { not (($in.name in ["config" "ENV_CONVERSIONS"]) or ($in.name | str contains "PROMPT")) } | each { |e|
         let conversion = $env.ENV_CONVERSIONS | get -i $e.name
         let value = if ($conversion | is-not-empty) { $e.value | do $conversion.to_string $e.value } else { $e.value }
         print $"export ($e.name)=(bash_quote ($value | to text))"

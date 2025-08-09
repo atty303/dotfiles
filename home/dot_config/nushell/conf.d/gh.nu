@@ -9,10 +9,10 @@ export def --wrapped --env main [...args: string] {
     ^gh ...$args
     cd ($clone_dir | path join $repo.1)
   } else if ($args | take 2) == ["codespace", "ssh"] and "--save" in $args {
-    let raw_args = [...($args | filter { $in != "--save" }), "--config"]
+    let raw_args = [...($args | where { $in != "--save" }), "--config"]
     let output = (^gh ...$raw_args | complete)
 
-    print ($output.stdout | lines | filter { $in =~ "^Host" })
+    print ($output.stdout | lines | where { $in =~ "^Host" })
     $output.stdout | save --force $"~/.ssh/codespaces/current"
   } else {
     ^gh ...$args
