@@ -1,0 +1,102 @@
+[
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 290,
+                "origin_hash": "472f75a2b2e667abd59c3fd02a8d3f9b"
+            },
+            {
+                "type": 1,
+                "code": 288,
+                "origin_hash": "472f75a2b2e667abd59c3fd02a8d3f9b"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_KP3",
+        "name": "BT2+Start (KP3)",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 289,
+                "origin_hash": "472f75a2b2e667abd59c3fd02a8d3f9b"
+            },
+            {
+                "type": 1,
+                "code": 290,
+                "origin_hash": "472f75a2b2e667abd59c3fd02a8d3f9b"
+            },
+            {
+                "type": 1,
+                "code": 288,
+                "origin_hash": "472f75a2b2e667abd59c3fd02a8d3f9b"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "Super_L+G",
+        "name": "BT1+BT2+Start  (Win+G)",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 292,
+                "origin_hash": "472f75a2b2e667abd59c3fd02a8d3f9b"
+            },
+            {
+                "type": 1,
+                "code": 291,
+                "origin_hash": "472f75a2b2e667abd59c3fd02a8d3f9b"
+            },
+            {
+                "type": 1,
+                "code": 288,
+                "origin_hash": "472f75a2b2e667abd59c3fd02a8d3f9b"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "Escape",
+        "name": "BT3+BT4+Start (Escape)",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 289,
+                "origin_hash": "472f75a2b2e667abd59c3fd02a8d3f9b"
+            },
+            {
+                "type": 1,
+                "code": 288,
+                "origin_hash": "472f75a2b2e667abd59c3fd02a8d3f9b"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_KP0",
+        "name": "BT1+Start (KP0)",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 292,
+                "origin_hash": "472f75a2b2e667abd59c3fd02a8d3f9b"
+            },
+            {
+                "type": 1,
+                "code": 288,
+                "origin_hash": "472f75a2b2e667abd59c3fd02a8d3f9b"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_KP6",
+        "name": "BT4+Start (KP6)",
+        "mapping_type": "key_macro"
+    }
+]
