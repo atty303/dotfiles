@@ -72,5 +72,13 @@
         "key": "alt+1",
         "command": "workbench.view.explorer",
         "when": "viewContainer.workbench.view.explorer.enabled"
+    },
+    {
+        "key": "shift+enter",
+        "command": "workbench.action.terminal.sendSequence",
+        "args": {
+            "text": "\\\r\n"
+        },
+        "when": "terminalFocus"
     }
 ]
