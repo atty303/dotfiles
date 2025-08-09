@@ -1,0 +1,6 @@
+[Unit]
+Description=Link %t/X11-unix/X* to /tmp/.X11-unix/X*
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -ec "rundir='%t/X11-unix'; out='/tmp/.X11-unix'; find \"$rundir\" -maxdepth 1 -type s -name 'X*' -print0 2>/dev/null | while IFS= read -r -d '' s; do ln -sfn \"$s\" \"$out/$(basename \"$s\")\"; done; for l in \"$out\"/X*; do [ -L \"$l\" ] || continue; target=$(readlink -f \"$l\" || true); case \"$target\" in \"$rundir\"/X*) [ -e \"$target\" ] || rm -f \"$l\";; esac; done"
