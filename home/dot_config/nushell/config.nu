@@ -81,21 +81,19 @@ if (which carapace | is-not-empty) {
     $env.CARAPACE_BRIDGES = 'zsh,inshellisense'
 
     const init_path = $vendor_autoload | path join carapace.nu
-    if ($init_path | path type | $in != "file") {
-        ^carapace _carapace nushell | save $init_path --force
-    }
+    ^carapace _carapace nushell | save $init_path --force
 }
 
 if (which mise | is-not-empty) {
     const init_path = $vendor_autoload | path join mise.nu
-    ^mise activate nu | lines | where {$in !~ ^set,Path,} | to text | save $init_path --force
+    #^mise activate nu | lines | where {$in !~ ^set,Path,} | to text | save $init_path --force
+    ^mise activate nu | save $init_path --force
 }
 
 if (which starship | is-not-empty) {
     const init_path = $vendor_autoload | path join starship.nu
-    if ($init_path | path type | $in != "file") {
-        ^starship init nu | save $init_path --force
-    }
+    ^starship init nu | save $init_path --force
+
     $env.config.render_right_prompt_on_last_line = false
     $env.TRANSIENT_PROMPT_COMMAND = {|| ^starship module character }
     $env.TRANSIENT_PROMPT_COMMAND_RIGHT = ""
@@ -104,9 +102,7 @@ if (which starship | is-not-empty) {
 
 if (which broot | is-not-empty) {
     const init_path = $vendor_autoload | path join broot.nu
-    if ($init_path | path type | $in != "file") {
-        ^broot --print-shell-function nushell | save $init_path --force
-    }
+    ^broot --print-shell-function nushell | save $init_path --force
 }
 
 alias c = br

@@ -3,9 +3,7 @@ export-env {
     if (which atuin | is-not-empty) {
         # Install the shell integration
         const init_path = $nu.data-dir | path join vendor autoload atuin.nu
-        if ($init_path | path type | $in != "file") {
-            ^atuin init nu | save $init_path --force
-        }
+        ^atuin init nu | str replace -a "get -i" "get -o" | save $init_path --force
 
         # Automatically log in and sync if running in a Cloud Development Environment
         # - CDE_PERSONAL_SECRETS: {"atuin": {"username":"<username>","password":"<password>","key":"<key>"}}
