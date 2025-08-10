@@ -1,13 +1,11 @@
 {
   "env": {
-    "WINEPREFIX": "/home/atty/.local/state/konaste/sdvx",
+    "WINEPREFIX": "/home/atty/Games/konaste/sdvx",
     "GAMEID": "umu-sdvx",
     "PROTONPATH": "GE-Proton10-9-wma",
     "PULSE_LATENCY_MSEC": "5",
     "PULSE_SINK": "konaste-sink",
     "PROTON_USE_NTSYNC": "1",
-    "MESA_VK_DEVICE_SELECT": "10de:1e82",
-    "MESA_VK_WSI_PRESENT_MODE": "mailbox",
     "OBS_VKCAPTURE": "1",
     "ENABLE_HDR_WSI": "0",
     "DXVK_FRAME_RATE": "120",
@@ -15,7 +13,7 @@
   },
   "profiles": {
     "launcher": {
-      "command": "systemd-cat -t %{id} umu-run %r\\launcher\\modules\\launcher.exe %u"
+      "command": "umu-run %r\\launcher\\modules\\launcher.exe %u"
     },
     "game": {
       "command": "mangohud umu-run %r\\game\\modules\\sv6c.exe -t %t"
