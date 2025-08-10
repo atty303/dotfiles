@@ -5,7 +5,7 @@ if (-not (Test-Path $targetDir)) {
 
 $targetPath = Join-Path $targetDir "atuin.exe"
 if (-not (Test-Path $targetPath)) {
-    Invoke-WebRequest -Uri "https://github.com/atty303/dotfiles/releases/download/atuin/atuin.exe" -OutFile $targetPath
+    Invoke-WebRequest -Uri "https://github.com/Esgariot/atuin-win/releases/download/v18.7.1/atuin.exe" -OutFile $targetPath
 }
 
 $targetPath = Join-Path $targetDir "gitpod.exe"
