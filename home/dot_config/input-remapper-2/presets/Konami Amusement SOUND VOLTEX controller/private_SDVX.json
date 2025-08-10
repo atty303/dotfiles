@@ -36,7 +36,7 @@
             }
         ],
         "target_uinput": "keyboard",
-        "output_symbol": "Super_L+G",
+        "output_symbol": "Super_L + G",
         "name": "BT1+BT2+Start  (Win+G)",
         "mapping_type": "key_macro"
     },
