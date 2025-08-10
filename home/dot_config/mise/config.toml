@@ -1,4 +1,5 @@
 [tools]
+node = "latest"
 
 [settings]
 default_config_filename = ".mise.toml"

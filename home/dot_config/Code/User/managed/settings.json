@@ -107,7 +107,6 @@
   "metals.inlayHints.inferredTypes.enable": true,
   "metals.inlayHints.typeParameters.enable": true,
   "mise.autoDetectMiseBinPath": false,
-  "mise.configureExtensionsAutomatically": false,
   "mise.configureExtensionsUseSymLinks": true,
   "redhat.telemetry.enabled": false,
   "remote.SSH.remotePlatform": {
@@ -116,7 +115,12 @@
     "01968945-01dc-73bb-ba89-36cc9c6c88b3.gitpod.remote": "linux",
     "0197454c-e83b-7e8b-8975-a10b85afdbaa.gitpod.remote": "linux",
     "0197456c-bb94-7989-8de8-46827467ac42.gitpod.remote": "linux",
-    "01975797-cccf-717e-b031-02c0fda892fe.gitpod.remote": "linux"
+    "01975797-cccf-717e-b031-02c0fda892fe.gitpod.remote": "linux",
+    "192.168.2.163": "linux",
+    "192.168.2.143": "linux",
+    "192.168.2.138": "linux",
+    "infinitas.local": "linux",
+    "sdvx.local": "linux"
   },
   "scm.alwaysShowRepositories": true,
   "scm.defaultViewMode": "tree",
@@ -324,5 +328,8 @@
   "workbench.editor.showTabs": "single",
   "workbench.list.smoothScrolling": true,
   "workbench.tree.indent": 16,
-  "workbench.view.alwaysShowHeaderActions": true
+  "workbench.view.alwaysShowHeaderActions": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "modificationsIfAvailable",
+  "diffEditor.ignoreTrimWhitespace": false
 }

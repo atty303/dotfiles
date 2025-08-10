@@ -47,12 +47,6 @@
         "when": "editorFocus && !editorReadonly"
     },
     {
-        "key": "ctrl-x ctrl-b",
-        "command": "workbench.action.showAllEditorsByMostRecentlyUsed",
-        "when": "!terminalFocus"
-    },
-    // disable
-    {
         "key": "ctrl+j",
         "command": "emacs-mcx.newLine",
         "when": "editorFocus && !editorReadonly"
