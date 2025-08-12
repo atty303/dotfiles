@@ -49,7 +49,7 @@ $env.config.keybindings ++= [
 source conf.d/homebrew.nu
 source conf.d/ssh-agent.nu
 
-use std/dirs
+use std *
 
 alias ch = chezmoi
 alias che = chezmoi --watch --apply
@@ -86,7 +86,6 @@ if (which carapace | is-not-empty) {
 
 if (which mise | is-not-empty) {
     const init_path = $vendor_autoload | path join mise.nu
-    #^mise activate nu | lines | where {$in !~ ^set,Path,} | to text | save $init_path --force
     ^mise activate nu | save $init_path --force
 }
 
