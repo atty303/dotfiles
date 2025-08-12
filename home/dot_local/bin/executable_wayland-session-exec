@@ -1,0 +1,5 @@
+#!/bin/bash
+
+input-remapper-control --command autoload
+
+exec "$@"
