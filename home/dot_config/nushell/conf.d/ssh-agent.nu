@@ -18,14 +18,17 @@ def save-ssh-agent-env [sock: string] {
 }
 
 do --env {
-    # If SSH_AUTH_SOCK is set, we assume the user has already started an SSH agent or forwarding is set up
-    if ($env.SSH_AUTH_SOCK? | is-not-empty) {
-        save-ssh-agent-env $env.SSH_AUTH_SOCK
+    # Check if the user has a local SSH agent running
+    if (check-local-ssh-agent) {
+        if ($env.SSH_AUTH_SOCK? | str contains "wezterm") {
+            hide-env SSH_AUTH_SOCK
+        }
         return
     }
 
-    # Check if the user has a local SSH agent running
-    if (check-local-ssh-agent) {
+    # If SSH_AUTH_SOCK is set, we assume the user has already started an SSH agent or forwarding is set up
+    if ($env.SSH_AUTH_SOCK? | is-not-empty) {
+        save-ssh-agent-env $env.SSH_AUTH_SOCK
         return
     }
 
