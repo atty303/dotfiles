@@ -1,0 +1,11 @@
+[Unit]
+Description=INFINITAS session
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecStart=ptyxis -- /home/atty/src/konaste-buddy/workflows/infinitas.sh
+
+[Install]
+WantedBy=graphical-session.target
