@@ -99,6 +99,11 @@ if (which starship | is-not-empty) {
     $env.STARSHIP_CONFIG = "~/.config/starship.toml" | path expand
 }
 
+if (which zoxide | is-not-empty) {
+    const init_path = $vendor_autoload | path join zoxide.nu
+    ^zoxide init nushell | save $init_path --force
+}
+
 if (which broot | is-not-empty) {
     const init_path = $vendor_autoload | path join broot.nu
     ^broot --print-shell-function nushell | save $init_path --force

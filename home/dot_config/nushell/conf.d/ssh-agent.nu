@@ -20,7 +20,7 @@ def save-ssh-agent-env [sock: string] {
 do --env {
     # Check if the user has a local SSH agent running
     if (check-local-ssh-agent) {
-        if ($env.SSH_AUTH_SOCK? | str contains "wezterm") {
+        if (($env.SSH_AUTH_SOCK? | is-not-empty) and ($env.SSH_AUTH_SOCK | str contains "wezterm")) {
             hide-env SSH_AUTH_SOCK
         }
         return

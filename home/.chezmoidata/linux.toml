@@ -7,4 +7,5 @@ essentials = [
   { project = "https://github.com/jdx/mise", exe = "mise" },
   { project = "https://github.com/carapace-sh/carapace-bin", exe = "carapace" },
   { project = "https://github.com/zellij-org/zellij", exe = "zellij" },
+  { project = "https://github.com/ajeetdsouza/zoxide", exe = "zoxide" },
 ]

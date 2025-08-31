@@ -1,5 +1,7 @@
 [tools]
+fzf = "latest"
 node = "latest"
+zoxide = "latest"
 
 [settings]
 default_config_filename = ".mise.toml"

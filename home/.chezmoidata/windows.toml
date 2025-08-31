@@ -20,6 +20,7 @@ essentials = [
     "REALiX.HWiNFO",
     "RamenSoftware.Windhawk",
     "SteelSeries.GG",
+    "ajeetdsouza.zoxide",
 ]
 gaming = [
     "Valve.Steam",
