@@ -120,7 +120,9 @@
     "192.168.2.143": "linux",
     "192.168.2.138": "linux",
     "infinitas.local": "linux",
-    "sdvx.local": "linux"
+    "sdvx.local": "linux",
+    "0198c051-212a-73e6-81c8-b6e60d0967f1.gitpod.remote": "linux",
+    "01991750-daeb-7706-9143-712fadd75e32.gitpod.remote": "linux"
   },
   "scm.alwaysShowRepositories": true,
   "scm.defaultViewMode": "tree",
