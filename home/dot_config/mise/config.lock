@@ -1,6 +1,11 @@
 [tools.age]
-version = "1.2.1"
+version = "1.2.0"
 backend = "aqua:FiloSottile/age"
+
+[tools.age.platforms.windows-x64]
+checksum = "blake3:11ac3e04828378425a07d23e277b238a99b215f7008e5a13ebedc37f39c4fbad"
+size = 5192969
+url = "https://github.com/FiloSottile/age/releases/download/v1.2.0/age-v1.2.0-windows-amd64.zip"
 
 [tools."aqua:nushell/nushell"]
 version = "0.107.0"

@@ -1,7 +1,7 @@
 min_version = "2025.9.2"
 
 [tools]
-age = "latest"
+age = "1.2.0"
 bun = "latest"
 carapace = "latest"
 claude = "latest"
