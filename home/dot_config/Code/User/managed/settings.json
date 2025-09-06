@@ -331,7 +331,6 @@
   "workbench.list.smoothScrolling": true,
   "workbench.tree.indent": 16,
   "workbench.view.alwaysShowHeaderActions": true,
-  "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "modificationsIfAvailable",
   "diffEditor.ignoreTrimWhitespace": false
 }

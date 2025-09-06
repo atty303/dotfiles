@@ -1,0 +1,10 @@
+$KeyPath = "$HOME\.config\chezmoi\key.txt"
+$KeyDir = [System.IO.Path]::GetDirectoryName($KeyPath)
+$AgeFile = "{{ .chezmoi.config.sourceDir }}/key.txt.age"
+
+if (-not (Test-Path $KeyPath)) {
+    if (-not (Test-Path $KeyDir)) {
+        New-Item -ItemType Directory -Path $KeyDir | Out-Null
+    }
+    chezmoi age decrypt --output $KeyPath --passphrase $AgeFile
+}

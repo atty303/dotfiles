@@ -1,0 +1,6 @@
+# Signature of all mise config files for change detection
+{{ range $index, $file := glob (print .chezmoi.sourceDir "/dot_config/mise/*.toml") -}}
+# {{ $file }}: {{ $file | include | sha256sum }}
+{{ end -}}
+
+mise install

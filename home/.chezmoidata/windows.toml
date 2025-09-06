@@ -1,7 +1,6 @@
 [packages.windows.winget]
 # TOOD: Intel.IntelDriverAndSupportAssistant if platform is Intel based (not AMD)
 essentials = [
-    "gerardog.gsudo",
     "AutoHotkey.AutoHotkey",
     "Zen-Team.Zen-Browser",
     "Zoom.Zoom",
@@ -11,16 +10,11 @@ essentials = [
     "Discord.Discord",
     "Microsoft.PowerToys",
     "SlackTechnologies.Slack",
-#    "Nushell.Nushell",
-#    "Starship.Starship",
-#    "Helix.Helix",
     "Obsidian.Obsidian",
     "Wakatime.DesktopWakatime",
-#    "rsteube.Carapace",
     "REALiX.HWiNFO",
     "RamenSoftware.Windhawk",
     "SteelSeries.GG",
-#    "ajeetdsouza.zoxide",
 ]
 gaming = [
     "Valve.Steam",
@@ -28,10 +22,7 @@ gaming = [
 development = [
     "Docker.DockerDesktop",
     "JetBrains.Toolbox",
-    "jdx.mise",
     "Git.Git",
-#    "GitHub.cli",
-#    "tamasfe.taplo",
     "Microsoft.VisualStudioCode",
     "Alacritty.Alacritty",
     "Microsoft.VisualStudio.2022.BuildTools",

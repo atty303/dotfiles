@@ -52,7 +52,7 @@ sourceDir = "/workspaces/.codespaces/.persistedshare/dotfiles/home"
 encryption = "age"
 
 [age]
-  identity = "~/.age.key"
+  identity = "~/.config/chezmoi/key.txt"
   recipient = "age1hwzfym9sw8wjyckwfgul4qe6mn67h8rrkw9vfprl95nv3dd0qd7susuu8z"
 
 [onepassword]
@@ -90,17 +90,6 @@ encryption = "age"
 [github]
     refreshPeriod = "12h"
 
-[interpreters.nu]
-{{ if eq .chezmoi.os "linux" }}
-    command = {{ joinPath (env "HOME") ".local/bin/nu" | toToml }}
-{{ else if eq .chezmoi.os "darwin" }}
-    command = "/opt/homebrew/bin/nu"
-{{ else if eq .chezmoi.os "windows" }}
-    command = {{ joinPath (env "LOCALAPPDATA") "Programs/nu/bin/nu.exe" | toToml }}
-{{ else }}
-    command = "nu"
-{{ end }}
-
 {{ if eq .chezmoi.os "windows" }}
 [interpreters.ps1]
     command = {{ joinPath (env "PROGRAMFILES") "PowerShell/7/pwsh.exe" | toToml }}
@@ -109,9 +98,13 @@ encryption = "age"
 
 # Run scripts after initializing the source state and before applying the state.
 [hooks.read-source-state.pre]
+{{ if eq .chezmoi.os "darwin" }}
+    command = "/usr/bin/env"
+    args = ["-S","bash", "-euo", "pipefail", {{ joinPath .chezmoi.sourceDir ".chezmoiscripts/darwin/.init.sh" | toToml }}]
+{{ end }}
 {{ if eq .chezmoi.os "linux" }}
     command = "/usr/bin/env"
-    args = ["bash", {{ joinPath .chezmoi.sourceDir ".chezmoiscripts/linux/.init.bash" | toToml }}]
+    args = ["-S","bash", "-euo", "pipefail", {{ joinPath .chezmoi.sourceDir ".chezmoiscripts/linux/.init.sh" | toToml }}]
 {{ end }}
 {{ if eq .chezmoi.os "windows" }}
     command = {{ joinPath (env "SystemRoot") "System32/WindowsPowerShell/v1.0/powershell.exe" | toToml }}

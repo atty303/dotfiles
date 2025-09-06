@@ -1,13 +1,3 @@
-brew "rage"
-brew "carapace"
-brew "gh"
-brew "git"
-brew "starship"
-brew "atuin"
-brew "mise"
-brew "helix"
-brew "zellij"
-
 if OS.mac? and !ENV["HEADLESS"]
   brew "pinentry-mac"
   mas "1Password", id: 443_987_910

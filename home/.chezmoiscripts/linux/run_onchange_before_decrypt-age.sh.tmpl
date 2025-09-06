@@ -1,0 +1,17 @@
+#!/usr/bin/env -S bash -euo pipefail
+
+if [ ! -f "${HOME}/.config/chezmoi/key.txt" ]; then
+  mkdir -p "${HOME}/.config/chezmoi"
+
+  # passphrase=$(mise exec ubi:open-source-cooperative/keyring-rs -- keyring-rs -s chezmoi -t age-passphrase password)
+
+  if [ -f "/usr/local/secrets/CHEZMOI_AGE_KEY" ]; then
+    cp /usr/local/secrets/CHEZMOI_AGE_KEY "${HOME}/.config/chezmoi/key.txt"
+  elif [ -n "${CHEZMOI_AGE_KEY+x}" ]; then
+    echo "$CHEZMOI_AGE_KEY" > "${HOME}/.config/chezmoi/key.txt"
+  else
+    chezmoi age decrypt --output "${HOME}/.config/chezmoi/key.txt" --passphrase "{{ .chezmoi.config.sourceDir }}/key.txt.age"
+  fi
+
+  chmod 600 "${HOME}/.config/chezmoi/key.txt"
+fi
