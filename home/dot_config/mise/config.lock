@@ -11,10 +11,6 @@ url = "https://github.com/FiloSottile/age/releases/download/v1.2.1/age-v1.2.1-wi
 version = "0.107.0"
 backend = "aqua:nushell/nushell"
 
-[tools.atuin]
-version = "18.8.0"
-backend = "aqua:atuinsh/atuin"
-
 [tools.bun]
 version = "1.2.21"
 backend = "core:bun"
@@ -38,6 +34,10 @@ backend = "aqua:junegunn/fzf"
 [tools.github-cli]
 version = "2.78.0"
 backend = "aqua:cli/cli"
+
+[tools."github:Esgariot/atuin-win"]
+version = "18.8.0"
+backend = "github:Esgariot/atuin-win"
 
 [tools.helix]
 version = "25.07.1"

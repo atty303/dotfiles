@@ -23,6 +23,21 @@ zoxide = "latest"
 atuin = { version = "latest", os = ["linux", "macos"] }
 zellij = { version = "latest", os = ["linux", "macos"] }
 
+[tools."github:Esgariot/atuin-win"]
+version = "latest"
+platforms.windows-x64.asset_pattern = "atuin.exe"
+
+[alias]
+atuin = """
+{% if os() == "windows" %}
+github:Esgariot/atuin-win
+{% else %}
+aqua:atuin/atuin
+{% endif %}
+"""
+
+
+
 [settings]
 activate_aggressive = true
 default_config_filename = ".mise.toml"
