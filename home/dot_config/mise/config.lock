@@ -1,0 +1,67 @@
+[tools.age]
+version = "1.2.1"
+backend = "aqua:FiloSottile/age"
+
+[tools."aqua:nushell/nushell"]
+version = "0.107.0"
+backend = "aqua:nushell/nushell"
+
+[tools.atuin]
+version = "18.8.0"
+backend = "aqua:atuinsh/atuin"
+
+[tools.bun]
+version = "1.2.21"
+backend = "core:bun"
+
+[tools.carapace]
+version = "1.4.1"
+backend = "aqua:carapace-sh/carapace-bin"
+
+[tools.claude]
+version = "1.0.108"
+backend = "npm:@anthropic-ai/claude-code"
+
+[tools.deno]
+version = "2.4.5"
+backend = "core:deno"
+
+[tools.fzf]
+version = "0.65.2"
+backend = "aqua:junegunn/fzf"
+
+[tools.github-cli]
+version = "2.78.0"
+backend = "aqua:cli/cli"
+
+[tools.helix]
+version = "25.07.1"
+backend = "aqua:helix-editor/helix"
+
+[tools.node]
+version = "24.7.0"
+backend = "core:node"
+
+[tools.restic]
+version = "0.18.0"
+backend = "aqua:restic/restic"
+
+[tools.starship]
+version = "1.23.0"
+backend = "aqua:starship/starship"
+
+[tools.taplo]
+version = "0.10.0"
+backend = "aqua:tamasfe/taplo"
+
+[tools."ubi:open-source-cooperative/keyring-rs"]
+version = "3.6.3-republish"
+backend = "ubi:open-source-cooperative/keyring-rs"
+
+[tools.zellij]
+version = "0.43.1"
+backend = "aqua:zellij-org/zellij"
+
+[tools.zoxide]
+version = "0.9.8"
+backend = "aqua:ajeetdsouza/zoxide"

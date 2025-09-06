@@ -1,12 +1,17 @@
+min_version = "2025.9.2"
+
 [tools]
 age = "latest"
+bun = "latest"
 carapace = "latest"
 claude = "latest"
+deno = "latest"
 fzf = "latest"
 github-cli = "latest"
 helix = "latest"
 taplo = "latest"
 node = "latest"
+restic = "latest"
 starship = "latest"
 zoxide = "latest"
 
@@ -14,7 +19,18 @@ zoxide = "latest"
 
 "ubi:open-source-cooperative/keyring-rs" = "latest"
 
+# Official Windows binaries are not provided, but custom builds exist, so manage with chezmoiexternal
+atuin = { version = "latest", os = ["linux", "macos"] }
+zellij = { version = "latest", os = ["linux", "macos"] }
+
 [settings]
+activate_aggressive = true
 default_config_filename = ".mise.toml"
 experimental = true
+windows_default_file_shell_args = "pwsh.exe -NoLogo -NoProfile -ExecutionPolicy Bypass"
+windows_default_inline_shell_args = "pwsh.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command"
 windows_shim_mode = "symlink"
+
+npm.bun = true
+
+python.uv_venv_auto = true

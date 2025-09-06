@@ -1,9 +1,0 @@
-# Platform-specific configurations
-
-[tools]
-{{ if ne .chezmoi.os "windows" -}}
-# Official Windows binaries are not provided, but custom builds exist, so manage with chezmoiexternal
-atuin = "latest"
-# Not yet supported on Windows
-zellij = "latest"
-{{ end -}}

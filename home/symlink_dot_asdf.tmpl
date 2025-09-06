@@ -1,0 +1,9 @@
+{{ if eq .chezmoi.os "darwin" }}
+{{ .chezmoi.destDir }}/.local/share/mise
+{{ end }}
+{{ if eq .chezmoi.os "linux" }}
+{{ .chezmoi.destDir }}/.local/share/mise
+{{ end }}
+{{ if eq .chezmoi.os "windows" }}
+{{ env "LOCALAPPDATA" }}\mise
+{{ end }}

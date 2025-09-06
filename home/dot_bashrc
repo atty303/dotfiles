@@ -1,68 +1,34 @@
-export PATH="$HOME/.local/bin:$PATH"
+dirs=(
+  "$HOME/.local/bin"
+)
+for dir in "${dirs[@]}"; do
+  case ":$PATH:" in
+    *":$dir:"*) ;;
+    *) PATH="$dir:$PATH" ;;
+  esac
+done
 
-EXEC_NUSHELL=1
+
 RESOLVING_ENVIRONMENT=0
-
 # https://intellij-support.jetbrains.com/hc/en-us/articles/15268184143890-Shell-Environment-Loading
 if [[ -n "$INTELLIJ_ENVIRONMENT_READER" ]]; then RESOLVING_ENVIRONMENT=1; fi
-
 # https://code.visualstudio.com/docs/editor/command-line#_how-do-i-detect-when-a-shell-was-launched-by-vs-code
 if [[ -n "$VSCODE_RESOLVING_ENVIRONMENT" ]]; then RESOLVING_ENVIRONMENT=1; fi
 
-# If running in OpenHands (I'm not using tmux)
-if [[ -n "$TMUX" ]]; then EXEC_NUSHELL=0; fi
-
+EXEC_NUSHELL=${EXEC_NUSHELL:-1}
 if ! command -v nu &> /dev/null; then
   EXEC_NUSHELL=0
 fi
+# If running in OpenHands (I'm not using tmux)
+if [[ -n "$TMUX" ]]; then EXEC_NUSHELL=0; fi
 
-run_if_older_than() {
-  local stamp_file="$1"
-  local interval="$2"
-  shift 2
-
-  local now=$(date +%s)
-  local last_run=0
-
-  if [[ -f "$stamp_file" ]]; then
-    last_run=$(<"$stamp_file")
-  fi
-
-  if (( now - last_run >= interval )); then
-    "$@"
-    echo "$now" > "$stamp_file"
-  else
-    return 1
-  fi
-}
-
-check_nu_release() {
-  local installed="$(nu --version)"
-
-  local latest="$(
-    curl -fsSL https://api.github.com/repos/nushell/nushell/releases/latest \
-      | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -n1
-  )"
-  [[ -n "$latest" ]] || { return 0; }
-
-  if [[ "$installed" != "$latest" ]]; then
-    echo "Update: nu $installed -> $latest"
-    local dir=$(mktemp -d)
-    ubi -i "$dir" -p "nushell/nushell" -t "$latest" --extract-all
-    rm -f "$dir"/LICENSE "$dir"/README.txt
-    mv -f "$dir"/* ~/.local/bin
-    rm -rf "$dir"
-  fi
-}
-
-if [[ $EXEC_NUSHELL == "1" ]]; then
-  # If launched by IDEs, set the environment variables from nushell
-  if [[ $RESOLVING_ENVIRONMENT == "1" ]]; then
+if [[ "$EXEC_NUSHELL" == "1" ]]; then
+  # If launched by IDEs, read the environment variables from nushell
+  if [[ "$RESOLVING_ENVIRONMENT" == "1" ]]; then
     export RESOLVING_ENVIRONMENT
     eval $(nu)
     unset RESOLVING_ENVIRONMENT
-  elif [[ $- == *i* ]]; then
-    run_if_older_than ~/.cache/nu-check-stamp 86400 check_nu_release
+  elif [[ "$-" == *i* ]]; then
     exec nu -i
   fi
 fi
