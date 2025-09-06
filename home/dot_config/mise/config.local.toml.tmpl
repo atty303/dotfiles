@@ -1,0 +1,7 @@
+# Platform-specific configurations
+
+[tools]
+{{ if ne .chezmoi.os "windows" -}}
+atuin = "latest"
+zellij = "latest"
+{{ end -}}

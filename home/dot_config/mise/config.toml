@@ -1,7 +1,16 @@
 [tools]
+carapace = "latest"
 fzf = "latest"
+github-cli = "latest"
+helix = "latest"
+taplo = "latest"
 node = "latest"
+starship = "latest"
 zoxide = "latest"
+
+"aqua:nushell/nushell" = "latest"
+
+"ubi:open-source-cooperative/keyring-rs" = "latest"
 
 [settings]
 default_config_filename = ".mise.toml"

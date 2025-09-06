@@ -1,5 +1,5 @@
 $paths = @(
-    "C:\Users\atty\.local\bin"
+    "$env:USERPROFILE\.local\bin"
 )
 
 $paths | ForEach-Object {
