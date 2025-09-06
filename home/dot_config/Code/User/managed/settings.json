@@ -321,7 +321,7 @@
   },
   "terminal.integrated.profiles.windows": {
     "Nu": {
-      "path": "nu.exe"
+      "path": "nu"
     }
   },
   "terminal.integrated.scrollback": 10000,

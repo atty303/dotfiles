@@ -4,19 +4,14 @@
 # 3. $nu.vendor-autoload-dirs
 # 4. $nu.user-autoload-dirs
 
-$env.ENV_CONVERSIONS = {
-    PATH : {
-        from_string: { |s| $s | split row (char esep) | path expand --no-symlink }
-        to_string: { |v| $v | path expand --no-symlink | str join (char esep) }
-    }
-}
-
-$env.PATH = $env.PATH | prepend [
+const pathes = [
     "~/.local/bin"
+    "/var/lib/flatpak/exports/bin"
 ]
-
-if ("/var/lib/flatpak/exports/bin" | path exists) {
-    $env.PATH = $env.PATH | prepend "/var/lib/flatpak/exports/bin"
+$pathes | each { |p|
+    if ($p | path exists) {
+        $env.PATH = $env.PATH | prepend ($p | path expand)
+    }
 }
 
 # ⚠ Doesn't set XDG_CONFIG_HOME !
@@ -74,9 +69,6 @@ def bash_quote [s: string] {
 const vendor_autoload = $nu.data-dir | path join vendor autoload
 mkdir $vendor_autoload
 
-use conf.d/gh.nu *
-use conf.d/atuin.nu *
-
 if (which carapace | is-not-empty) {
     $env.CARAPACE_BRIDGES = 'zsh,inshellisense'
 
@@ -108,6 +100,9 @@ if (which broot | is-not-empty) {
     const init_path = $vendor_autoload | path join broot.nu
     ^broot --print-shell-function nushell | save $init_path --force
 }
+
+use conf.d/gh.nu *
+use conf.d/atuin.nu *
 
 alias c = br
 
