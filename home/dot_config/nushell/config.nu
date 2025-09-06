@@ -69,6 +69,11 @@ def bash_quote [s: string] {
 const vendor_autoload = $nu.data-dir | path join vendor autoload
 mkdir $vendor_autoload
 
+if (which atuin | is-not-empty) {
+    const init_path = $vendor_autoload | path join atuin.nu
+    ^atuin init --disable-up-arrow nu | str replace -a "get -i" "get -o" | save $init_path --force
+}
+
 if (which carapace | is-not-empty) {
     $env.CARAPACE_BRIDGES = 'zsh,inshellisense'
 

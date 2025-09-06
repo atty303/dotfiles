@@ -1,5 +1,7 @@
 [tools]
+age = "latest"
 carapace = "latest"
+claude = "latest"
 fzf = "latest"
 github-cli = "latest"
 helix = "latest"
