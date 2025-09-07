@@ -47,6 +47,15 @@ backend = "github:Esgariot/atuin-win"
 version = "25.07.1"
 backend = "aqua:helix-editor/helix"
 
+[tools."http:gitpod-cli"]
+version = "stable"
+backend = "http:gitpod-cli"
+
+[tools."http:gitpod-cli".platforms.windows-x64]
+checksum = "blake3:34459bcf014370b7ed3cfc8c939921692d5222cc715362a9c0efc6d2ff044deb"
+size = 43980288
+url = "https://releases.gitpod.io/cli/stable/gitpod-windows-amd64.exe"
+
 [tools.node]
 version = "24.7.0"
 backend = "core:node"
