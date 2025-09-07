@@ -1,14 +1,6 @@
 {{ if eq .chezmoi.os "windows" }}
 # Windows specific externals
 
-{{ $atuinVersion := "18.8.0" -}}
-# https://github.com/Esgariot/atuin-win/releases
-["atuin.exe"]
-  type = "file"
-  url = "https://github.com/Esgariot/atuin-win/releases/download/v{{ $atuinVersion }}/atuin.exe"
-  checksum.sha256 = "e3e79bd6cff15d51c7a7ca420fb8e9a1171c3c24ff4088ecd0a52b10ca6c7053"
-  executable = true
-
 # https://ona.com/docs/ona/integrations/cli
 ["gitpod.exe"]
   type = "file"

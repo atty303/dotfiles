@@ -13,30 +13,20 @@ taplo = "latest"
 node = "latest"
 restic = "latest"
 starship = "latest"
+zellij = { version = "latest", os = ["linux", "macos"] }
 zoxide = "latest"
 
 "aqua:nushell/nushell" = "latest"
-
 "ubi:open-source-cooperative/keyring-rs" = "latest"
 
-# Official Windows binaries are not provided, but custom builds exist, so manage with chezmoiexternal
-atuin = { version = "latest", os = ["linux", "macos"] }
-zellij = { version = "latest", os = ["linux", "macos"] }
+[tools."aqua:atuinsh/atuin"]
+version = "latest"
+os = ["linux", "macos"]
 
 [tools."github:Esgariot/atuin-win"]
-version = "latest"
+version = "18.8.0"
+os = ["windows"]
 platforms.windows-x64.asset_pattern = "atuin.exe"
-
-[alias]
-atuin = """
-{% if os() == "windows" %}
-github:Esgariot/atuin-win
-{% else %}
-aqua:atuin/atuin
-{% endif %}
-"""
-
-
 
 [settings]
 activate_aggressive = true

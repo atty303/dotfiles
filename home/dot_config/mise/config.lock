@@ -7,6 +7,10 @@ checksum = "blake3:ccc4221a625902a7e54e583c3f5f23c7bd9ea76d688e7c21733e5a196d799
 size = 5526045
 url = "https://github.com/FiloSottile/age/releases/download/v1.2.1/age-v1.2.1-windows-amd64.zip"
 
+[tools."aqua:atuinsh/atuin"]
+version = "18.8.0"
+backend = "aqua:atuinsh/atuin"
+
 [tools."aqua:nushell/nushell"]
 version = "0.107.0"
 backend = "aqua:nushell/nushell"
