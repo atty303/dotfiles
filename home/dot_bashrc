@@ -16,7 +16,7 @@ if [[ -n "$INTELLIJ_ENVIRONMENT_READER" ]]; then RESOLVING_ENVIRONMENT=1; fi
 if [[ -n "$VSCODE_RESOLVING_ENVIRONMENT" ]]; then RESOLVING_ENVIRONMENT=1; fi
 
 EXEC_NUSHELL=${EXEC_NUSHELL:-1}
-if ! command -v nu &> /dev/null; then
+if ! mise which nu &> /dev/null; then
   EXEC_NUSHELL=0
 fi
 # If running in OpenHands (I'm not using tmux)
@@ -26,9 +26,9 @@ if [[ "$EXEC_NUSHELL" == "1" ]]; then
   # If launched by IDEs, read the environment variables from nushell
   if [[ "$RESOLVING_ENVIRONMENT" == "1" ]]; then
     export RESOLVING_ENVIRONMENT
-    eval $(nu)
+    eval $(mise exec -- nu)
     unset RESOLVING_ENVIRONMENT
   elif [[ "$-" == *i* ]]; then
-    exec nu -i
+    exec mise exec -- nu -i
   fi
 fi
