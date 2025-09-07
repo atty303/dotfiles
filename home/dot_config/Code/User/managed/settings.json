@@ -106,7 +106,6 @@
   "metals.inlayHints.implicitConversions.enable": true,
   "metals.inlayHints.inferredTypes.enable": true,
   "metals.inlayHints.typeParameters.enable": true,
-  "mise.autoDetectMiseBinPath": false,
   "mise.configureExtensionsUseSymLinks": true,
   "redhat.telemetry.enabled": false,
   "remote.SSH.remotePlatform": {
@@ -332,5 +331,6 @@
   "workbench.tree.indent": 16,
   "workbench.view.alwaysShowHeaderActions": true,
   "editor.formatOnSaveMode": "modificationsIfAvailable",
-  "diffEditor.ignoreTrimWhitespace": false
+  "diffEditor.ignoreTrimWhitespace": false,
+  "mise.autoDetectMiseBinPath": false
 }

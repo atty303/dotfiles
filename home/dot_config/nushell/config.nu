@@ -107,3 +107,4 @@ if (which broot | is-not-empty) {
 }
 
 use conf.d/gh.nu *
+use conf.d/tasks.nu

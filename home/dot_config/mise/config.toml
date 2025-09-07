@@ -16,6 +16,7 @@ starship = "latest"
 zellij = { version = "latest", os = ["linux", "macos"] }
 zoxide = "latest"
 
+"github:cargo-generate/cargo-generate" = "latest"
 "aqua:nushell/nushell" = "latest"
 "ubi:open-source-cooperative/keyring-rs" = "latest"
 
