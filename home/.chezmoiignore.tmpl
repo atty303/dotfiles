@@ -1,5 +1,18 @@
-# ignored source
-/README.md
+# global
+**/.DS_Store
+
+# Platform specific directories
+{{ if ne .chezmoi.os "darwin" }}
+.chezmoiscripts/darwin/**
+Library/
+{{ end }}
+{{ if ne .chezmoi.os "linux" }}
+.chezmoiscripts/linux/**
+{{ end }}
+{{ if ne .chezmoi.os "windows" }}
+.chezmoiscripts/windows/**
+AppData/
+{{ end }}
 
 # ignored target
 .ssh/SSH_AUTH_SOCK
@@ -57,42 +70,10 @@
 .config/carapace/specs
 .config/configstore/
 
-.chezmoiscripts/darwin/.init.sh
-.chezmoiscripts/linux/.init.sh
-.chezmoiscripts/windows/.init.ps1
-
-# ignored by os
-{{ if eq .chezmoi.os "darwin" }}
-!Library/Application Support/nushell/
-#Library/
-Applications/
-Desktop/
-Documents/
-Downloads/
-Dropbox/
-Movies/
-Music/
-Pictures/
-Public/
-{{ end }}
-{{ if ne .chezmoi.os "darwin" }}
-.chezmoiscripts/darwin/**
-/Library/
-{{ end }}
-
-{{ if ne .chezmoi.os "linux" }}
-.chezmoiscripts/linux/**
-{{ end }}
-
 {{ if ne .chezmoi.os "windows" }}
-.chezmoiscripts/windows/**
-AppData/
 .config/alacritty/windows.toml
 {{ end }}
 
 {{ if not .homebrew }}
 .config/homebrew/
 {{ end }}
-
-# global
-**/.DS_Store

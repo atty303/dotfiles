@@ -69,6 +69,11 @@ def bash_quote [s: string] {
 const vendor_autoload = $nu.data-dir | path join vendor autoload
 mkdir $vendor_autoload
 
+if (which mise | is-not-empty) {
+    const init_path = $vendor_autoload | path join mise.nu
+    ^mise activate nu | save $init_path --force
+}
+
 if (which atuin | is-not-empty) {
     const init_path = $vendor_autoload | path join atuin.nu
     ^atuin init --disable-up-arrow nu | str replace -a "get -i" "get -o" | save $init_path --force
@@ -79,11 +84,6 @@ if (which carapace | is-not-empty) {
 
     const init_path = $vendor_autoload | path join carapace.nu
     ^carapace _carapace nushell | save $init_path --force
-}
-
-if (which mise | is-not-empty) {
-    const init_path = $vendor_autoload | path join mise.nu
-    ^mise activate nu | save $init_path --force
 }
 
 if (which starship | is-not-empty) {
@@ -107,21 +107,3 @@ if (which broot | is-not-empty) {
 }
 
 use conf.d/gh.nu *
-use conf.d/atuin.nu *
-
-alias c = br
-
-#if $env.ZELLIJ? != "0" {
-#  zellij attach -c
-#  exit
-#}
-
-# If we are called by envinronment resolver, print the environment variables for parent shell
-if ($env.RESOLVING_ENVIRONMENT? == "1") {
-    $env | transpose name value | where { not (($in.name in ["config" "ENV_CONVERSIONS"]) or ($in.name | str contains "PROMPT")) } | each { |e|
-        let conversion = $env.ENV_CONVERSIONS | get -o $e.name
-        let value = if ($conversion | is-not-empty) { $e.value | do $conversion.to_string $e.value } else { $e.value }
-        print $"export ($e.name)=(bash_quote ($value | to text))"
-    }
-    exit 0
-}
