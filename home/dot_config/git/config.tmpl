@@ -3,6 +3,7 @@
 
 [core]
   autocrlf = input
+  symlink = true
 {{ if (eq .chezmoi.os "windows") -}}
   sshCommand = "C:/Windows/System32/OpenSSH/ssh.exe"
 {{ else if (.wsl) }}
