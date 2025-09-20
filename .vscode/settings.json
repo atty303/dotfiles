@@ -1,7 +1,4 @@
 {
-    "debug.javascript.defaultRuntimeExecutable": {
-        "pwa-node": "${workspaceFolder}\\.vscode\\mise-tools\\node"
-    },
     "files.associations": {
         "*.ps1.tmpl": "powershell",
         ".chezmoiscripts/*": "go-template"
