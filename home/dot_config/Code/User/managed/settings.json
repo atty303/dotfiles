@@ -109,6 +109,9 @@
   "metals.inlayHints.inferredTypes.enable": true,
   "metals.inlayHints.typeParameters.enable": true,
   "mise.autoDetectMiseBinPath": false,
+  "mise.checkForNewMiseVersion": false,
+  "mise.configureExtensionsAutomatically": false,
+  "powershell.enableReferencesCodeLens": false,
   "redhat.telemetry.enabled": false,
   "remote.SSH.remotePlatform": {
     "*.gitpod.local": "linux",

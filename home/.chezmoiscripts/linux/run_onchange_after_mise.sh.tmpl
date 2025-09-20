@@ -6,7 +6,7 @@
 {{ end -}}
 
 if command -v git &>/dev/null; then
-  token=$(printf "%s\n" protocol=https host=github.com | GIT_TERMINAL_PROMPT=0 git credential fill 2>/dev/null | sed -n "s/^password=//p")
+  token=$((printf "%s\n" protocol=https host=github.com | GIT_TERMINAL_PROMPT=0 git credential fill 2>/dev/null | sed -n "s/^password=//p") || exit 0)
   export GITHUB_TOKEN=$token
 fi
 
