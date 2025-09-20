@@ -1,15 +1,47 @@
-#!/usr/bin/env -S mise tool-stub
-
-version = "18.8.0"
-
-[platforms.darwin-arm64]
-url = "https://github.com/atuinsh/atuin/releases/download/v{{version}}/atuin-aarch64-apple-darwin.tar.gz"
-
-[platforms.linux-x64]
-url = "https://github.com/atuinsh/atuin/releases/download/v{{version}}/atuin-x86_64-unknown-linux-gnu.tar.gz"
-
-[platforms.linux-arm64]
-url = "https://github.com/atuinsh/atuin/releases/download/v{{version}}/atuin-aarch64-unknown-linux-gnu.tar.gz"
-
-[platforms.windows-x64]
-url = "https://github.com/Esgariot/atuin-win/releases/download/v{{version}}/atuin.exe"
+#!/usr/bin/env dotslash
+{
+    "name": "atuin",
+    "platforms": {
+        "macos-aarch64": {
+            "size": 54597579,
+            "hash": "sha256",
+            "digest": "e3e79bd6cff15d51c7a7ca420fb8e9a1171c3c24ff4088ecd0a52b10ca6c7053",
+            "format": "tar.gz",
+            "path": "atuin",
+            "providers": [
+                {
+                    "type": "github-release",
+                    "repo": "atuinsh/atuin",
+                    "tag": "v18.8.0",
+                    "name": "atuin-aarch64-apple-darwin.tar.gz"
+                }
+            ]
+        },
+        "linux-x86_64": {
+            "size": 54597579,
+            "hash": "sha256",
+            "digest": "e3e79bd6cff15d51c7a7ca420fb8e9a1171c3c24ff4088ecd0a52b10ca6c7053",
+            "format": "tar.gz",
+            "path": "atuin",
+            "providers": [
+                {
+                    "type": "github-release",
+                    "repo": "atuinsh/atuin",
+                    "tag": "v18.8.0",
+                    "name": "atuin-x86_64-unknown-linux-gnu.tar.gz"
+                }
+            ]
+        },
+        "windows-x86_64": {
+            "path": "atuin",
+            "hash": "sha256",
+            "digest": "e3e79bd6cff15d51c7a7ca420fb8e9a1171c3c24ff4088ecd0a52b10ca6c7053",
+            "size": 54597579,
+            "providers": [
+                {
+                    "url": "https://github.com/Esgariot/atuin-win/releases/download/v18.8.0/atuin.exe"
+                }
+            ]
+        }
+    }
+}

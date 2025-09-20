@@ -1,0 +1,16 @@
+{{ if eq .chezmoi.os "windows" }}
+["dotslash.exe"]
+    type = "file"
+    url = "https://github.com/facebook/dotslash/raw/main/windows_shim/dotslash_windows_shim-x86_64.exe"
+    executable = true
+{{ else if eq .chezmoi.os "linux" }}
+["dotslash"]
+    type = "archive-file"
+    url = {{ gitHubReleaseAssetURL "facebook/dotslash" "v0.5.8" (printf "dotslash-linux-musl.%s.tar.gz" .chezmoi.arch) }}
+    executable = true
+{{ else if eq .chezmoi.os "darwin" }}
+["dotslash"]
+    type = "archive-file"
+    url = {{ gitHubReleaseAssetURL "facebook/dotslash" "v0.5.8" (printf "dotslash-macos-%s.tar.gz" .chezmoi.arch) }}
+    executable = true
+{{ end }}

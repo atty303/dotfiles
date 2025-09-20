@@ -49,6 +49,10 @@ backend = "core:deno"
 checksum = "blake3:69f86aa5943ad338a0cae4b2ca7a045017b1692042196117bb0ab58b8ca6c165"
 size = 45151703
 
+[[tools.dotslash]]
+version = "0.5.8"
+backend = "github:facebook/dotslash"
+
 [[tools.fzf]]
 version = "0.65.2"
 backend = "aqua:junegunn/fzf"
