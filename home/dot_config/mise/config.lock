@@ -122,10 +122,6 @@ backend = "aqua:tamasfe/taplo"
 version = "3.6.3-republish"
 backend = "ubi:open-source-cooperative/keyring-rs"
 
-[[tools.zellij]]
-version = "0.43.1"
-backend = "aqua:zellij-org/zellij"
-
 [[tools.zoxide]]
 version = "0.9.8"
 backend = "aqua:ajeetdsouza/zoxide"

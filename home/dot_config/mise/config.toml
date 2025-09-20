@@ -15,7 +15,7 @@ taplo = "latest"
 restic = "latest"
 ripgrep = "latest"
 starship = "latest"
-zellij = { version = "latest", os = ["linux", "macos"] }
+# zellij = { version = "latest", os = ["linux", "macos"] }
 zoxide = "latest"
 
 "aqua:nushell/nushell" = "latest"
