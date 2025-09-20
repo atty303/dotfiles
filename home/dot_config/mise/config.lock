@@ -15,6 +15,11 @@ backend = "aqua:nushell/nushell"
 version = "0.25.0"
 backend = "aqua:sharkdp/bat"
 
+[tools.bat.platforms.linux-x64]
+checksum = "blake3:7df2a4f13bc15af2139f6c3a4ade54c6596bdfe67955a14c7ae3c43c782a3575"
+size = 3275963
+url = "https://github.com/sharkdp/bat/releases/download/v0.25.0/bat-v0.25.0-x86_64-unknown-linux-musl.tar.gz"
+
 [tools.bat.platforms.windows-x64]
 checksum = "blake3:7bc5a453cec7e352be788effb06e2f37cf13af57cecc6bd62031313c842d0e65"
 size = 3339506
@@ -23,6 +28,10 @@ url = "https://github.com/sharkdp/bat/releases/download/v0.25.0/bat-v0.25.0-x86_
 [[tools.bun]]
 version = "1.2.22"
 backend = "core:bun"
+
+[tools.bun.platforms.linux-x64]
+checksum = "blake3:bf32acffd6e77803ba760caf8d2909389da01c95613b81fe155fe87e2a8f8004"
+size = 39256266
 
 [tools.bun.platforms.windows-x64]
 checksum = "blake3:a03fdbbc1ba6d3f39607d1c5065629792eeed1e56489e215858e3d527793c760"
@@ -45,6 +54,10 @@ backend = "npm:@anthropic-ai/claude-code"
 version = "2.5.1"
 backend = "core:deno"
 
+[tools.deno.platforms.linux-x64]
+checksum = "blake3:28f70242a417ac61ab6476ba32c131bed590269de6e50b000b5462e3c752b7fa"
+size = 45359922
+
 [tools.deno.platforms.windows-x64]
 checksum = "blake3:69f86aa5943ad338a0cae4b2ca7a045017b1692042196117bb0ab58b8ca6c165"
 size = 45151703
@@ -52,6 +65,11 @@ size = 45151703
 [[tools.dotslash]]
 version = "0.5.8"
 backend = "github:facebook/dotslash"
+
+[tools.dotslash.platforms.linux-x64]
+checksum = "blake3:4d518dd6e020724ffab6ec8d39b1f93618636491a3e83d32f16376356ebdf2f6"
+size = 834668
+url = "https://github.com/facebook/dotslash/releases/download/v0.5.8/dotslash-linux-musl.x86_64.tar.gz"
 
 [[tools.fzf]]
 version = "0.65.2"
