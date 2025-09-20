@@ -18,7 +18,7 @@
             ]
         },
         "linux-x86_64": {
-            "size": 14422242,
+            "size": 13833762,
             "hash": "sha256",
             "digest": "d6270f44b11ee3aa781a7ba4d9e947e8569e3b8073f3c0eae5e41c4a69d859f4",
             "format": "tar.gz",
