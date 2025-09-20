@@ -31,6 +31,7 @@
   "diffEditor.experimental.showMoves": true,
   "diffEditor.experimental.useTrueInlineView": true,
   "diffEditor.hideUnchangedRegions.enabled": true,
+  "diffEditor.ignoreTrimWhitespace": false,
   "diffEditor.renderSideBySide": false,
   "docker.extension.enableComposeLanguageServer": false,
   "editor.autoIndent": "advanced",
@@ -41,6 +42,7 @@
   "editor.find.seedSearchStringFromSelection": "selection",
   "editor.fontFamily": "\"UDEV Gothic NFLG\", Cica, Consolas, monospace",
   "editor.fontSize": 14,
+  "editor.formatOnSaveMode": "modificationsIfAvailable",
   "editor.formatOnType": true,
   "editor.guides.bracketPairs": "active",
   "editor.inlayHints.fontFamily": "\"IBM Plex Sans Condensed\"",
@@ -106,7 +108,7 @@
   "metals.inlayHints.implicitConversions.enable": true,
   "metals.inlayHints.inferredTypes.enable": true,
   "metals.inlayHints.typeParameters.enable": true,
-  "mise.configureExtensionsUseSymLinks": true,
+  "mise.autoDetectMiseBinPath": false,
   "redhat.telemetry.enabled": false,
   "remote.SSH.remotePlatform": {
     "*.gitpod.local": "linux",
@@ -115,13 +117,35 @@
     "0197454c-e83b-7e8b-8975-a10b85afdbaa.gitpod.remote": "linux",
     "0197456c-bb94-7989-8de8-46827467ac42.gitpod.remote": "linux",
     "01975797-cccf-717e-b031-02c0fda892fe.gitpod.remote": "linux",
-    "192.168.2.163": "linux",
-    "192.168.2.143": "linux",
-    "192.168.2.138": "linux",
-    "infinitas.local": "linux",
-    "sdvx.local": "linux",
     "0198c051-212a-73e6-81c8-b6e60d0967f1.gitpod.remote": "linux",
-    "01991750-daeb-7706-9143-712fadd75e32.gitpod.remote": "linux"
+    "01991750-daeb-7706-9143-712fadd75e32.gitpod.remote": "linux",
+    "019936a4-2bbb-7e26-bd81-21c58cb09174.gitpod.remote": "linux",
+    "019936cf-632a-79a3-952f-5befdf8f2af1.gitpod.remote": "linux",
+    "019937e2-6f88-7903-8994-55adfc33be79.gitpod.remote": "linux",
+    "01993808-f858-78fd-b226-15fd497679f6.gitpod.remote": "linux",
+    "01993830-f6e3-708f-b95a-2214a0609838.gitpod.remote": "linux",
+    "0199385d-b8f9-745b-a96d-0420d1813b2e.gitpod.remote": "linux",
+    "01994d11-2af8-7dbc-8585-16d2ad57724c.gitpod.remote": "linux",
+    "01994fa3-506b-72fc-af52-76c98de09b48.gitpod.remote": "linux",
+    "01994faf-c43e-77af-8daa-dc25542c6a70.gitpod.remote": "linux",
+    "0199504d-d147-785f-b4a7-565640030852.gitpod.remote": "linux",
+    "019952fd-6cd8-764e-8e83-7ff51ec392f9.gitpod.remote": "linux",
+    "019957e6-2aa6-7e72-8b7f-9ea505134655.gitpod.remote": "linux",
+    "019959b7-4a78-734b-87df-134441444f05.gitpod.remote": "linux",
+    "01995a2d-5daf-7993-951b-b35aa70d1b3e.gitpod.remote": "linux",
+    "01995a32-2cd9-7654-948b-d58a2208b62c.gitpod.remote": "linux",
+    "01995b51-5b8c-7eec-a48f-1579faf0a9c2.gitpod.remote": "linux",
+    "01995b81-2b94-7a05-8426-2f078c10165f.gitpod.remote": "linux",
+    "01995b9b-24a9-7944-9886-8f8f7603f340.gitpod.remote": "linux",
+    "0199612e-806c-74ee-9a5b-c4684aec6b46.gitpod.remote": "linux",
+    "01996132-fe94-79ed-99d7-37c74c203bbd.gitpod.remote": "linux",
+    "0199650c-8ba3-7954-b5aa-e74dbe8a963e.gitpod.remote": "linux",
+    "01996597-06da-78fa-b316-df5b37fa0dd3.gitpod.remote": "linux",
+    "192.168.2.138": "linux",
+    "192.168.2.143": "linux",
+    "192.168.2.163": "linux",
+    "infinitas.local": "linux",
+    "sdvx.local": "linux"
   },
   "scm.alwaysShowRepositories": true,
   "scm.defaultViewMode": "tree",
@@ -311,8 +335,22 @@
       "icon": "terminal-bash",
       "path": "bash"
     },
+    "fish": {
+      "path": "fish"
+    },
     "nu": {
       "path": "nu"
+    },
+    "pwsh": {
+      "icon": "terminal-powershell",
+      "path": "pwsh"
+    },
+    "sh": {
+      "path": "/bin/sh"
+    },
+    "tmux": {
+      "icon": "terminal-tmux",
+      "path": "tmux"
     },
     "zsh": {
       "path": "zsh"
@@ -329,8 +367,5 @@
   "workbench.editor.showTabs": "single",
   "workbench.list.smoothScrolling": true,
   "workbench.tree.indent": 16,
-  "workbench.view.alwaysShowHeaderActions": true,
-  "editor.formatOnSaveMode": "modificationsIfAvailable",
-  "diffEditor.ignoreTrimWhitespace": false,
-  "mise.autoDetectMiseBinPath": false
+  "workbench.view.alwaysShowHeaderActions": true
 }
