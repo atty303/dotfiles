@@ -22,7 +22,7 @@
             "hash": "sha256",
             "digest": "20422e93d25159f895c1fabbba6b000bc1ef65d2276ceb09e2902b3dda8ca422",
             "format": "tar.gz",
-            "path": "atuin-aarch64-unknown-linux-musl/atuin",
+            "path": "atuin-x86_64-unknown-linux-musl/atuin",
             "providers": [
                 {
                     "url": "https://github.com/atuinsh/atuin/releases/download/v18.8.0/atuin-x86_64-unknown-linux-musl.tar.gz"
