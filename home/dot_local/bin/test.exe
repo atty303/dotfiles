@@ -1,8 +1,0 @@
-#!/usr/bin/env -S mise tool-stub
-
-bin = 'complete\_rg.ps1'
-
-[platforms.linux-x64]
-url = "https://github.com/BurntSushi/ripgrep/releases/download/14.0.3/ripgrep-14.0.3-x86_64-unknown-linux-musl.tar.gz"
-checksum = "blake3:0b1f7f5e80201710ea6e0b32cc47dcaf2dd60ed451451065cb5c2eb40576030c"
-size = 2413752 # 2.30 MiB
