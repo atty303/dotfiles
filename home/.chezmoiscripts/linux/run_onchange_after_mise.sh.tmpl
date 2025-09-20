@@ -5,8 +5,8 @@
 # {{ $file }}: {{ $file | include | sha256sum }}
 {{ end -}}
 
-if command -v git &>/dev/null && command -v timeout &>/dev/null; then
-  token=$(timeout 0.1s bash -c 'printf "%s\n" protocol=https host=github.com | git credential fill 2>/dev/null | sed -n "s/^password=//p"' || exit 0)
+if command -v git &>/dev/null; then
+  token=$(printf "%s\n" protocol=https host=github.com | GIT_TERMINAL_PROMPT=0 git credential fill 2>/dev/null | sed -n "s/^password=//p")
   export GITHUB_TOKEN=$token
 fi
 
