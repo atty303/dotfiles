@@ -18,14 +18,14 @@
             ]
         },
         "linux-x86_64": {
-            "size": 13833762,
+            "size": 14522115,
             "hash": "sha256",
-            "digest": "d6270f44b11ee3aa781a7ba4d9e947e8569e3b8073f3c0eae5e41c4a69d859f4",
+            "digest": "20422e93d25159f895c1fabbba6b000bc1ef65d2276ceb09e2902b3dda8ca422",
             "format": "tar.gz",
             "path": "atuin-aarch64-unknown-linux-musl/atuin",
             "providers": [
                 {
-                    "url": "https://github.com/atuinsh/atuin/releases/download/v18.8.0/atuin-aarch64-unknown-linux-musl.tar.gz"
+                    "url": "https://github.com/atuinsh/atuin/releases/download/v18.8.0/atuin-x86_64-unknown-linux-musl.tar.gz"
                 }
             ]
         },
