@@ -5,4 +5,10 @@
 # {{ $file }}: {{ $file | include | sha256sum }}
 {{ end -}}
 
-mise install
+if command -v git &>/dev/null && command -v timeout &>/dev/null; then
+  token=$(timeout 0.1s bash -c 'printf "%s\n" protocol=https host=github.com | git credential fill 2>/dev/null | sed -n "s/^password=//p"' || exit 0)
+  export GITHUB_TOKEN=$token
+fi
+
+mise install -y
+

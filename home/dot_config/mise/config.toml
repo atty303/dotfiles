@@ -2,6 +2,7 @@ min_version = "2025.9.2"
 
 [tools]
 age = "latest"
+bat = "latest"
 bun = "latest"
 carapace = "latest"
 claude = "latest"
@@ -10,23 +11,14 @@ fzf = "latest"
 github-cli = "latest"
 helix = "latest"
 taplo = "latest"
-node = "latest"
 restic = "latest"
+ripgrep = "latest"
 starship = "latest"
 zellij = { version = "latest", os = ["linux", "macos"] }
 zoxide = "latest"
 
 "aqua:nushell/nushell" = "latest"
 "ubi:open-source-cooperative/keyring-rs" = "latest"
-
-[tools."aqua:atuinsh/atuin"]
-version = "latest"
-os = ["linux", "macos"]
-
-[tools."github:Esgariot/atuin-win"]
-version = "18.8.0"
-os = ["windows"]
-platforms.windows-x64.asset_pattern = "atuin.exe"
 
 [tools."http:gitpod-cli"]
 version = "stable"
