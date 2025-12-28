@@ -2,7 +2,8 @@
 google = [
     "IBM Plex Sans Condensed",
     "IBM Plex Sans JP",
-
+    "BIZ UDPGothic:400",
+    "BIZ UDPGothic:700",
 ]
 zip = [
     "https://github.com/yuru7/udev-gothic/releases/download/v2.1.0/UDEVGothic_v2.1.0.zip",

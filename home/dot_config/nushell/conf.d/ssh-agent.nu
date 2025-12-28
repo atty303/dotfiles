@@ -2,11 +2,15 @@ def check-local-ssh-agent [] {
      return (match $nu.os-info.name {
         "macos" => {
             # 1Password agent
-            "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" | path exists
+            if ("~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" | path exists) { "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" } else null
         }
         "windows" => {
             # Bundled OpenSSH agent and 1Password agent use the same socket
-            '\\.\pipe\openssh-ssh-agent' | path exists
+            if ('\\.\pipe\openssh-ssh-agent' | path exists) { '\\.\pipe\openssh-ssh-agent' } else null
+        }
+        "linux" => {
+            # 1Password agent
+            if ("~/.1password/agent.sock" | path exists) { "~/.1password/agent.sock" } else null
         }
         _ => false
     })
@@ -18,21 +22,31 @@ def save-ssh-agent-env [sock: string] {
 }
 
 do --env {
-    # Check if the user has a local SSH agent running
-    if (check-local-ssh-agent) {
-        if (($env.SSH_AUTH_SOCK? | is-not-empty) and ($env.SSH_AUTH_SOCK | str contains "wezterm")) {
+    # If SSH_AUTH_SOCK is set, we assume the user has already started an SSH agent or forwarding is set up
+    if ($env.SSH_AUTH_SOCK? | is-not-empty) {
+        # Ignore wezterm's builtin ssh support
+        if ($env.SSH_AUTH_SOCK | str contains "wezterm") {
             hide-env SSH_AUTH_SOCK
+        }
+        if ($env.SSH_AUTH_SOCK | path exists) {
+            save-ssh-agent-env $env.SSH_AUTH_SOCK
+            return
+        } else {
+            hide-env SSH_AUTH_SOCK
+        }
+    }
+
+    # Check if the user has a local SSH agent running
+    let local_sock = check-local-ssh-agent
+    if $local_sock != null {
+        $env.SSH_AUTH_SOCK = ($local_sock | path expand)
+        if (which systemctl | is-not-empty) {
+            systemctl --user import-environment SSH_AUTH_SOCK
         }
         return
     }
 
-    # If SSH_AUTH_SOCK is set, we assume the user has already started an SSH agent or forwarding is set up
-    if ($env.SSH_AUTH_SOCK? | is-not-empty) {
-        save-ssh-agent-env $env.SSH_AUTH_SOCK
-        return
-    }
-
-    # There is no SSH agent running, so we need to start one
+    # There is no SSH agent running, so we need to start one (typically CDE)
     let ssh_agent_file = (
         $nu.temp-path | path join $"ssh-agent-($env.USER? | default $env.USERNAME?).nuon"
     )

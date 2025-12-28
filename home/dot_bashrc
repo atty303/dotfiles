@@ -8,6 +8,7 @@ for dir in "${dirs[@]}"; do
   esac
 done
 
+alias ni="exec mise exec -- nu -i"
 
 RESOLVING_ENVIRONMENT=0
 # https://intellij-support.jetbrains.com/hc/en-us/articles/15268184143890-Shell-Environment-Loading
@@ -15,20 +16,11 @@ if [[ -n "$INTELLIJ_ENVIRONMENT_READER" ]]; then RESOLVING_ENVIRONMENT=1; fi
 # https://code.visualstudio.com/docs/editor/command-line#_how-do-i-detect-when-a-shell-was-launched-by-vs-code
 if [[ -n "$VSCODE_RESOLVING_ENVIRONMENT" ]]; then RESOLVING_ENVIRONMENT=1; fi
 
-EXEC_NUSHELL=${EXEC_NUSHELL:-1}
-if ! mise which nu &> /dev/null; then
-  EXEC_NUSHELL=0
-fi
-# If running in OpenHands (I'm not using tmux)
-if [[ -n "$TMUX" ]]; then EXEC_NUSHELL=0; fi
-
-if [[ "$EXEC_NUSHELL" == "1" ]]; then
-  # If launched by IDEs, read the environment variables from nushell
-  if [[ "$RESOLVING_ENVIRONMENT" == "1" ]]; then
+# If launched by IDEs, read the environment variables from nushell
+if [[ "$RESOLVING_ENVIRONMENT" == "1" ]]; then
+  if mise which nu &> /dev/null; then
     export RESOLVING_ENVIRONMENT
     eval $(mise exec -- nu)
     unset RESOLVING_ENVIRONMENT
-  elif [[ "$-" == *i* ]]; then
-    exec mise exec -- nu -i
   fi
 fi

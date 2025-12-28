@@ -1,0 +1,9 @@
+[Unit]
+Description=Set SSH_AUTH_SOCK
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/mise exec -- nu %h/.config/nushell/conf.d/ssh-agent.nu
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,71 @@
+#!/usr/bin/env -S bash -euo pipefail
+
+fonts_dir="${2:-${XDG_DATA_HOME:-$HOME/.local/share}/fonts}"
+
+cd "$fonts_dir"
+
+{{ range .fonts.google -}}
+  mise exec http:google-font-download[url=https://raw.githubusercontent.com/neverpanic/google-font-download/refs/tags/1.4.3/google-font-download] -- google-font-download --format=ttf --languages=all --output=/dev/null {{ . | quote }}
+{{ end -}}
+
+install_fonts_from_zip() {
+  local url="${1:?URL is required}"
+
+  local tmpdir zipfile
+  tmpdir="$(mktemp -d)" || return 1
+  zipfile="$tmpdir/fonts.zip"
+
+  # Clean up temp on return
+  trap 'rm -rf "$tmpdir"' RETURN
+
+  local outdir="$fonts_dir"
+
+  # Download
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL --retry 3 --retry-delay 1 -o "$zipfile" "$url" || return 1
+  elif command -v wget >/dev/null 2>&1; then
+    wget -qO "$zipfile" "$url" || return 1
+  else
+    echo "install_fonts_from_zip: need curl or wget" >&2
+    return 1
+  fi
+
+  # Extract into temp
+  local extract_dir="$tmpdir/extracted"
+  mkdir -p "$extract_dir" || return 1
+
+  if command -v unzip >/dev/null 2>&1; then
+    unzip -qq "$zipfile" -d "$extract_dir" || return 1
+  elif command -v bsdtar >/dev/null 2>&1; then
+    bsdtar -xf "$zipfile" -C "$extract_dir" || return 1
+  else
+    echo "install_fonts_from_zip: need unzip or bsdtar (libarchive)" >&2
+    return 1
+  fi
+
+  # Find and copy .ttf files (case-insensitive)
+  local count=0
+  while IFS= read -r -d '' f; do
+    # Keep just the filename; if you want to preserve subdirs, change this.
+    local base
+    base="$(basename "$f")"
+    install -m 0644 "$f" "$outdir/$base"
+    count=$((count + 1))
+  done < <(find "$extract_dir" -type f \( -iname '*.ttf' \) -print0)
+
+  if [[ $count -eq 0 ]]; then
+    echo "install_fonts_from_zip: no .ttf files found in zip" >&2
+    return 2
+  fi
+
+  echo "Installed $count font(s) to: $outdir"
+}
+
+{{ range .fonts.zip -}}
+  install_fonts_from_zip {{ . | quote }}
+{{ end -}}
+
+# Update font cache
+if command -v fc-cache >/dev/null 2>&1; then
+  fc-cache -f "$fonts_dir" >/dev/null 2>&1 || fc-cache -f >/dev/null 2>&1 || true
+fi
