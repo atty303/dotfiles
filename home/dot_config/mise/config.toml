@@ -19,6 +19,9 @@ zoxide = "latest"
 
 "aqua:nushell/nushell" = "latest"
 "ubi:open-source-cooperative/keyring-rs" = "latest"
+pnpm = "latest"
+node = "latest"
+yazi = "latest"
 
 [tools."http:gitpod-cli"]
 version = "stable"
