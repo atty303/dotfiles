@@ -1,0 +1,14 @@
+[[mgr.append_keymap]]
+on   = "q"
+run  = "quit --no-cwd-file"
+desc = "Quit without outputting cwd-file"
+
+[[mgr.append_keymap]]
+on   = "Q"
+run  = "quit"
+desc = "Quit the process"
+
+[[mgr.prepend_keymap]]
+on   = "T"
+run  = "plugin toggle-pane max-preview"
+desc = "Maximize or restore the preview pane"
