@@ -1,9 +1,9 @@
-[[mgr.append_keymap]]
+[[mgr.prepend_keymap]]
 on   = "q"
 run  = "quit --no-cwd-file"
 desc = "Quit without outputting cwd-file"
 
-[[mgr.append_keymap]]
+[[mgr.prepend_keymap]]
 on   = "Q"
 run  = "quit"
 desc = "Quit the process"

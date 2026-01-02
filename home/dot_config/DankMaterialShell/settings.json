@@ -1,5 +1,5 @@
 {
-  "currentThemeName": "dynamic",
+  "currentThemeName": "blue",
   "customThemeFile": "",
   "matugenScheme": "scheme-tonal-spot",
   "runUserMatugenTemplates": true,
@@ -17,7 +17,7 @@
   "customAnimationDuration": 500,
   "wallpaperFillMode": "Fill",
   "blurredWallpaperLayer": false,
-  "blurWallpaperOnOverview": true,
+  "blurWallpaperOnOverview": false,
   "showLauncherButton": true,
   "showWorkspaceSwitcher": true,
   "showFocusedWindow": true,
@@ -36,12 +36,12 @@
   "showBattery": true,
   "showControlCenterButton": true,
   "showCapsLockIndicator": true,
-  "controlCenterShowNetworkIcon": false,
+  "controlCenterShowNetworkIcon": true,
   "controlCenterShowBluetoothIcon": true,
   "controlCenterShowAudioIcon": true,
   "controlCenterShowVpnIcon": true,
   "controlCenterShowBrightnessIcon": false,
-  "controlCenterShowMicIcon": true,
+  "controlCenterShowMicIcon": false,
   "controlCenterShowBatteryIcon": false,
   "controlCenterShowPrinterIcon": false,
   "showPrivacyButton": true,
@@ -98,39 +98,30 @@
   "workspacesPerMonitor": true,
   "showOccupiedWorkspacesOnly": false,
   "dwlShowAllTags": false,
-  "workspaceNameIcons": {
-    "widget": {
-      "type": "icon",
-      "value": "dashboard"
-    },
-    "secondary": {
-      "type": "icon",
-      "value": "chat"
-    }
-  },
+  "workspaceNameIcons": {},
   "waveProgressEnabled": true,
   "scrollTitleEnabled": true,
   "clockCompactMode": false,
   "focusedWindowCompactMode": false,
   "runningAppsCompactMode": true,
   "keyboardLayoutNameCompactMode": false,
-  "runningAppsCurrentWorkspace": true,
+  "runningAppsCurrentWorkspace": false,
   "runningAppsGroupByApp": false,
   "centeringMode": "index",
-  "clockDateFormat": "yyyy-MM-dd",
+  "clockDateFormat": "",
   "lockDateFormat": "",
   "mediaSize": 1,
   "appLauncherViewMode": "grid",
   "spotlightModalViewMode": "list",
   "sortAppsAlphabetically": false,
-  "appLauncherGridColumns": 4,
+  "appLauncherGridColumns": 6,
   "spotlightCloseNiriOverview": true,
   "niriOverviewOverlayEnabled": true,
-  "weatherLocation": "東京都",
-  "weatherCoordinates": "35.6768601,139.7638947",
-  "useAutoLocation": false,
+  "weatherLocation": "New York, NY",
+  "weatherCoordinates": "40.7128,-74.0060",
+  "useAutoLocation": true,
   "weatherEnabled": true,
-  "networkPreference": "ethernet",
+  "networkPreference": "auto",
   "vpnLastConnected": "",
   "iconTheme": "System Default",
   "launcherLogoMode": "apps",
@@ -141,7 +132,7 @@
   "launcherLogoContrast": 1,
   "launcherLogoSizeOffset": 0,
   "fontFamily": "IBM Plex Sans JP",
-  "monoFontFamily": "Noto Sans Mono CJK JP",
+  "monoFontFamily": "Fira Code",
   "fontWeight": 400,
   "fontScale": 1,
   "notepadUseMonospace": true,
@@ -155,7 +146,7 @@
   "soundNewNotification": true,
   "soundVolumeChanged": true,
   "soundPluggedIn": true,
-  "acMonitorTimeout": 0,
+  "acMonitorTimeout": 3600,
   "acLockTimeout": 0,
   "acSuspendTimeout": 0,
   "acSuspendBehavior": 0,
@@ -179,15 +170,15 @@
   "qtThemingEnabled": false,
   "syncModeWithPortal": true,
   "terminalsAlwaysDark": false,
-  "showDock": true,
-  "dockAutoHide": true,
+  "showDock": false,
+  "dockAutoHide": false,
   "dockGroupByApp": false,
-  "dockOpenOnOverview": true,
+  "dockOpenOnOverview": false,
   "dockPosition": 1,
   "dockSpacing": 4,
   "dockBottomGap": 0,
   "dockMargin": 0,
-  "dockIconSize": 48,
+  "dockIconSize": 40,
   "dockIndicatorStyle": "circle",
   "dockBorderEnabled": false,
   "dockBorderColor": "surfaceText",
@@ -198,14 +189,14 @@
   "lockScreenShowPowerActions": true,
   "enableFprint": false,
   "maxFprintTries": 15,
-  "lockScreenActiveMonitor": "DP-5",
+  "lockScreenActiveMonitor": "all",
   "lockScreenInactiveColor": "#000000",
   "hideBrightnessSlider": false,
   "notificationTimeoutLow": 5000,
   "notificationTimeoutNormal": 5000,
   "notificationTimeoutCritical": 0,
   "notificationPopupPosition": 3,
-  "osdAlwaysShowValue": true,
+  "osdAlwaysShowValue": false,
   "osdPosition": 5,
   "osdVolumeEnabled": true,
   "osdMediaVolumeEnabled": true,
@@ -213,7 +204,7 @@
   "osdIdleInhibitorEnabled": true,
   "osdMicMuteEnabled": true,
   "osdCapsLockEnabled": true,
-  "osdPowerProfileEnabled": true,
+  "osdPowerProfileEnabled": false,
   "osdAudioOutputEnabled": true,
   "powerActionConfirm": true,
   "powerActionHoldDuration": 0.5,
@@ -225,7 +216,7 @@
     "suspend",
     "restart"
   ],
-  "powerMenuDefaultAction": "logout",
+  "powerMenuDefaultAction": "suspend",
   "powerMenuGridLayout": false,
   "customPowerActionLock": "",
   "customPowerActionLogout": "",
@@ -236,21 +227,9 @@
   "updaterUseCustomCommand": false,
   "updaterCustomCommand": "",
   "updaterTerminalAdditionalParams": "",
-  "displayNameMode": "model",
-  "screenPreferences": {
-    "notifications": [
-      {
-        "name": "DP-5",
-        "model": "LC49G95T"
-      }
-    ],
-    "wallpaper": [
-      "all"
-    ]
-  },
-  "showOnLastDisplay": {
-    "notifications": false
-  },
+  "displayNameMode": "system",
+  "screenPreferences": {},
+  "showOnLastDisplay": {},
   "barConfigs": [
     {
       "id": "default",
@@ -259,81 +238,41 @@
       "position": 0,
       "screenPreferences": [
         {
-          "name": "DP-4",
-          "model": "DELL U2720QM",
-          "modelIndex": 0
+          "name": "DP-3",
+          "model": "Unknown",
+          "modelIndex": 2
         },
         {
-          "name": "DP-3",
-          "model": "DELL U2720QM",
-          "modelIndex": 1
+          "name": "DP-4",
+          "model": "Unknown",
+          "modelIndex": 0
         }
       ],
       "showOnLastDisplay": false,
       "leftWidgets": [
-        {
-          "id": "launcherButton",
-          "enabled": true
-        },
-        {
-          "id": "controlCenterButton",
-          "enabled": true
-        },
-        {
-          "id": "workspaceSwitcher",
-          "enabled": true
-        },
-        {
-          "id": "focusedWindow",
-          "enabled": true
-        }
+        "launcherButton",
+        "workspaceSwitcher",
+        "focusedWindow"
       ],
       "centerWidgets": [
         "music",
-        {
-          "id": "runningApps",
-          "enabled": true
-        },
-        {
-          "id": "systemTray",
-          "enabled": true
-        }
+        "clock",
+        "weather"
       ],
       "rightWidgets": [
-        {
-          "id": "clipboard",
-          "enabled": true
-        },
-        {
-          "id": "cpuUsage",
-          "enabled": true
-        },
-        {
-          "id": "memUsage",
-          "enabled": true
-        },
-        {
-          "id": "network_speed_monitor",
-          "enabled": true
-        },
-        {
-          "id": "weather",
-          "enabled": true
-        },
-        {
-          "id": "clock",
-          "enabled": true
-        },
-        {
-          "id": "notificationButton",
-          "enabled": true
-        }
+        "systemTray",
+        "clipboard",
+        "cpuUsage",
+        "memUsage",
+        "notificationButton",
+        "battery",
+        "controlCenterButton"
       ],
       "spacing": 4,
       "innerPadding": 4,
       "bottomGap": 0,
-      "transparency": 1,
-      "widgetTransparency": 1,
+      "transparency": 0.5,
+      "widgetTransparency": 0.75,
       "squareCorners": false,
       "noBackground": false,
       "gothCornersEnabled": false,
@@ -357,62 +296,42 @@
       "maximizeDetection": true
     },
     {
-      "id": "bar1767111695114",
+      "id": "bar1767348327832",
       "name": "Bar 2",
       "enabled": true,
       "position": 2,
       "screenPreferences": [
         {
           "name": "DP-5",
-          "model": "LC49G95T"
+          "model": "Unknown",
+          "modelIndex": 1
         }
       ],
       "showOnLastDisplay": false,
       "leftWidgets": [
-        {
-          "id": "privacyIndicator",
-          "enabled": true
-        },
-        {
-          "id": "launcherButton",
-          "enabled": true
-        },
-        {
-          "id": "workspaceSwitcher",
-          "enabled": true
-        },
-        {
-          "id": "separator",
-          "enabled": true
-        },
-        {
-          "id": "notepadButton",
-          "enabled": true
-        },
-        {
-          "id": "runningApps",
-          "enabled": true
-        }
+        "launcherButton",
+        "workspaceSwitcher",
+        "focusedWindow"
       ],
       "centerWidgets": [
         "music",
-        {
-          "id": "clock",
-          "enabled": true,
-          "clockCompactMode": false
-        },
+        "clock",
         "weather"
       ],
       "rightWidgets": [
         "systemTray",
         "clipboard",
-        "notificationButton"
+        "cpuUsage",
+        "memUsage",
+        "notificationButton",
+        "battery",
+        "controlCenterButton"
       ],
       "spacing": 4,
       "innerPadding": 4,
       "bottomGap": 0,
-      "transparency": 1,
-      "widgetTransparency": 1,
+      "transparency": 0.5,
+      "widgetTransparency": 0.75,
       "squareCorners": false,
       "noBackground": false,
       "gothCornersEnabled": false,
