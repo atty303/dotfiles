@@ -1,0 +1,10 @@
+font-family = "UDEV Gothic NFLG"
+font-size = 10
+background-opacity = 0.9
+command = "nu -i"
+clipboard-read = allow
+clipboard-write = allow
+copy-on-select = clipboard
+
+keybind = shift+insert=paste_from_clipboard
+keybind = global:super+escape=toggle_quick_terminal
