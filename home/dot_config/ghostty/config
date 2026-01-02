@@ -4,7 +4,7 @@ background-opacity = 0.9
 command = nu -l
 clipboard-read = allow
 clipboard-write = allow
-copy-on-select = clipboard
+# copy-on-select = clipboard
 
 keybind = shift+insert=paste_from_clipboard
 keybind = global:super+f=toggle_quick_terminal
