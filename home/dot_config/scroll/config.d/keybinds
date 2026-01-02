@@ -1,0 +1,29 @@
+# Key bindings
+
+## Basics:
+# Start a terminal
+bindsym $mod+Return exec $term
+
+# Kill focused window
+bindsym $mod+q kill
+#bindsym $mod+Shift+Backspace kill unfocused
+#bindsym $mod+Ctrl+Backspace kill all
+
+# Start your launcher
+bindsym $mod+d exec $menu
+
+# Drag floating windows by holding down $mod and left mouse button.
+# Resize them with right mouse button + $mod.
+# Despite the name, also works for non-floating windows.
+# Change normal to inverse to use left mouse button for resizing and right
+# mouse button for dragging.
+floating_modifier $mod
+# Reload the configuration file
+bindsym $mod+Shift+c reload
+
+# Exit scroll (logs you out of your Wayland session)
+bindsym $mod+Shift+x exec scrollnag -t warning -m 'You pressed the exit shortcut. Do you really want to exit scroll? This will end your Wayland session.' -B 'Yes, exit scroll' 'scrollmsg exit' -w 500 -e center -y overlay
+
+# Layout mode
+bindsym $mod+bracketleft set_mode h
+bindsym $mod+bracketright set_mode v

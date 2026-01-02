@@ -3,25 +3,28 @@
 # Read `man 5 scroll` for a complete reference.
 
 ### Variables
-#
+
 # Logo key. Use Mod1 for Alt.
 set $mod Mod4
+
 # Home row direction keys, like vim
-set $left Left
-set $down Down
-set $up Up
-set $right Right
+set $left h
+set $down j
+set $up k
+set $right l
+
 # Your preferred terminal emulator
-set $term uwsm app -- ghostty
+set $term uwsm-app -- ghostty
 # Your preferred application launcher
-set $menu uwsm app -- fuzzel
+set $menu uwsm-app -- fuzzel
+
 set $out_left DP-4
 set $out_middle DP-5
 set $out_right DP-3
 
-#exec dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
-exec uwsm finalize
-#exec uwsm app -- dms run --session
+set $lua_scripts /home/atty/.config/scroll/scripts
+
+exec uwsm finalize SCROLLSOCK
 exec uwsm app -- ghostty
 
 ### Output configuration
@@ -89,7 +92,7 @@ for_window [all] inhibit_idle fullscreen
 
 # Layout settings
 default_orientation auto
-layout_default_width 0.33333333
+layout_default_width 0.5
 layout_default_height 1.0
 layout_widths [0.33333333 0.5 0.666666667 1.0]
 layout_heights [0.33333333 0.5 0.666666667 1.0]
@@ -119,38 +122,6 @@ animations {
     window_size yes 300 var 3 [ -0.35 0 0 0.5 ]
 }
 
-### Key bindings
-#
-# Basics:
-#
-    # Start a terminal
-    bindsym $mod+Return exec $term
-
-    # Kill focused window
-    bindsym $mod+q kill
-    #bindsym $mod+Shift+Backspace kill unfocused
-    #bindsym $mod+Ctrl+Backspace kill all
-
-    # Start your launcher
-    bindsym $mod+d exec $menu
-    
-    #bindsym $mod+e exec $filemanager
-
-    # Drag floating windows by holding down $mod and left mouse button.
-    # Resize them with right mouse button + $mod.
-    # Despite the name, also works for non-floating windows.
-    # Change normal to inverse to use left mouse button for resizing and right
-    # mouse button for dragging.
-    floating_modifier $mod
-    # Reload the configuration file
-    bindsym $mod+Shift+c reload
-
-    # Exit scroll (logs you out of your Wayland session)
-    bindsym $mod+Shift+x exec scrollnag -t warning -m 'You pressed the exit shortcut. Do you really want to exit scroll? This will end your Wayland session.' -B 'Yes, exit scroll' 'scrollmsg exit' -w 500 -e center -y overlay
-
-    # Layout mode
-    bindsym $mod+bracketleft set_mode h
-    bindsym $mod+bracketright set_mode v
 #
 # Moving around:
 #
@@ -350,7 +321,7 @@ mode "modifiers" {
     bindsym end set_mode end; mode default 
     bindsym $up set_mode focus; mode default 
     bindsym $down set_mode nofocus; mode default 
-    bindsym h set_mode center_horiz; mode default 
+#    bindsym h set_mode center_horiz; mode default
     bindsym Shift+h set_mode nocenter_horiz; mode default 
     bindsym v set_mode center_vert; mode default 
     bindsym Shift+v set_mode nocenter_vert; mode default 
@@ -650,7 +621,10 @@ workspace --no-auto-back-and-forth dashboard
 workspace --no-auto-back-and-forth secondary
 
 workspace --no-auto-back-and-forth main
-#workspace main exec workspace split v 0.333333
+lua $lua_scripts/workspace_exec.lua main workspace split v 0.333333
+
+# Ensure JetBrains popups and dialogs float and focus correctly
+for_window [app_id="jetbrains-idea"][window_type=dialog] focus
 
 #
 # Status Bar:
@@ -668,4 +642,4 @@ bar {
     }
 }
 
-# include /etc/scroll/config.d/*
+include /home/atty/.config/scroll/config.d/*
