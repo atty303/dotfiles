@@ -616,6 +616,16 @@ for_window [app_id="youtube-frame"] {
     set_size h 1
     set_size v 0.5
 }
+for_window [app_id="chrome-agimnkijcaahngcdmfeangaknmldooml-youtube"] {
+    move container to workspace panel
+    set_size h 1
+    set_size v 0.33333333
+}
+for_window [app_id="chrome-lodlkdfmihgonocnmddehnfgiljnadcf-X"] {
+    move container to workspace strip
+    set_size h 1
+    set_size v 1
+}
 for_window [class="steam"] {
     move container to workspace panel
     set_size h 1
