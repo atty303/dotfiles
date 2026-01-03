@@ -2,7 +2,7 @@
 #
 # Read `man 5 scroll` for a complete reference.
 
-### Variables
+# ---- Variables
 
 # Logo key. Use Mod1 for Alt.
 set $mod Mod4
@@ -27,19 +27,11 @@ set $lua_scripts /home/atty/.config/scroll/scripts
 exec uwsm finalize SCROLLSOCK
 exec uwsm app -- ghostty
 
-### Output configuration
-#
-# Default wallpaper (more resolutions are available in /usr/share/backgrounds/scroll/)
-# output * bg /usr/share/backgrounds/scroll/Sway_Wallpaper_Blue_1920x1080.png fill
-#
-# Example configuration:
-#
-#   output HDMI-A-1 resolution 1920x1080 position 1920,0
-#
+# ---- Output configuration
 # You can get the names of your outputs by running: scrollmsg -t get_outputs
-output $out_left resolution 3840x2160 position 0,0 scale 1.25 transform 270 layout_default_width 0.5
-output $out_middle resolution 5120x1440 position 1800,1220 scale 1 allow_tearing yes layout_default_width 0.333333
-output $out_right resolution 3840x2160 position 6920,0 scale 1.25 transform 90 layout_default_width 0.5
+output $out_left resolution 3840x2160 position 0,0 scale 1.25 transform 270 subpixel rgb layout_type vertical layout_default_width 1 layout_default_height 0.5
+output $out_middle resolution 5120x1440 position 1800,1220 scale 1 allow_tearing yes subpixel rgb render_bit_depth 10 layout_type horizontal
+output $out_right resolution 3840x2160 position 6920,0 scale 1.25 transform 90 subpixel rgb layout_type vertical layout_default_width 1 layout_default_height 0.5
 
 ### Idle configuration
 #
@@ -77,8 +69,8 @@ swaybg_command -
 ### Windows defaults
 default_border pixel 2
 default_decoration border_radius 8 shadow on shadow_dynamic on
-gaps inner 16
-gaps outer 32
+gaps inner 4
+gaps outer 0
 client.focused #15439e #4b4b4b #e0e0e0 #2e9ef4 #15439e
 client.focused_inactive #595959 #3b3b3b #e0e0e0 #2e9ef4 #595959
 client.unfocused #595959 #1b1b1b #e0e0e0 #2e9ef4 #595959
@@ -241,7 +233,6 @@ bindsym $mod+Shift+backslash mode "wssplit"
 
     # Overview
     bindsym --no-repeat $mod+tab scale_workspace overview
-#    bindsym --whole-window button8 scale_workspace overview
 
     # Jump
     # jump_labels_color #9e1530FF
@@ -602,31 +593,44 @@ bindgesture swipe:4:left workspace prev
 
 bindgesture swipe:4:up scale_workspace overview 
 
-#
-# Workspace rules:
-#
-# Opens a terminal when creating workspace 6
-# workspace 6 exec kitty
-
-workspace main output $out_middle
-workspace dashboard output $out_right
+# ---- Workspace rules:
+## Left
 workspace secondary output $out_left
+lua $lua_scripts/workspace_exec.lua secondary layout_default_width 1
+
+## Right
+workspace panel output $out_right
+lua $lua_scripts/workspace_exec.lua panel workspace split v 0.66666666
+lua $lua_scripts/workspace_exec.lua panel rename workspace 3 to strip
+lua $lua_scripts/workspace_exec.lua panel layout_default_width 1
+
+## Middle
+lua $lua_scripts/workspace_exec.lua 1 workspace split v 0.333333
+workspace 1 output $out_middle
+lua $lua_scripts/workspace_exec.lua 1 layout_default_width 1
+
+workspace --no-auto-back-and-forth 1
 
 for_window [app_id="youtube-frame"] {
-    move container to workspace dashboard
+    move container to workspace panel
+    set_size h 1
+    set_size v 0.5
+}
+for_window [class="steam"] {
+    move container to workspace panel
+    set_size h 1
+    set_size v 0.5
 }
 
-workspace --no-auto-back-and-forth dashboard
+for_window [app_id="app.zen_browser.zen"] {
+    move container to workspace 1
+    set_size h 1
+}
 
-workspace --no-auto-back-and-forth secondary
+for_window [app_id="obsidian"] {
+    move container to workspace secondary
+}
 
-workspace --no-auto-back-and-forth main
-lua $lua_scripts/workspace_exec.lua main workspace split v 0.333333
-
-# Ensure JetBrains popups and dialogs float and focus correctly
-for_window [app_id="jetbrains-idea"][window_type=dialog] focus
-
-#
 # Status Bar:
 #
 # Read `man 5 scroll-bar` for more information about this section.

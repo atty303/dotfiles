@@ -22,7 +22,7 @@ floating_modifier $mod
 bindsym $mod+Shift+c reload
 
 # Exit scroll (logs you out of your Wayland session)
-bindsym $mod+Shift+x exec scrollnag -t warning -m 'You pressed the exit shortcut. Do you really want to exit scroll? This will end your Wayland session.' -B 'Yes, exit scroll' 'scrollmsg exit' -w 500 -e center -y overlay
+bindsym $mod+Shift+e exec scrollnag -t warning -m 'You pressed the exit shortcut. Do you really want to exit scroll? This will end your Wayland session.' -B 'Yes, exit scroll' 'scrollmsg exit' -w 500 -e center -y overlay
 
 # Layout mode
 bindsym $mod+bracketleft set_mode h
