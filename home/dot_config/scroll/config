@@ -25,7 +25,7 @@ set $out_right DP-3
 set $lua_scripts /home/atty/.config/scroll/scripts
 
 exec uwsm finalize SCROLLSOCK
-exec uwsm app -- ghostty
+#exec uwsm app -- ghostty
 
 # ---- Output configuration
 # You can get the names of your outputs by running: scrollmsg -t get_outputs

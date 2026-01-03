@@ -22,6 +22,7 @@ $pathes | each { |p|
 # In chezmoi, files are placed under ~/.config, and symbolic links are created from
 # the OS-specific directories to this location to standardize the configuration path.
 
+$env.PAGER = "bat"
 $env.EDITOR = "hx"
 $env.SRC_ROOT = (if $nu.os-info.name == "windows" { "D:/src" } else { "~/src" }) | path expand
 
