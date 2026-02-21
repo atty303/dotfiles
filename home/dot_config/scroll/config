@@ -63,6 +63,16 @@ output $out_right resolution 3840x2160 position 6920,0 scale 1.25 transform 90 s
 #
 # You can also configure each device individually.
 # Read `man 5 scroll-input` for more information about this section.
+input type:keyboard {
+    xkb_layout "us"
+    xkb_options "caps:hyper"
+    repeat_delay 250
+    repeat_rate 30
+}
+input type:pointer {
+    accel_profile adaptive
+    pointer_accel 0
+}
 
 swaybg_command -
 
@@ -639,6 +649,10 @@ for_window [app_id="app.zen_browser.zen"] {
 
 for_window [app_id="obsidian"] {
     move container to workspace secondary
+}
+
+for_window [app_id="gamescope"] {
+    move container to workspace 2
 }
 
 # Status Bar:
