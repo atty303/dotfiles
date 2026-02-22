@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=scroll (uwsm)
+Comment=A scrollable-tiling Wayland compositor
+GenericName=Wayland Compositor
+Exec=uwsm start -N scroll-uwsm -D scroll -C scroll -- scroll
+TryExec=uwsm
+Type=Application
