@@ -7,7 +7,7 @@ export def gen-repo [
   } else {
     $name
   }
-  let scope_dir = ($env.SRC_ROOT | path join "github.com" "atty303")
+  let scope_dir = ($env.SRC_ROOT | path join "atty303")
   mkdir $scope_dir
   mise exec --raw github:cargo-generate/cargo-generate -- cargo-generate generate --git https://github.com/atty303/repository-template.git --name $name --allow-commands --vcs git --destination $scope_dir
   $scope_dir | path join $name
