@@ -93,7 +93,7 @@ output $out_left {
 }
 output $out_middle {
   resolution 5120x1440
-  position 1800,1220
+  position 1728,1220
   scale 1
   allow_tearing yes
   subpixel rgb
@@ -104,7 +104,7 @@ output $out_middle {
 }
 output $out_right {
   resolution 3840x2160
-  position 6920,0
+  position 6848,0
   scale 1.25
   transform 90
   subpixel rgb
@@ -114,6 +114,8 @@ output $out_right {
 }
 output HDMI-A-1 {
   enable
+  resolution 3840x2160
+  position 8576,0
 }
 
 # xwayland_output_scale true
