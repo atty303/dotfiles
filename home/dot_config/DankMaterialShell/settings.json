@@ -293,7 +293,7 @@
   "syncModeWithPortal": true,
   "terminalsAlwaysDark": false,
   "runDmsMatugenTemplates": true,
-  "matugenTemplateGtk": true,
+  "matugenTemplateGtk": false,
   "matugenTemplateNiri": true,
   "matugenTemplateHyprland": true,
   "matugenTemplateMangowc": true,
@@ -729,6 +729,18 @@
           "height": 480,
           "x": 2400,
           "y": 480
+        },
+        "": {
+          "width": 160,
+          "height": 180,
+          "x": 0,
+          "y": 0
+        },
+        "HDMI-A-1": {
+          "width": 320,
+          "height": 480,
+          "x": 1760,
+          "y": 840
         }
       }
     },
@@ -779,6 +791,18 @@
           "height": 200,
           "x": 4868.875,
           "y": 32.48046875
+        },
+        "": {
+          "width": 120,
+          "height": 120,
+          "x": 0,
+          "y": 0
+        },
+        "HDMI-A-1": {
+          "width": 200,
+          "height": 200,
+          "x": 1820,
+          "y": 980
         }
       }
     },
@@ -812,6 +836,18 @@
           "height": 200,
           "x": 4890.1171875,
           "y": 274.8984375
+        },
+        "": {
+          "width": 200,
+          "height": 200,
+          "x": 0,
+          "y": 0
+        },
+        "HDMI-A-1": {
+          "width": 200,
+          "height": 200,
+          "x": 1820,
+          "y": 980
         }
       }
     }
