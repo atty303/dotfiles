@@ -76,7 +76,7 @@ input type:keyboard {
 }
 input type:pointer {
     accel_profile adaptive
-    pointer_accel 0
+    pointer_accel -0.8
 }
 # seat
 
@@ -111,6 +111,9 @@ output $out_right {
   layout_type vertical
   layout_default_width 1
   layout_default_height 0.5
+}
+output HDMI-A-1 {
+  enable
 }
 
 # xwayland_output_scale true
@@ -181,12 +184,27 @@ for_window [app_id="obsidian"] {
 
 for_window [app_id="gamescope"] {
     move container to workspace 1
+    set_size v 1
     resize set width 2560px
     resize set height 1440px
+}
+for_window [app_id="gamescope" title="Forza Horizon 6"] {
+    move container to output HDMI-A-1
+    set_size v 1
+    resize set width 3840px
+    resize set height 2160px
+    fullscreen enable
 }
 for_window [title="Endfield"] {
     move container to workspace 1
 #    fullscreen enable
+}
+
+for_window [app_id="flameshot"] {
+    border pixel 0
+    floating enable
+    fullscreen enable global
+    move absolute position 0 0
 }
 
 include /home/atty/.config/scroll/config.d/*

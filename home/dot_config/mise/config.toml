@@ -15,14 +15,12 @@ taplo = "latest"
 restic = "latest"
 ripgrep = "latest"
 starship = "latest"
-yazi = "latest"
 # zellij = { version = "latest", os = ["linux", "macos"] }
 zoxide = "latest"
 
 "aqua:nushell/nushell" = "latest"
 "ubi:open-source-cooperative/keyring-rs" = "latest"
 pnpm = "latest"
-node = "latest"
 
 [tools."http:gitpod-cli"]
 version = "stable"
