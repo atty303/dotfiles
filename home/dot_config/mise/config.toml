@@ -1,12 +1,5 @@
 min_version = "2025.9.2"
 
-[tools]
-dotslash = "latest"
-github-cli = "latest"
-
-"aqua:nushell/nushell" = "latest"
-"ubi:open-source-cooperative/keyring-rs" = "latest"
-
 [tools."http:gitpod-cli"]
 version = "stable"
 [tools."http:gitpod-cli".platforms]
@@ -28,3 +21,9 @@ windows_shim_mode = "symlink"
 npm.bun = true
 
 python.uv_venv_auto = true
+
+[settings.github]
+oauth_client_id = "Iv1.4e496c43570982f2"
+oauth_scopes = ""
+oauth_open_browser = true
+oauth_export_env = ""
