@@ -1,26 +1,11 @@
 min_version = "2025.9.2"
 
 [tools]
-age = "latest"
-bat = "latest"
-bun = "latest"
-carapace = "latest"
-deno = "latest"
 dotslash = "latest"
-fd = "latest"
-fzf = "latest"
 github-cli = "latest"
-helix = "latest"
-taplo = "latest"
-restic = "latest"
-ripgrep = "latest"
-starship = "latest"
-# zellij = { version = "latest", os = ["linux", "macos"] }
-zoxide = "latest"
 
 "aqua:nushell/nushell" = "latest"
 "ubi:open-source-cooperative/keyring-rs" = "latest"
-pnpm = "latest"
 
 [tools."http:gitpod-cli"]
 version = "stable"
