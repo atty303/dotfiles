@@ -1,13 +1,24 @@
-### Homebrew
-if [[ -f /opt/homebrew/bin/brew ]]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
+dirs=(
+  "$HOME/.local/bin"
+)
+for dir in "${dirs[@]}"; do
+  case ":$PATH:" in
+    *":$dir:"*) ;;
+    *) PATH="$dir:$PATH" ;;
+  esac
+done
 
+RESOLVING_ENVIRONMENT=0
 # https://intellij-support.jetbrains.com/hc/en-us/articles/15268184143890-Shell-Environment-Loading
+if [[ -n "$INTELLIJ_ENVIRONMENT_READER" ]]; then RESOLVING_ENVIRONMENT=1; fi
 # https://code.visualstudio.com/docs/editor/command-line#_how-do-i-detect-when-a-shell-was-launched-by-vs-code
-if [[ -z "$INTELLIJ_ENVIRONMENT_READER" ]] && [[ -z "$VSCODE_RESOLVING_ENVIRONMENT" ]]; then
-  # Launch Nushell only in an interactive shell
-  if [[ $- == *i* ]]; then
-    exec nu -i
+if [[ -n "$VSCODE_RESOLVING_ENVIRONMENT" ]]; then RESOLVING_ENVIRONMENT=1; fi
+
+# If launched by IDEs, read the environment variables from nushell
+if [[ "$RESOLVING_ENVIRONMENT" == "1" ]]; then
+  if command -v nu &> /dev/null; then
+    export RESOLVING_ENVIRONMENT
+    eval $(nu)
+    unset RESOLVING_ENVIRONMENT
   fi
 fi

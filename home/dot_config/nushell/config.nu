@@ -8,11 +8,7 @@ const pathes = [
     "~/.local/bin"
     "/var/lib/flatpak/exports/bin"
 ]
-$pathes | each { |p|
-    if ($p | path exists) {
-        $env.PATH = $env.PATH | prepend ($p | path expand)
-    }
-}
+$env.PATH = ($env.PATH | prepend $pathes)
 
 # ⚠ Doesn't set XDG_CONFIG_HOME !
 # The default configuration directories are different across Windows, Mac, and Linux.
