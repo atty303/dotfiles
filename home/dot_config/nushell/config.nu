@@ -19,6 +19,7 @@ $env.PATH = ($env.PATH | prepend $pathes)
 # the OS-specific directories to this location to standardize the configuration path.
 
 $env.PAGER = "bat"
+$env.MANPAGER = "bat -plman"
 $env.EDITOR = "hx"
 $env.SRC_ROOT = (if $nu.os-info.name == "windows" { "D:/src" } else { "~/src" }) | path expand
 
