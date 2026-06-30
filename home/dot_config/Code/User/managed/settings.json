@@ -70,8 +70,8 @@
   "files.trimTrailingWhitespace": true,
   "files.watcherExclude": {
     "**/.ammonite": true,
-    "**/.bloop": true,
-    "**/.metals": true
+    "**/.bloop/**": true,
+    "**/.metals/**/*.{java,scala}": true
   },
   "git.allowForcePush": true,
   "git.blame.editorDecoration.enabled": false,
