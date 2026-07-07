@@ -3,4 +3,5 @@ if OS.mac? and !ENV["HEADLESS"]
   cask "1password-cli"
   cask "karabiner-elements"
   cask "visual-studio-code"
+  cask "google-japanese-ime"
 end
