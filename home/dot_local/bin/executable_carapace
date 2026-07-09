@@ -1,2 +1,35 @@
 #!/usr/bin/env -S mise tool-stub
-version = "latest"
+
+version = "1.6.6"
+
+[lock]
+
+[lock.platforms]
+
+[lock.platforms.linux-arm64]
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.6.6/carapace-bin_1.6.6_linux_arm64.tar.gz"
+checksum = "sha256:f490222ed2e0e45bb0418ee90ace8d310c52a5e3223fdcdc0c767324ace4d72b"
+
+[lock.platforms.linux-arm64-musl]
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.6.6/carapace-bin_1.6.6_linux_arm64.tar.gz"
+checksum = "sha256:f490222ed2e0e45bb0418ee90ace8d310c52a5e3223fdcdc0c767324ace4d72b"
+
+[lock.platforms.linux-x64]
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.6.6/carapace-bin_1.6.6_linux_amd64.tar.gz"
+checksum = "sha256:e31c8a30531ba03bff4085d8aefc277f0e518c6dc525f42e733f31ad5f5f776b"
+
+[lock.platforms.linux-x64-musl]
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.6.6/carapace-bin_1.6.6_linux_amd64.tar.gz"
+checksum = "sha256:e31c8a30531ba03bff4085d8aefc277f0e518c6dc525f42e733f31ad5f5f776b"
+
+[lock.platforms.macos-arm64]
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.6.6/carapace-bin_1.6.6_darwin_arm64.tar.gz"
+checksum = "sha256:900f4ef09b669a141026bd01c1ac40e633f5b8dd7f3c52444e650842ab648541"
+
+[lock.platforms.macos-x64]
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.6.6/carapace-bin_1.6.6_darwin_amd64.tar.gz"
+checksum = "sha256:610473e47408601693ea2b8b3cd63c11b78c969d86adc2f1a1c9370d4acb1c97"
+
+[lock.platforms.windows-x64]
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.6.6/carapace-bin_1.6.6_windows_amd64.zip"
+checksum = "sha256:13642a3547758d5e3fcb4518366207bbe8cf2fad009816901a55a42218d8b034"

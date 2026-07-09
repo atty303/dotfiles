@@ -1,2 +1,35 @@
 #!/usr/bin/env -S mise tool-stub
-version = "latest"
+
+version = "0.140.0"
+
+[lock]
+
+[lock.platforms]
+
+[lock.platforms.linux-arm64]
+url = "https://github.com/openai/codex/releases/download/rust-v0.140.0/codex-aarch64-unknown-linux-musl.zst"
+checksum = "sha256:b2774098060a9d0c4b9ada6c901c2fa50f208cd2a1c3f13687a95e64df288220"
+
+[lock.platforms.linux-arm64-musl]
+url = "https://github.com/openai/codex/releases/download/rust-v0.140.0/codex-aarch64-unknown-linux-musl.zst"
+checksum = "sha256:b2774098060a9d0c4b9ada6c901c2fa50f208cd2a1c3f13687a95e64df288220"
+
+[lock.platforms.linux-x64]
+url = "https://github.com/openai/codex/releases/download/rust-v0.140.0/codex-x86_64-unknown-linux-musl.zst"
+checksum = "sha256:a3c1eccb71e0f8f6c093c31dab6c22f9267350401b9f1becfcd32ed109b95bec"
+
+[lock.platforms.linux-x64-musl]
+url = "https://github.com/openai/codex/releases/download/rust-v0.140.0/codex-x86_64-unknown-linux-musl.zst"
+checksum = "sha256:a3c1eccb71e0f8f6c093c31dab6c22f9267350401b9f1becfcd32ed109b95bec"
+
+[lock.platforms.macos-arm64]
+url = "https://github.com/openai/codex/releases/download/rust-v0.140.0/codex-aarch64-apple-darwin.zst"
+checksum = "sha256:5e38113f213d0ba1982a04ba2d4f19fa2f1971e3493639b2c61905d764b7548e"
+
+[lock.platforms.macos-x64]
+url = "https://github.com/openai/codex/releases/download/rust-v0.140.0/codex-x86_64-apple-darwin.zst"
+checksum = "sha256:b27369db4e307dfc6cbf1a7b904cf9bfb0199e13be062ced807f8213915663f8"
+
+[lock.platforms.windows-x64]
+url = "https://github.com/openai/codex/releases/download/rust-v0.140.0/codex-x86_64-pc-windows-msvc.exe.zst"
+checksum = "sha256:b3a62f22d4dcbe3c5f57fb738c448d1796996dc880cf820e58706d2b4b9606f8"

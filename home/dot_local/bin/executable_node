@@ -1,2 +1,35 @@
 #!/usr/bin/env -S mise tool-stub
-version = "latest"
+
+version = "25.4.0"
+
+[lock]
+
+[lock.platforms]
+
+[lock.platforms.linux-arm64]
+url = "https://nodejs.org/dist/v25.4.0/node-v25.4.0-linux-arm64.tar.gz"
+checksum = "sha256:b059f504162053f4a5d71e85f3d1d89032a7c14eb1a7223c76ef2ff9ce34612c"
+
+[lock.platforms.linux-arm64-musl]
+url = "https://unofficial-builds.nodejs.org/download/release/v25.4.0/node-v25.4.0-linux-arm64-musl.tar.gz"
+checksum = "sha256:4c8c9d0192f514020b6b4e5458c4bc8195f792114f484b036bb048f9dd2b7a42"
+
+[lock.platforms.linux-x64]
+url = "https://nodejs.org/dist/v25.4.0/node-v25.4.0-linux-x64.tar.gz"
+checksum = "sha256:5951a889ab65b3a73cc88e6d412d70499f523a89fe553b5349471af7586f2be2"
+
+[lock.platforms.linux-x64-musl]
+url = "https://unofficial-builds.nodejs.org/download/release/v25.4.0/node-v25.4.0-linux-x64-musl.tar.gz"
+checksum = "sha256:679c74cc099073c57e4f3c832f897993e4d948253cd648dcbb401b2b214aa841"
+
+[lock.platforms.macos-arm64]
+url = "https://nodejs.org/dist/v25.4.0/node-v25.4.0-darwin-arm64.tar.gz"
+checksum = "sha256:bfa7af56c0f24074d7a6c5b08d837b8be211f44db5fcc93dcb2cb96153e49b65"
+
+[lock.platforms.macos-x64]
+url = "https://nodejs.org/dist/v25.4.0/node-v25.4.0-darwin-x64.tar.gz"
+checksum = "sha256:1c75d67c9416c61a948c7cd5662b4293daa0e5a9ddac664f17921ccd5d41a016"
+
+[lock.platforms.windows-x64]
+url = "https://nodejs.org/dist/v25.4.0/node-v25.4.0-win-x64.zip"
+checksum = "sha256:5a5fcd17bc7567645c85b016cd428e4cd9e54796994651be3f3709768714e002"

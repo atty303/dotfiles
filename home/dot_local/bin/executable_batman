@@ -1,3 +1,26 @@
 #!/usr/bin/env -S mise tool-stub
-version = "latest"
+
+version = "2024.08.24"
 tool = "bat-extras"
+
+[lock]
+
+[lock.platforms]
+
+[lock.platforms.linux-arm64]
+url = "https://github.com/eth-p/bat-extras/releases/download/v2024.08.24/bat-extras-2024.08.24.zip"
+
+[lock.platforms.linux-arm64-musl]
+url = "https://github.com/eth-p/bat-extras/releases/download/v2024.08.24/bat-extras-2024.08.24.zip"
+
+[lock.platforms.linux-x64]
+url = "https://github.com/eth-p/bat-extras/releases/download/v2024.08.24/bat-extras-2024.08.24.zip"
+
+[lock.platforms.linux-x64-musl]
+url = "https://github.com/eth-p/bat-extras/releases/download/v2024.08.24/bat-extras-2024.08.24.zip"
+
+[lock.platforms.macos-arm64]
+url = "https://github.com/eth-p/bat-extras/releases/download/v2024.08.24/bat-extras-2024.08.24.zip"
+
+[lock.platforms.macos-x64]
+url = "https://github.com/eth-p/bat-extras/releases/download/v2024.08.24/bat-extras-2024.08.24.zip"

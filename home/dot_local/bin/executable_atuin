@@ -1,2 +1,31 @@
 #!/usr/bin/env -S mise tool-stub
-version = "latest"
+
+version = "18.16.1"
+
+[lock]
+
+[lock.platforms]
+
+[lock.platforms.linux-arm64]
+url = "https://github.com/atuinsh/atuin/releases/download/v18.16.1/atuin-aarch64-unknown-linux-musl.tar.gz"
+checksum = "sha256:5245dc1553f40afe3a160878a71076e4c5257c83cf819e259c0447a67a9c2d37"
+
+[lock.platforms.linux-arm64-musl]
+url = "https://github.com/atuinsh/atuin/releases/download/v18.16.1/atuin-aarch64-unknown-linux-musl.tar.gz"
+checksum = "sha256:5245dc1553f40afe3a160878a71076e4c5257c83cf819e259c0447a67a9c2d37"
+
+[lock.platforms.linux-x64]
+url = "https://github.com/atuinsh/atuin/releases/download/v18.16.1/atuin-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:aeee16faab126d2f11658ad4920c73fa8479b25fbd3e26570450af7310aac70a"
+
+[lock.platforms.linux-x64-musl]
+url = "https://github.com/atuinsh/atuin/releases/download/v18.16.1/atuin-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:aeee16faab126d2f11658ad4920c73fa8479b25fbd3e26570450af7310aac70a"
+
+[lock.platforms.macos-arm64]
+url = "https://github.com/atuinsh/atuin/releases/download/v18.16.1/atuin-aarch64-apple-darwin.tar.gz"
+checksum = "sha256:0a3fdc4cfa18758d6a872950625f2042233df0412a0c10d0dadf30bfc3bc6d6b"
+
+[lock.platforms.windows-x64]
+url = "https://github.com/atuinsh/atuin/releases/download/v18.16.1/atuin-x86_64-pc-windows-msvc.zip"
+checksum = "sha256:ffebcc8fcb530b79a6096e0a04a7926beda021d68e066cd1c76b423b4e4f7281"

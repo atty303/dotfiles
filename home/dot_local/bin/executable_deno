@@ -1,2 +1,35 @@
 #!/usr/bin/env -S mise tool-stub
-version = "latest"
+
+version = "2.9.1"
+
+[lock]
+
+[lock.platforms]
+
+[lock.platforms.linux-arm64]
+url = "https://dl.deno.land/release/v2.9.1/deno-aarch64-unknown-linux-gnu.zip"
+checksum = "sha256:0a60d079fa79635a59803074dbbfe86ccc35746dc2c4f8d73f2e50338b3283a9"
+
+[lock.platforms.linux-arm64-musl]
+url = "https://dl.deno.land/release/v2.9.1/deno-aarch64-unknown-linux-gnu.zip"
+checksum = "sha256:0a60d079fa79635a59803074dbbfe86ccc35746dc2c4f8d73f2e50338b3283a9"
+
+[lock.platforms.linux-x64]
+url = "https://dl.deno.land/release/v2.9.1/deno-x86_64-unknown-linux-gnu.zip"
+checksum = "sha256:710c54d63477d1100844ef4818f19507ce0dbf40510903b1d883f19e394446a2"
+
+[lock.platforms.linux-x64-musl]
+url = "https://dl.deno.land/release/v2.9.1/deno-x86_64-unknown-linux-gnu.zip"
+checksum = "sha256:710c54d63477d1100844ef4818f19507ce0dbf40510903b1d883f19e394446a2"
+
+[lock.platforms.macos-arm64]
+url = "https://dl.deno.land/release/v2.9.1/deno-aarch64-apple-darwin.zip"
+checksum = "sha256:ee3473502118eab301eca93aa6b31d6b0b6c1602d0f59e4cb89d4a262b12f6e7"
+
+[lock.platforms.macos-x64]
+url = "https://dl.deno.land/release/v2.9.1/deno-x86_64-apple-darwin.zip"
+checksum = "sha256:89cbc8c974247772d9200724741b4e692ef49fe470b2ff555da905817c3daa11"
+
+[lock.platforms.windows-x64]
+url = "https://dl.deno.land/release/v2.9.1/deno-x86_64-pc-windows-msvc.zip"
+checksum = "sha256:ab310b4232cca207d40ffa41867e93aaf9f893802bc76756e74f486a6b21b371"

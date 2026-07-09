@@ -1,4 +1,5 @@
 #!/usr/bin/env -S mise tool-stub
+
 version = "stable"
 
 [platforms]
@@ -8,3 +9,28 @@ macos-x64 = { url = "https://releases.gitpod.io/cli/stable/gitpod-darwin-amd64" 
 macos-arm64 = { url = "https://releases.gitpod.io/cli/stable/gitpod-darwin-arm64" }
 windows-x64 = { url = "https://releases.gitpod.io/cli/stable/gitpod-windows-amd64.exe" }
 windows-arm64 = { url = "https://releases.gitpod.io/cli/stable/gitpod-windows-arm64.exe" }
+
+[lock]
+
+[lock.platforms]
+
+[lock.platforms.linux-arm64]
+url = "https://releases.gitpod.io/cli/stable/gitpod-linux-arm64"
+
+[lock.platforms.linux-arm64-musl]
+url = "https://releases.gitpod.io/cli/stable/gitpod-linux-arm64"
+
+[lock.platforms.linux-x64]
+url = "https://releases.gitpod.io/cli/stable/gitpod-linux-amd64"
+
+[lock.platforms.linux-x64-musl]
+url = "https://releases.gitpod.io/cli/stable/gitpod-linux-amd64"
+
+[lock.platforms.macos-arm64]
+url = "https://releases.gitpod.io/cli/stable/gitpod-darwin-arm64"
+
+[lock.platforms.macos-x64]
+url = "https://releases.gitpod.io/cli/stable/gitpod-darwin-amd64"
+
+[lock.platforms.windows-x64]
+url = "https://releases.gitpod.io/cli/stable/gitpod-windows-amd64.exe"
