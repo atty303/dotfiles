@@ -3,3 +3,11 @@
 [user]
 name = "Koji AGAWA"
 email = "atty303@gmail.com"
+
+[signing]
+backend = "ssh"
+key = "~/.ssh/atty303.pub"
+behavior = "drop"
+
+[git]
+sign-on-push = true
