@@ -1,5 +1,6 @@
 #!/usr/bin/env -S mise tool-stub
 
+tool = "zellij"
 version = "0.44.3"
 
 [lock]

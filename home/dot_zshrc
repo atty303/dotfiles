@@ -12,8 +12,17 @@ for dir in "${dirs[@]}"; do
   esac
 done
 
+if (( $+commands[mise] )); then
+  eval "$(mise activate --shims zsh)"
+  eval "$(mise activate zsh)"
+fi
+
 if (( $+commands[starship] )); then
   eval "$(starship init zsh)"
+fi
+
+if (( $+commands[atuin] )); then
+  eval "$(atuin init zsh)"
 fi
 
 RESOLVING_ENVIRONMENT=0

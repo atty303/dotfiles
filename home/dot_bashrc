@@ -12,8 +12,17 @@ for dir in "${dirs[@]}"; do
   esac
 done
 
+if command -v mise >/dev/null; then
+  eval "$(mise activate --shims bash)"
+  eval "$(mise activate bash)"
+fi
+
 if command -v starship >/dev/null; then
   eval "$(starship init bash)"
+fi
+
+if command -v atuin >/dev/null; then
+  eval "$(atuin init bash)"
 fi
 
 RESOLVING_ENVIRONMENT=0

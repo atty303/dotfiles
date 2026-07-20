@@ -1,5 +1,6 @@
 #!/usr/bin/env -S mise tool-stub
 
+tool = "taplo"
 version = "0.10.0"
 
 [lock]

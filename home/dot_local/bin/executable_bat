@@ -1,5 +1,6 @@
 #!/usr/bin/env -S mise tool-stub
 
+tool = "bat"
 version = "0.26.1"
 
 [lock]
