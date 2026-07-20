@@ -1,5 +1,7 @@
+use gh.nu *
+
 # Generate a new repository from a template
-export def gen-repo [
+def gen-repo [
     --name: string # The name of the repository to create
 ]: nothing -> path {
   let name = if $name == null {

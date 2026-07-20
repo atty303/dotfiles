@@ -1,0 +1,6 @@
+$env.SHELL = $nu.current-exe
+$env.PAGER = "bat"
+$env.MANPAGER = "bat -plman"
+$env.EDITOR = "hx"
+$env.SRC_ROOT = (if $nu.os-info.name == "windows" { "D:/src" } else { "~/src" }) | path expand
+$env.LS_COLORS = (vivid generate molokai)

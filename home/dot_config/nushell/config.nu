@@ -4,12 +4,6 @@
 # 3. $nu.vendor-autoload-dirs
 # 4. $nu.user-autoload-dirs
 
-const pathes = [
-    "~/.local/bin"
-    "/var/lib/flatpak/exports/bin"
-]
-$env.PATH = ($env.PATH | prepend $pathes)
-
 # ⚠ Doesn't set XDG_CONFIG_HOME !
 # The default configuration directories are different across Windows, Mac, and Linux.
 # Setting environment variables in the shell works when launching from the shell,
@@ -18,37 +12,24 @@ $env.PATH = ($env.PATH | prepend $pathes)
 # In chezmoi, files are placed under ~/.config, and symbolic links are created from
 # the OS-specific directories to this location to standardize the configuration path.
 
-$env.PAGER = "bat"
-$env.MANPAGER = "bat -plman"
-$env.EDITOR = "hx"
-$env.SRC_ROOT = (if $nu.os-info.name == "windows" { "D:/src" } else { "~/src" }) | path expand
+# Enable homebrew for mise command
+if $nu.os-info.name == "linux" and ("/home/linuxbrew/.linuxbrew" | path exists) {
+    $env.PATH = ($env.PATH | prepend ["/home/linuxbrew/.linuxbrew/bin" "/home/linuxbrew/.linuxbrew/sbin"])
+    $env.HOMEBREW_PREFIX = "/home/linuxbrew/.linuxbrew"
+    $env.HOMEBREW_CELLAR = "/home/linuxbrew/.linuxbrew/Cellar"
+    $env.HOMEBREW_REPOSITORY = "/home/linuxbrew/.linuxbrew/Homebrew"
+    $env.INFOPATH = (if ($env.INFOPATH? | is-not-empty) { $env.INFOPATH | split row (char esep) } else { [] }) | append "/home/linuxbrew/.linuxbrew/share/info" | str join (char esep)
+} else if $nu.os-info.name == "macos" and ("/opt/homebrew" | path exists) {
+    $env.PATH = ($env.PATH | prepend ["/opt/homebrew/bin" "/opt/homebrew/sbin"])
+    $env.HOMEBREW_PREFIX = "/opt/homebrew"
+    $env.HOMEBREW_CELLAR = "/opt/homebrew/Cellar"
+    $env.HOMEBREW_REPOSITORY = "/opt/homebrew"
+    $env.INFOPATH = (if ($env.INFOPATH? | is-not-empty) { $env.INFOPATH | split row (char esep) } else { [] }) | append "/opt/homebrew/share/info" | str join (char esep)
+}
 
-$env.config.show_banner = "short"
-$env.config.history.file_format = "sqlite"
-$env.config.table.header_on_separator = true
-$env.config.datetime_format.table = "%y-%m-%d %I:%M:%S"
-$env.config.datetime_format.normal = "%y-%m-%d %I:%M:%S"
-$env.config.keybindings ++= [
-  # alacritty on windows, Control-h sends Control+Backspace
-  { name: user, modifier: control, keycode: Backspace, mode: [emacs], event: { edit: Backspace } },
-  { name: user, modifier: alt, keycode: char_b, mode: [emacs],
-    event: { edit: MoveBigWordLeft } }
-  { name: user, modifier: alt, keycode: char_d, mode: [emacs],
-    event: { edit: CutBigWordRight } }
-  { name: user, modifier: alt, keycode: char_h, mode: [emacs],
-    event: { edit: CutBigWordLeft } }
-]
-
-source conf.d/homebrew.nu
-source conf.d/ssh-agent.nu
-
-use std *
-
-alias ch = chezmoi
-alias che = chezmoi --watch --apply
-alias vi = hx
-alias r = mise run
-alias jf = jj git fetch
+use std/util "path add"
+path add "~/.local/bin"
+path add { linux: "/var/lib/flatpak/exports/bin" }
 
 def get-editor [] {
   [$env.config.buffer-editor, $env.EDITOR, $env.VISUAL] | where { is-not-empty } | first
@@ -58,62 +39,45 @@ def bash_quote [s: string] {
   $s | str replace -a "'" "'\"'\"'" | $"'($in)'"
 }
 
-def --env y [...args] {
-	let tmp = (mktemp -t "yazi-cwd.XXXXXX")
-	^yazi ...$args --cwd-file $tmp
-	let cwd = (open $tmp)
-	if $cwd != "" and $cwd != $env.PWD {
-		cd $cwd
-	}
-	rm -fp $tmp
-}
-
-# def chezmoi-edit-apply[name?: path]: nothing -> any {
-#   let editor = if name | is-empty { }  $"(get-editor) "
-#   let args = [-c $'nu -c "watch \"(chezmoi source-path)\" {|| chezmoi apply --no-tty}" & apply=$! ; hx . ; kill $apply']
-#   run-external sh ...$args
-# }
-
 # Generate vendor/autoload scripts
 const vendor_autoload = $nu.data-dir | path join vendor autoload
 mkdir $vendor_autoload
 
+const mise_init_path = $vendor_autoload | path join mise.nu
 if (which mise | is-not-empty) {
-    const init_path = $vendor_autoload | path join mise.nu
-    ^mise activate nu | save $init_path --force
+    ^mise activate nu | save $mise_init_path --force
+} else {
+    rm -fp $mise_init_path
 }
 
+const atuin_init_path = $vendor_autoload | path join atuin.nu
 if (which atuin | is-not-empty) {
-    const init_path = $vendor_autoload | path join atuin.nu
-    ^atuin init --disable-up-arrow nu | str replace -a "get -i" "get -o" | save $init_path --force
+    ^atuin init --disable-up-arrow nu | str replace -a "get -i" "get -o" | save $atuin_init_path --force
+} else {
+    rm -fp $atuin_init_path
 }
 
-if (which carapace | is-not-empty) {
-    $env.CARAPACE_BRIDGES = 'zsh,inshellisense'
+# if (which carapace | is-not-empty) {
+#     $env.CARAPACE_BRIDGES = 'zsh,inshellisense'
+#     const init_path = $vendor_autoload | path join carapace.nu
+#     ^carapace _carapace nushell | save $init_path --force
+# }
 
-    const init_path = $vendor_autoload | path join carapace.nu
-    ^carapace _carapace nushell | save $init_path --force
-}
-
+const starship_init_path = $vendor_autoload | path join starship.nu
 if (which starship | is-not-empty) {
-    const init_path = $vendor_autoload | path join starship.nu
-    ^starship init nu | save $init_path --force
+    ^starship init nu | save $starship_init_path --force
 
     $env.config.render_right_prompt_on_last_line = false
     $env.TRANSIENT_PROMPT_COMMAND = {|| ^starship module character }
     $env.TRANSIENT_PROMPT_COMMAND_RIGHT = ""
     $env.STARSHIP_CONFIG = "~/.config/starship.toml" | path expand
+} else {
+    rm -fp $starship_init_path
 }
 
+const zoxide_init_path = $vendor_autoload | path join zoxide.nu
 if (which zoxide | is-not-empty) {
-    const init_path = $vendor_autoload | path join zoxide.nu
-    ^zoxide init nushell | save $init_path --force
+    ^zoxide init nushell | save $zoxide_init_path --force
+} else {
+    rm -fp $zoxide_init_path
 }
-
-if (which broot | is-not-empty) {
-    const init_path = $vendor_autoload | path join broot.nu
-    ^broot --print-shell-function nushell | save $init_path --force
-}
-
-use conf.d/gh.nu *
-use conf.d/task.nu
