@@ -82,3 +82,12 @@ if (which zoxide | is-not-empty) {
 } else {
     rm -fp $zoxide_init_path
 }
+
+const fzf_init_path = $vendor_autoload | path join fzf.nu
+if (which fzf | is-not-empty) {
+    ^fzf --nushell | save $fzf_init_path --force
+    $env.FZF_CTRL_R_COMMAND = ""
+    $env.FZF_ALT_C_COMMAND = ""
+} else {
+    rm -fp $fzf_init_path
+}
