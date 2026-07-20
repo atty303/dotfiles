@@ -5,6 +5,7 @@ alias vi = hx
 alias r = mise run
 alias jf = jj git fetch
 alias e = explore
+alias nue = exec nu
 
 def --env y [...args] {
 	let tmp = (mktemp -t "yazi-cwd.XXXXXX")
