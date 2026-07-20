@@ -1,4 +1,4 @@
-min_version = "2025.9.2"
+min_version = "2025.7.5"
 
 [settings]
 activate_aggressive = true
@@ -7,7 +7,8 @@ windows_default_file_shell_args = "pwsh.exe -NoLogo -NoProfile -ExecutionPolicy 
 windows_default_inline_shell_args = "pwsh.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command"
 windows_shim_mode = "symlink"
 
-python.uv_venv_auto = true
+cargo.binstall_native = true
+cargo.binstall_quickinstall = true
 
 [settings.github]
 oauth_client_id = "Iv1.4e496c43570982f2"

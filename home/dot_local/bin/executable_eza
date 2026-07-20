@@ -1,0 +1,8 @@
+#!/usr/bin/env -S mise tool-stub
+
+tool = "cargo:eza"
+version = "0.23.5"
+
+[lock]
+
+[lock.platforms]

@@ -370,5 +370,7 @@
   "workbench.editor.showTabs": "single",
   "workbench.list.smoothScrolling": true,
   "workbench.tree.indent": 16,
-  "workbench.view.alwaysShowHeaderActions": true
+  "workbench.view.alwaysShowHeaderActions": true,
+  "workbench.colorTheme": "Catppuccin Mocha",
+  "workbench.iconTheme": "catppuccin-mocha"
 }

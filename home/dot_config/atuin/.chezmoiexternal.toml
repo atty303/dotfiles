@@ -1,0 +1,7 @@
+[themes]
+    type = "archive"
+    url = "https://github.com/catppuccin/atuin/archive/refs/heads/main.zip"
+    exact = true
+    include = ["*/themes/mocha/**"]
+    stripComponents = 3
+    refreshPeriod = "168h"

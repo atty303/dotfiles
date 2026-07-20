@@ -4,4 +4,5 @@ if OS.mac? and !ENV["HEADLESS"]
   cask "karabiner-elements"
   cask "visual-studio-code"
   cask "google-japanese-ime"
+  cask "raycast"
 end

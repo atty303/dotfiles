@@ -52,7 +52,8 @@ if (which mise | is-not-empty) {
 
 const atuin_init_path = $vendor_autoload | path join atuin.nu
 if (which atuin | is-not-empty) {
-    ^atuin init --disable-up-arrow nu | str replace -a "get -i" "get -o" | save $atuin_init_path --force
+    ^atuin pty-proxy init nu | save $atuin_init_path --force
+    ^atuin init --disable-up-arrow nu | save $atuin_init_path --append
 } else {
     rm -fp $atuin_init_path
 }
