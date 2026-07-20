@@ -48,7 +48,6 @@ alias ch = chezmoi
 alias che = chezmoi --watch --apply
 alias vi = hx
 alias r = mise run
-alias y = yazi
 alias jf = jj git fetch
 
 def get-editor [] {

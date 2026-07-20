@@ -1,10 +1,14 @@
 font-family = "UDEV Gothic NFLG"
 font-size = 10
 background-opacity = 0.9
-# command = nu -l
+command = ~/.local/bin/login-nu
 clipboard-read = allow
 clipboard-write = allow
 # copy-on-select = clipboard
+quit-after-last-window-closed = true
+
+macos-option-as-alt = true
+macos-shortcuts = deny
 
 keybind = shift+insert=paste_from_clipboard
-keybind = global:super+f=toggle_quick_terminal
+# keybind = global:super+f=toggle_quick_terminal

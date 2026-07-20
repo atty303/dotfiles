@@ -1,0 +1,32 @@
+#!/usr/bin/env -S mise tool-stub
+
+tool = "television"
+version = "0.15.9"
+
+[lock]
+
+[lock.platforms]
+
+[lock.platforms.linux-arm64]
+url = "https://github.com/alexpasmantier/television/releases/download/0.15.9/tv-0.15.9-aarch64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:78a246170c9d83bea0f0c4a3fa8c9bc5cee80bbe66d34946d06fdc5a17a2cd1a"
+
+[lock.platforms.linux-x64]
+url = "https://github.com/alexpasmantier/television/releases/download/0.15.9/tv-0.15.9-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:3410e34132f4e44fd439c711f08c15b3a21f51630657cb03f248b2c7aef3e29a"
+
+[lock.platforms.linux-x64-musl]
+url = "https://github.com/alexpasmantier/television/releases/download/0.15.9/tv-0.15.9-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:3410e34132f4e44fd439c711f08c15b3a21f51630657cb03f248b2c7aef3e29a"
+
+[lock.platforms.macos-arm64]
+url = "https://github.com/alexpasmantier/television/releases/download/0.15.9/tv-0.15.9-aarch64-apple-darwin.tar.gz"
+checksum = "sha256:94ae7177d499f74e7544243ffe9c82371183ca11a6363f198a4b3d0e29f82732"
+
+[lock.platforms.macos-x64]
+url = "https://github.com/alexpasmantier/television/releases/download/0.15.9/tv-0.15.9-x86_64-apple-darwin.tar.gz"
+checksum = "sha256:0c6029ced92ddcf8218a8ce9a9d605d232898e2df021ae212d38c66f6c3abaad"
+
+[lock.platforms.windows-x64]
+url = "https://github.com/alexpasmantier/television/releases/download/0.15.9/tv-0.15.9-x86_64-pc-windows-msvc.tar.gz"
+checksum = "sha256:b6ecb3bf2587d8068a50c855671b2b693acaf172fcddb6542b6f80db1e38b681"
