@@ -3,133 +3,270 @@
 add_newline = false
 
 format = """
-[](pl-1)[ ](bg:pl-1)\
+[](red)\
+$shlvl\
+$shell\
+[](fg:red bg:peach)\
 $os\
 $hostname\
-[](pl-1 bg:pl-2)[ ](bg:pl-2)\
 $container\
-[](pl-2 bg:pl-3)[ ](bg:pl-3)\
+[](fg:peach bg:yellow)\
 $username\
-[](pl-3 bg:pl-4)[ ](bg:pl-4)\
+[](fg:yellow bg:green)\
 $directory\
-[](pl-4 bg:pl-5)[ ](bg:pl-5)\
+[ ](fg:green bg:sapphire)\
+${custom.vcs_status}\
+[](fg:sapphire bg:lavender)\
+$job\
 $cmd_duration\
 $status\
-[](pl-5)\
-[ ]()$all\
+[ ](fg:lavender)\
+$localip\
+$singularity\
+$kubernetes\
+$nats\
+$vcsh\
+$fossil_branch\
+$fossil_metrics\
+$hg_branch\
+$hg_state\
+$pijul_channel\
+$docker_context\
+$package\
+$bun\
+$c\
+$cmake\
+$cobol\
+$cpp\
+$daml\
+$dart\
+$deno\
+$dotnet\
+$elixir\
+$elm\
+$erlang\
+$fennel\
+$fortran\
+$gleam\
+$golang\
+$gradle\
+$haskell\
+$haxe\
+$helm\
+$java\
+$julia\
+$kotlin\
+$lua\
+$maven\
+$mojo\
+$nim\
+$nodejs\
+$ocaml\
+$odin\
+$opa\
+$perl\
+$php\
+$pulumi\
+$purescript\
+$python\
+$quarto\
+$raku\
+$rlang\
+$red\
+$ruby\
+$rust\
+$scala\
+$solidity\
+$swift\
+$terraform\
+$typst\
+$vlang\
+$vagrant\
+$xmake\
+$zig\
+$buf\
+$guix_shell\
+$nix_shell\
+$conda\
+$pixi\
+$meson\
+$spack\
+$memory_usage\
+$aws\
+$gcloud\
+$openstack\
+$azure\
+$direnv\
+$env_var\
+$mise\
+$crystal\
+$sudo\
+$battery\
+$time\
+$netns\
+$line_break\
 $character"""
 
 right_format = """"""
 
-# https://coolors.co/palettes/popular/5%20colors
-palette = "me5"
+palette = "catppuccin_mocha"
 
-[palettes.me]
-pl-fg = "black"
-pl-1 = "#8cb369"
-pl-2 = "#f4e285"
-pl-3 = "#f4a259"
-pl-4 = "#5b8e7d"
-pl-5 = "#bc4b51"
-
-[palettes.me2]
-# https://coolors.co/palette/22223b-4a4e69-9a8c98-c9ada7-f2e9e4
-pl-fg = "black"
-pl-1 = "#22223b"
-pl-2 = "#4a4e69"
-pl-3 = "#9a8c98"
-pl-4 = "#c9ada7"
-pl-5 = "#f2e9e4"
-
-[palettes.me3]
-# https://coolors.co/palette/ffcdb2-ffb4a2-e5989b-b5838d-6d6875
-pl-fg = "black"
-pl-1 = "#FFCDB2"
-pl-2 = "#FFB4A2"
-pl-3 = "#E5989B"
-pl-4 = "#B5838D"
-pl-5 = "#6D6875"
-
-[palettes.me4]
-# https://coolors.co/palette/a3a380-d6ce93-efebce-d8a48f-bb8588
-pl-fg = "black"
-pl-1 = "#A3A380"
-pl-2 = "#D6CE93"
-pl-3 = "#EFEBCE"
-pl-4 = "#D8A48F"
-pl-5 = "#BB8588"
-
-[palettes.me5]
-pl-fg = "black"
-pl-1 = "#005e10"
-pl-2 = "#328031"
-pl-3 = "#56a351"
-pl-4 = "#7ac772"
-pl-5 = "#9eec95"
-
-# --------------------------------
-
-[os]
-style = "pl-fg bg:pl-1"
+# -------------------------------- level 1
+[shlvl]
 disabled = false
+threshold = 2
+symbol = "󰘍 "
+repeat = true
+repeat_offset = 1
+style = "bg:red fg:crust"
+format = '[$symbol]($style)'
+
+[shell]
+disabled = false
+style = "bg:red fg:crust"
+format = '[$indicator ]($style)'
+
+# -------------------------------- level 2
+[os]
+disabled = false
+style = "bg:peach fg:crust"
+
+[os.symbols]
+Windows = ""
+Ubuntu = "󰕈"
+SUSE = ""
+Raspbian = "󰐿"
+Mint = "󰣭"
+Macos = "󰀵"
+Manjaro = ""
+Linux = "󰌽"
+Gentoo = "󰣨"
+Fedora = "󰣛"
+Alpine = ""
+Amazon = ""
+Android = ""
+AOSC = ""
+Arch = "󰣇"
+Artix = "󰣇"
+CentOS = ""
+Debian = "󰣚"
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
 
 [hostname]
 ssh_only = false
 ssh_symbol = "󱘖 "
-format = "[$hostname$ssh_symbol ](pl-fg bg:pl-1)"
-
-# --------------------------------
+trim_at = "."
+style = "bg:peach fg:crust"
+format = "[$hostname$ssh_symbol ]($style)"
 
 [container]
-format = "[$symbol $name ]($style)"
-style = "pl-fg bg:pl-2"
+symbol = " "
+format = "[$symbol$name ]($style)"
+style = "bg:peach fg:crust"
 
-# --------------------------------
-
+# -------------------------------- level 3
 [username]
-format = "[ $user ](pl-fg bg:pl-3)"
 show_always = true
+style_user = "bg:yellow fg:crust"
+style_root = "bg:yellow fg:red"
+format = "[ $user ]($style)"
 
-# --------------------------------
-
+# -------------------------------- level 4
 [directory]
+truncation_length = 5
+truncation_symbol = "…"
 truncate_to_repo = false
 use_os_path_sep = false
-fish_style_pwd_dir_length = 2
-style = "pl-fg bg:pl-4"
-repo_root_style = "pl-fg bg:pl-4"
+fish_style_pwd_dir_length = 1
+style = "bg:green fg:crust"
+before_repo_root_style = "bg:green fg:base"
+repo_root_style = "bg:green fg:mantle"
 repo_root_format = '[ $repo_root ]($repo_root_style)[󰉋 $path ]($style)'
 format = "[󰉋 $path ]($style)"
 
-# --------------------------------
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = " "
+"Developer" = "󰲋 "
 
+# -------------------------------- level 5
+[git_branch]
+disabled = false
+style = "bg:sapphire fg:crust"
+format = '[$symbol$branch(:$remote_branch) ]($style)'
+
+[git_commit]
+disabled = false
+style = "bg:sapphire fg:crust"
+format = '[\($hash$tag\) ]($style)'
+
+[git_state]
+disabled = false
+style = "bg:sapphire fg:crust"
+format = '\([$state( $progress_current/$progress_total) ]($style)\)'
+
+[git_metrics]
+disabled = false
+added_style = "bg:sapphire fg:crust"
+deleted_style = "bg:sapphire fg:crust"
+format = '([+$added ]($added_style))([-$deleted ]($deleted_style))'
+
+[git_status]
+disabled = false
+style = "bg:sapphire fg:crust"
+format = '([\[$all_status$ahead_behind\] ]($style))'
+
+[custom.jj]
+disabled = false
+symbol = ""
+style = "bg:sapphire fg:crust"
+format = '[$output]($style)'
+when = true
+shell = ["jj-starship", "--no-color"]
+
+[custom.vcs_status]
+when = true
+command = "jj root >/dev/null 2>&1; [[ $? -eq 0 ]] && starship module custom.jj || (starship module git_branch; starship module git_commit; starship module git_state; starship module git_metrics; starship module git_status )"
+style = "bg:sapphire fg:crust"
+format = "$output"
+shell = 'bash'
+
+# -------------------------------- level 6
 [cmd_duration]
 min_time = 0
 show_milliseconds = true
-show_notifications = true
-min_time_to_notify = 30000
-style = "pl-fg bg:pl-5"
+show_notifications = false
+min_time_to_notify = 60000
+style = "bg:lavender fg:crust"
 format = "[󱎫 $duration ]($style)"
+disabled = false
 
 [status]
 disabled = false
 symbol = " "
 success_symbol = " "
 signal_symbol = "󱐋 "
-style = "pl-fg bg:pl-5"
+style = "bg:lavender fg:crust"
+failure_style = "bg:red fg:crust bold"
 format = "[$symbol$status$signal_name$maybe_int ]($style)"
 
-# --------------------------------
-[mise]
+# -------------------------------- prompt line
+[character]
 disabled = false
+success_symbol = '[❯](bold fg:green)'
+error_symbol = '[❯](bold fg:red)'
+vimcmd_symbol = '[❮](bold fg:green)'
+vimcmd_replace_one_symbol = '[❮](bold fg:lavender)'
+vimcmd_replace_symbol = '[❮](bold fg:lavender)'
+vimcmd_visual_symbol = '[❮](bold fg:yellow)'
 
-# --------------------------------
-# Nerd Font Symbols Preset
-# https://starship.rs/presets/nerd-font
-# --------------------------------
-
+# -------------------------------- other conditionals
 [aws]
-symbol = "  "
+symbol = " "
+format = '[$symbol ($profile)(\($region\) )(\[$duration\] )]($style)'
 
 [buf]
 symbol = " "
@@ -149,6 +286,10 @@ symbol = " "
 [dart]
 symbol = " "
 
+[deno]
+symbol = " "
+format = '[$symbol($version )]($style)'
+
 [docker_context]
 symbol = " "
 
@@ -164,17 +305,20 @@ symbol = " "
 [fossil_branch]
 symbol = " "
 
-[git_branch]
-symbol = " "
-
-[git_commit]
-tag_symbol = '  '
+[gcloud]
+symbol = "󱇶 "
+format = '[$symbol$account(@$domain)(\($region\))]($style) '
+detect_env_vars = ["CLOUDSDK_CORE_PROJECT"]
 
 [golang]
 symbol = " "
 
 [guix_shell]
 symbol = " "
+
+[gradle]
+symbol = " "
+format = '[$symbol($version )]($style)'
 
 [haskell]
 symbol = " "
@@ -187,11 +331,14 @@ symbol = " "
 
 [java]
 symbol = " "
+detect_extensions = ['java', 'class', 'gradle', 'jar', 'cljs', 'cljc', 'mill']
+format = '[${symbol}(${version} )]($style)'
 
 [julia]
 symbol = " "
 
 [kotlin]
+disabled = true
 symbol = " "
 
 [lua]
@@ -203,6 +350,12 @@ symbol = "󰍛 "
 [meson]
 symbol = "󰔷 "
 
+[mise]
+format = '[$symbol$health]($style) '
+healthy_symbol = "healthy"
+unhealthy_symbol = "unhealthy"
+disabled = true
+
 [nim]
 symbol = "󰆥 "
 
@@ -210,60 +363,15 @@ symbol = "󰆥 "
 symbol = " "
 
 [nodejs]
-symbol = " "
+symbol = " "
+format = '[$symbol($version )]($style)'
 
 [ocaml]
 symbol = " "
 
-[os.symbols]
-Alpaquita = " "
-Alpine = " "
-AlmaLinux = " "
-Amazon = " "
-Android = " "
-Arch = " "
-Artix = " "
-CachyOS = " "
-CentOS = " "
-Debian = " "
-DragonFly = " "
-Emscripten = " "
-EndeavourOS = " "
-Fedora = " "
-FreeBSD = " "
-Garuda = "󰛓 "
-Gentoo = " "
-HardenedBSD = "󰞌 "
-Illumos = "󰈸 "
-Kali = " "
-Linux = " "
-Mabox = " "
-Macos = " "
-Manjaro = " "
-Mariner = " "
-MidnightBSD = " "
-Mint = " "
-NetBSD = " "
-NixOS = " "
-Nobara = " "
-OpenBSD = "󰈺 "
-openSUSE = " "
-OracleLinux = "󰌷 "
-Pop = " "
-Raspbian = " "
-Redhat = " "
-RedHatEnterprise = " "
-RockyLinux = " "
-Redox = "󰀘 "
-Solus = "󰠳 "
-SUSE = " "
-Ubuntu = " "
-Unknown = " "
-Void = " "
-Windows = "󰍲 "
-
 [package]
 symbol = "󰏗 "
+format = '[$symbol$version]($style) '
 
 [perl]
 symbol = " "
@@ -285,15 +393,132 @@ symbol = " "
 
 [rust]
 symbol = "󱘗 "
+format = '[$symbol($version )]($style)'
 
 [scala]
+disabled = true
 symbol = " "
+format = '[${symbol}(${version} )]($style)'
+detect_extensions = ['sbt', 'scala', 'mill']
 
 [swift]
 symbol = " "
 
+[terraform]
+symbol = " "
+format = '[$symbol$version\($workspace\)]($style) '
+
 [zig]
 symbol = " "
 
-[gradle]
-symbol = " "
+[palettes.catppuccin_mocha]
+rosewater = "#f5e0dc"
+flamingo = "#f2cdcd"
+pink = "#f5c2e7"
+mauve = "#cba6f7"
+red = "#f38ba8"
+maroon = "#eba0ac"
+peach = "#fab387"
+yellow = "#f9e2af"
+green = "#a6e3a1"
+teal = "#94e2d5"
+sky = "#89dceb"
+sapphire = "#74c7ec"
+blue = "#89b4fa"
+lavender = "#b4befe"
+text = "#cdd6f4"
+subtext1 = "#bac2de"
+subtext0 = "#a6adc8"
+overlay2 = "#9399b2"
+overlay1 = "#7f849c"
+overlay0 = "#6c7086"
+surface2 = "#585b70"
+surface1 = "#45475a"
+surface0 = "#313244"
+base = "#1e1e2e"
+mantle = "#181825"
+crust = "#11111b"
+
+[palettes.catppuccin_frappe]
+rosewater = "#f2d5cf"
+flamingo = "#eebebe"
+pink = "#f4b8e4"
+mauve = "#ca9ee6"
+red = "#e78284"
+maroon = "#ea999c"
+peach = "#ef9f76"
+yellow = "#e5c890"
+green = "#a6d189"
+teal = "#81c8be"
+sky = "#99d1db"
+sapphire = "#85c1dc"
+blue = "#8caaee"
+lavender = "#babbf1"
+text = "#c6d0f5"
+subtext1 = "#b5bfe2"
+subtext0 = "#a5adce"
+overlay2 = "#949cbb"
+overlay1 = "#838ba7"
+overlay0 = "#737994"
+surface2 = "#626880"
+surface1 = "#51576d"
+surface0 = "#414559"
+base = "#303446"
+mantle = "#292c3c"
+crust = "#232634"
+
+[palettes.catppuccin_latte]
+rosewater = "#dc8a78"
+flamingo = "#dd7878"
+pink = "#ea76cb"
+mauve = "#8839ef"
+red = "#d20f39"
+maroon = "#e64553"
+peach = "#fe640b"
+yellow = "#df8e1d"
+green = "#40a02b"
+teal = "#179299"
+sky = "#04a5e5"
+sapphire = "#209fb5"
+blue = "#1e66f5"
+lavender = "#7287fd"
+text = "#4c4f69"
+subtext1 = "#5c5f77"
+subtext0 = "#6c6f85"
+overlay2 = "#7c7f93"
+overlay1 = "#8c8fa1"
+overlay0 = "#9ca0b0"
+surface2 = "#acb0be"
+surface1 = "#bcc0cc"
+surface0 = "#ccd0da"
+base = "#eff1f5"
+mantle = "#e6e9ef"
+crust = "#dce0e8"
+
+[palettes.catppuccin_macchiato]
+rosewater = "#f4dbd6"
+flamingo = "#f0c6c6"
+pink = "#f5bde6"
+mauve = "#c6a0f6"
+red = "#ed8796"
+maroon = "#ee99a0"
+peach = "#f5a97f"
+yellow = "#eed49f"
+green = "#a6da95"
+teal = "#8bd5ca"
+sky = "#91d7e3"
+sapphire = "#7dc4e4"
+blue = "#8aadf4"
+lavender = "#b7bdf8"
+text = "#cad3f5"
+subtext1 = "#b8c0e0"
+subtext0 = "#a5adcb"
+overlay2 = "#939ab7"
+overlay1 = "#8087a2"
+overlay0 = "#6e738d"
+surface2 = "#5b6078"
+surface1 = "#494d64"
+surface0 = "#363a4f"
+base = "#24273a"
+mantle = "#1e2030"
+crust = "#181926"

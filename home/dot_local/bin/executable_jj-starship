@@ -1,0 +1,37 @@
+#!/usr/bin/env -S mise tool-stub
+
+tool = "github:dmmulroy/jj-starship"
+version = "0.7.1"
+postinstall = "chmod a+x ${MISE_TOOL_INSTALL_PATH}/jj-starship"
+
+[lock]
+
+[lock.platforms]
+
+[lock.platforms.linux-arm64]
+url = "https://github.com/dmmulroy/jj-starship/releases/download/v0.7.1/jj-starship-aarch64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:41421f753a3ad732b6473a81487cbbf1cf86263097b2355fc9f235ec96661869"
+
+[lock.platforms.linux-arm64-musl]
+url = "https://github.com/dmmulroy/jj-starship/releases/download/v0.7.1/jj-starship-aarch64-unknown-linux-musl.tar.gz"
+checksum = "sha256:6bf0d10d42535ba9de02bb1517566eec1d838fbeccd7dc418445baa5f67b7ae2"
+
+[lock.platforms.linux-x64]
+url = "https://github.com/dmmulroy/jj-starship/releases/download/v0.7.1/jj-starship-x86_64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:45b5e1d1fa1702348f33849d2361ca537ba9b949581ac8c5f4d15b7a9646b7d9"
+
+[lock.platforms.linux-x64-musl]
+url = "https://github.com/dmmulroy/jj-starship/releases/download/v0.7.1/jj-starship-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:d5199970824298c7536552d2a964eb40011bfb7d3a33f3c18a23274aa00abe7e"
+
+[lock.platforms.macos-arm64]
+url = "https://github.com/dmmulroy/jj-starship/releases/download/v0.7.1/jj-starship-aarch64-apple-darwin.tar.gz"
+checksum = "sha256:6d382ef8b1ee9cf2ae027ec5a43f4eb6ce8dc7853b2e8157744f80a54e9b6ac0"
+
+[lock.platforms.macos-x64]
+url = "https://github.com/dmmulroy/jj-starship/releases/download/v0.7.1/jj-starship-x86_64-apple-darwin.tar.gz"
+checksum = "sha256:da0c6ac255ecc4f8eca8a7bb2b48a84abf08f528f9aa929406e2781c29ebd159"
+
+[lock.platforms.windows-x64]
+url = "https://github.com/dmmulroy/jj-starship/releases/download/v0.7.1/jj-starship-x86_64-pc-windows-msvc.tar.gz"
+checksum = "sha256:9fbd9c5dad722e50c110aa9e5d84a60f4782b8a9078ca160fcbff2ac26f0eea7"
