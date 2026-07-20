@@ -1,35 +1,36 @@
 #!/usr/bin/env -S mise tool-stub
 
-version = "2.9.1"
+tool = "deno"
+version = "2.9.3"
 
 [lock]
 
 [lock.platforms]
 
 [lock.platforms.linux-arm64]
-url = "https://dl.deno.land/release/v2.9.1/deno-aarch64-unknown-linux-gnu.zip"
-checksum = "sha256:0a60d079fa79635a59803074dbbfe86ccc35746dc2c4f8d73f2e50338b3283a9"
+url = "https://dl.deno.land/release/v2.9.3/deno-aarch64-unknown-linux-gnu.zip"
+checksum = "sha256:753937db98a4b56cbbbd26e8f00eb4b789191a229afec93f74bcfa4e79bc2c8b"
 
 [lock.platforms.linux-arm64-musl]
-url = "https://dl.deno.land/release/v2.9.1/deno-aarch64-unknown-linux-gnu.zip"
-checksum = "sha256:0a60d079fa79635a59803074dbbfe86ccc35746dc2c4f8d73f2e50338b3283a9"
+url = "https://dl.deno.land/release/v2.9.3/deno-aarch64-unknown-linux-gnu.zip"
+checksum = "sha256:753937db98a4b56cbbbd26e8f00eb4b789191a229afec93f74bcfa4e79bc2c8b"
 
 [lock.platforms.linux-x64]
-url = "https://dl.deno.land/release/v2.9.1/deno-x86_64-unknown-linux-gnu.zip"
-checksum = "sha256:710c54d63477d1100844ef4818f19507ce0dbf40510903b1d883f19e394446a2"
+url = "https://dl.deno.land/release/v2.9.3/deno-x86_64-unknown-linux-gnu.zip"
+checksum = "sha256:8101865641cbede56f08ad19c0a67a87df84bce127fee0d3e3e1f7467717ffa6"
 
 [lock.platforms.linux-x64-musl]
-url = "https://dl.deno.land/release/v2.9.1/deno-x86_64-unknown-linux-gnu.zip"
-checksum = "sha256:710c54d63477d1100844ef4818f19507ce0dbf40510903b1d883f19e394446a2"
+url = "https://dl.deno.land/release/v2.9.3/deno-x86_64-unknown-linux-gnu.zip"
+checksum = "sha256:8101865641cbede56f08ad19c0a67a87df84bce127fee0d3e3e1f7467717ffa6"
 
 [lock.platforms.macos-arm64]
-url = "https://dl.deno.land/release/v2.9.1/deno-aarch64-apple-darwin.zip"
-checksum = "sha256:ee3473502118eab301eca93aa6b31d6b0b6c1602d0f59e4cb89d4a262b12f6e7"
+url = "https://dl.deno.land/release/v2.9.3/deno-aarch64-apple-darwin.zip"
+checksum = "sha256:1b2972f7ceb6df28d9600eab18d423bebb9aa18db02f01d7eb37a5b501482203"
 
 [lock.platforms.macos-x64]
-url = "https://dl.deno.land/release/v2.9.1/deno-x86_64-apple-darwin.zip"
-checksum = "sha256:89cbc8c974247772d9200724741b4e692ef49fe470b2ff555da905817c3daa11"
+url = "https://dl.deno.land/release/v2.9.3/deno-x86_64-apple-darwin.zip"
+checksum = "sha256:cff2bce236fde0952aac62a5699464c46901b4eb1e61d0caffbb33d556e098c1"
 
 [lock.platforms.windows-x64]
-url = "https://dl.deno.land/release/v2.9.1/deno-x86_64-pc-windows-msvc.zip"
-checksum = "sha256:ab310b4232cca207d40ffa41867e93aaf9f893802bc76756e74f486a6b21b371"
+url = "https://dl.deno.land/release/v2.9.3/deno-x86_64-pc-windows-msvc.zip"
+checksum = "sha256:60343461ac5fe3a31f4ef12667f2946bb852e20655c8610aeb7e751e87f7df3a"

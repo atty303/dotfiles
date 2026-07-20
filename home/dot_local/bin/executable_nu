@@ -1,36 +1,36 @@
 #!/usr/bin/env -S mise tool-stub
 
 tool = "aqua:nushell/nushell"
-version = "0.111.0"
+version = "0.114.1"
 
 [lock]
 
 [lock.platforms]
 
 [lock.platforms.linux-arm64]
-url = "https://github.com/nushell/nushell/releases/download/0.111.0/nu-0.111.0-aarch64-unknown-linux-gnu.tar.gz"
-checksum = "sha256:ff72150fefcac7c990fa0f2e04550d51b609274cbd0a2831335e6975bd2079c8"
+url = "https://github.com/nushell/nushell/releases/download/0.114.1/nu-0.114.1-aarch64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:39944812ee619736fd50828e66c96b91747c1e189ccddac89c3ac1a02e0614f2"
 
 [lock.platforms.linux-arm64-musl]
-url = "https://github.com/nushell/nushell/releases/download/0.111.0/nu-0.111.0-aarch64-unknown-linux-musl.tar.gz"
-checksum = "sha256:fe8c4e1d8efd5333425b53d0502b43f7e78bebc5e9e44f27a49870ea65394d74"
+url = "https://github.com/nushell/nushell/releases/download/0.114.1/nu-0.114.1-aarch64-unknown-linux-musl.tar.gz"
+checksum = "sha256:4f9e880e7bbf8ee58f3860ef49f453eb2628965b6f2c880fb03d4775f290b536"
 
 [lock.platforms.linux-x64]
-url = "https://github.com/nushell/nushell/releases/download/0.111.0/nu-0.111.0-x86_64-unknown-linux-musl.tar.gz"
-checksum = "sha256:aaf0cce45be9f3b30b3e297b9b5026f91b48df088b3c110ac5db79a7a7d957e5"
+url = "https://github.com/nushell/nushell/releases/download/0.114.1/nu-0.114.1-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:ce3a1c5a07c784098b5675224a165e73a45f0f720a8392791d7c3a5b4720255e"
 
 [lock.platforms.linux-x64-musl]
-url = "https://github.com/nushell/nushell/releases/download/0.111.0/nu-0.111.0-x86_64-unknown-linux-musl.tar.gz"
-checksum = "sha256:aaf0cce45be9f3b30b3e297b9b5026f91b48df088b3c110ac5db79a7a7d957e5"
+url = "https://github.com/nushell/nushell/releases/download/0.114.1/nu-0.114.1-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:ce3a1c5a07c784098b5675224a165e73a45f0f720a8392791d7c3a5b4720255e"
 
 [lock.platforms.macos-arm64]
-url = "https://github.com/nushell/nushell/releases/download/0.111.0/nu-0.111.0-aarch64-apple-darwin.tar.gz"
-checksum = "sha256:260e59f7f9ac65cad4624cd45c11e38ac8aed7d0d7d027ad2d39f50d2373b274"
+url = "https://github.com/nushell/nushell/releases/download/0.114.1/nu-0.114.1-aarch64-apple-darwin.tar.gz"
+checksum = "sha256:cb0ac9b97b985cd217a952f44438a14d2df2a95504d9bd8bc01ec73e1351b179"
 
 [lock.platforms.macos-x64]
-url = "https://github.com/nushell/nushell/releases/download/0.111.0/nu-0.111.0-x86_64-apple-darwin.tar.gz"
-checksum = "sha256:20dae71461c4d432531f78e5dfcd1f3cf5919ebbbafd10a95e8a2925532b721a"
+url = "https://github.com/nushell/nushell/releases/download/0.114.1/nu-0.114.1-x86_64-apple-darwin.tar.gz"
+checksum = "sha256:4659a78545b7f6a303e661fe3bd276a765c64ccde67112d32045be5fe075f206"
 
 [lock.platforms.windows-x64]
-url = "https://github.com/nushell/nushell/releases/download/0.111.0/nu-0.111.0-x86_64-pc-windows-msvc.zip"
-checksum = "sha256:4efd0a72ce26052961183aa3ecb8dce17bb6c43903392bc3521a9fda4e6127b2"
+url = "https://github.com/nushell/nushell/releases/download/0.114.1/nu-0.114.1-x86_64-pc-windows-msvc.zip"
+checksum = "sha256:71a88cb74f51a9fdd91003273fb1f3361d7b393fb3a03014f43e5f111df9666f"
