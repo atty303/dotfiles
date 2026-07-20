@@ -45,8 +45,7 @@ mkdir $vendor_autoload
 
 const mise_init_path = $vendor_autoload | path join mise.nu
 if (which mise | is-not-empty) {
-    ^mise activate --shims nu | save $mise_init_path --force
-    ^mise activate nu | save $mise_init_path --append
+    ^mise activate nu | save $mise_init_path --force
 } else {
     rm -fp $mise_init_path
 }

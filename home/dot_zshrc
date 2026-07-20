@@ -13,7 +13,6 @@ for dir in "${dirs[@]}"; do
 done
 
 if (( $+commands[mise] )); then
-  eval "$(mise activate --shims zsh)"
   eval "$(mise activate zsh)"
 fi
 
