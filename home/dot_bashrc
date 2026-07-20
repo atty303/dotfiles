@@ -12,6 +12,10 @@ for dir in "${dirs[@]}"; do
   esac
 done
 
+if command -v starship >/dev/null; then
+  eval "$(starship init bash)"
+fi
+
 RESOLVING_ENVIRONMENT=0
 # https://intellij-support.jetbrains.com/hc/en-us/articles/15268184143890-Shell-Environment-Loading
 if [[ -n "$INTELLIJ_ENVIRONMENT_READER" ]]; then RESOLVING_ENVIRONMENT=1; fi
