@@ -4,6 +4,7 @@
 [core]
   autocrlf = input
   symlink = true
+  pager = delta
 {{ if (eq .chezmoi.os "windows") -}}
   sshCommand = "C:/Windows/System32/OpenSSH/ssh.exe"
 {{ else if (.wsl) }}
@@ -42,6 +43,17 @@
 
 [commit]
   gpgsign = true
+
+[interactive]
+  diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+    dark = true
+    theme = Catppuccin Mocha
+
+[merge]
+    conflictStyle = zdiff3
 
 [hook "hk-pre-commit"]
   command = test \"${HK:-1}\" = \"0\" || ! command -v hk >/dev/null || hk run pre-commit --from-hook \"$@\"
