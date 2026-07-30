@@ -91,3 +91,12 @@ if (which fzf | is-not-empty) {
 } else {
     rm -fp $fzf_init_path
 }
+
+# Generate completions
+const completions = $nu.default-config-dir | path join completions
+mkdir $completions
+
+if (which jj | is-not-empty) {
+    const path = $completions | path join jj.nu
+    ^jj util completion nushell | save $path --force
+}
