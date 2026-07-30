@@ -2,6 +2,7 @@
 
 fonts_dir="${2:-${XDG_DATA_HOME:-$HOME/.local/share}/fonts}"
 
+mkdir -p "$fonts_dir"
 cd "$fonts_dir"
 
 {{ range .fonts.google -}}
