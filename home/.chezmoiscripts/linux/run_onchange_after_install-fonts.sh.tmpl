@@ -6,7 +6,7 @@ mkdir -p "$fonts_dir"
 cd "$fonts_dir"
 
 {{ range .fonts.google -}}
-  mise exec http:google-font-download[url=https://raw.githubusercontent.com/neverpanic/google-font-download/refs/tags/1.4.3/google-font-download] -- google-font-download --format=ttf --languages=all --output=/dev/null {{ . | quote }}
+  mise exec http:google-font-download[url=https://raw.githubusercontent.com/neverpanic/google-font-download/refs/tags/1.4.3/google-font-download]@1.4.3 -- google-font-download --format=ttf --languages=all --output=/dev/null {{ . | quote }}
 {{ end -}}
 
 install_fonts_from_zip() {
