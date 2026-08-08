@@ -10,9 +10,10 @@ This is a cross-platform chezmoi dotfiles repository. `.chezmoiroot` points to `
 - `chezmoi apply --dry-run --verbose`: inspect planned changes and scripts without applying them.
 - `chezmoi apply --init --verbose`: apply the source state; this can install packages or run lifecycle scripts, so review the diff first.
 - `chezmoi doctor`: check the local chezmoi installation and dependencies.
+- `mise run test:e2e:linux`: run the full chezmoi E2E test on Fedora 44 and Ubuntu 24.04.
 - `./install.sh`: bootstrap and apply this checkout on a new machine.
 
-There is no compilation step or automated test suite. Validate on the relevant operating system, especially after changing `.chezmoiscripts` or platform-conditional templates.
+There is no compilation step. Validate on the relevant operating system, especially after changing `.chezmoiscripts` or platform-conditional templates.
 
 ## Coding Style & Naming Conventions
 
@@ -20,7 +21,7 @@ Preserve the format native to each tool (TOML, JSON, KDL, Lua, Nushell, POSIX sh
 
 ## Testing Guidelines
 
-Run `chezmoi diff` and the dry run before committing. Inspect rendered templates for every affected OS and confirm secret material remains encrypted. For executable changes, also run the language's parser or formatter when available.
+Run `chezmoi diff` and the dry run before committing. Inspect rendered templates for every affected OS and confirm secret material remains encrypted. Run `mise run test:e2e:linux` after changing files under `home/.chezmoiscripts/linux/` or changing `install.sh`. For executable changes, also run the language's parser or formatter when available.
 
 ## Commit & Pull Request Guidelines
 
