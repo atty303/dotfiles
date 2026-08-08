@@ -26,13 +26,16 @@ const TARGETS: Record<LinuxTarget, TargetConfig> = {
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 const repository = join(moduleDirectory, "..", "..");
+const signalShieldedExec = 'trap "" HUP INT TERM; exec "$@"';
 
 export async function runLinuxTargets(target: LinuxTarget | "all"): Promise<void> {
   const targets: LinuxTarget[] = target === "all" ? ["fedora", "ubuntu"] : [target];
   const abort = new AbortController();
   let receivedSignal: Deno.Signal | undefined;
+  let successfulCleanupStarted = false;
   const handleSignal = (signal: Deno.Signal) => {
     receivedSignal ??= signal;
+    if (successfulCleanupStarted) return;
     abort.abort(new Error(`received ${signal}`));
   };
   const onInterrupt = () => handleSignal("SIGINT");
@@ -52,14 +55,24 @@ export async function runLinuxTargets(target: LinuxTarget | "all"): Promise<void
     console.log(`source archive sha256: ${staged.sha256}`);
 
     for (const currentTarget of targets) {
+      successfulCleanupStarted = false;
       try {
-        await runLinuxTarget(currentTarget, staged, runId, abort.signal);
+        await runLinuxTarget(
+          currentTarget,
+          staged,
+          runId,
+          abort.signal,
+          () => successfulCleanupStarted = true,
+        );
+        if (receivedSignal !== undefined) throw new InterruptedError(receivedSignal);
       } catch (error) {
         if (receivedSignal !== undefined) {
           throw new InterruptedError(receivedSignal, { cause: error });
         }
         failures.push({ target: currentTarget, error });
         console.error(`${TARGETS[currentTarget].label} failed:`, error);
+      } finally {
+        successfulCleanupStarted = false;
       }
     }
   } finally {
@@ -85,6 +98,7 @@ async function runLinuxTarget(
   staged: StagedSource,
   runId: string,
   signal: AbortSignal,
+  beginSuccessfulCleanup: () => void,
 ): Promise<void> {
   const config = TARGETS[target];
   const containerName = `chezmoi-e2e-${target}-${runId}`;
@@ -97,7 +111,19 @@ async function runLinuxTarget(
   await Deno.mkdir(logDirectory, { recursive: true });
   await Deno.writeTextFile(
     join(logDirectory, "metadata.json"),
-    `${JSON.stringify({ target, label: config.label, sourceSha256: staged.sha256 }, null, 2)}\n`,
+    `${
+      JSON.stringify(
+        {
+          target,
+          label: config.label,
+          sourceSha256: staged.sha256,
+          containerName,
+          volumeName,
+        },
+        null,
+        2,
+      )
+    }\n`,
   );
 
   const execute = async (builder: CommandBuilder) => {
@@ -109,6 +135,10 @@ async function runLinuxTarget(
   console.log(`\n==> ${config.label}`);
   console.log(`logs: ${logDirectory}`);
 
+  let completed = false;
+  let archiveCopied = false;
+  let cleanupFailure: string | undefined;
+
   try {
     await execute(
       $`podman build --file ${containerfile} --tag ${config.image} ${repository}`.signal(
@@ -117,14 +147,18 @@ async function runLinuxTarget(
     );
     await execute($`podman volume create ${volumeName}`.signal(signal));
     await execute(
-      $`podman create --name ${containerName} --volume ${staged.archivePath}:/e2e/source.tar:ro,Z --volume ${volumeName}:/home/e2e:U --env CHEZMOI_AGE_KEY --env CHEZMOI_E2E=1 --env CHEZMOI_E2E_RECIPIENT=${staged.recipient} ${config.image}`
+      $`podman create --name ${containerName} --volume ${volumeName}:/home/e2e:U --env CHEZMOI_AGE_KEY --env CHEZMOI_E2E=1 --env CHEZMOI_E2E_RECIPIENT=${staged.recipient} ${config.image}`
         .env({ CHEZMOI_AGE_KEY: staged.identity })
         .signal(signal),
     );
+    await execute(
+      $`podman cp ${staged.archivePath} ${containerName}:/tmp/source.tar`.signal(signal),
+    );
+    archiveCopied = true;
     await execute($`podman start ${containerName}`.signal(signal));
     await execute($`podman exec ${containerName} mkdir -p /tmp/source`.signal(signal));
     await execute(
-      $`podman exec ${containerName} tar -xf /e2e/source.tar -C /tmp/source`.signal(signal),
+      $`podman exec ${containerName} tar -xf /tmp/source.tar -C /tmp/source`.signal(signal),
     );
     await execute(
       $`podman exec --workdir /tmp/source ${containerName} /bin/sh ./install.sh`.signal(
@@ -149,10 +183,115 @@ async function runLinuxTarget(
           signal,
         ),
     );
+    completed = true;
   } finally {
-    await $`podman rm --force ${containerName}`.quiet().noThrow();
-    await $`podman volume rm --force ${volumeName}`.quiet().noThrow();
+    if (completed) beginSuccessfulCleanup();
+    let containerPresence = await resourcePresence("container", containerName);
+    let volumePresence = await resourcePresence("volume", volumeName);
+
+    if (completed) {
+      const cleanupErrors: string[] = [];
+      let containerRemoved = containerPresence === "absent";
+      if (containerPresence !== "absent") {
+        const result =
+          await $`sh -c ${signalShieldedExec} sh setsid --fork --wait podman rm --force ${containerName}`
+            .quiet().noThrow();
+        if (result.code !== 0) {
+          cleanupErrors.push(`container cleanup exited ${result.code}`);
+        } else {
+          containerPresence = await resourcePresence("container", containerName);
+          containerRemoved = containerPresence === "absent";
+          if (!containerRemoved) {
+            cleanupErrors.push(`container cleanup left resource ${containerPresence}`);
+          }
+        }
+      }
+      if (containerRemoved && volumePresence !== "absent") {
+        const result =
+          await $`sh -c ${signalShieldedExec} sh setsid --fork --wait podman volume rm ${volumeName}`
+            .quiet().noThrow();
+        if (result.code !== 0) cleanupErrors.push(`volume cleanup exited ${result.code}`);
+      }
+      if (cleanupErrors.length > 0) {
+        containerPresence = await resourcePresence("container", containerName);
+        volumePresence = await resourcePresence("volume", volumeName);
+        reportRetainedResources(
+          logDirectory,
+          containerName,
+          volumeName,
+          containerPresence,
+          volumePresence,
+          archiveCopied,
+        );
+        cleanupFailure = cleanupErrors.join(", ");
+      }
+    } else if (containerPresence !== "absent" || volumePresence !== "absent") {
+      reportRetainedResources(
+        logDirectory,
+        containerName,
+        volumeName,
+        containerPresence,
+        volumePresence,
+        archiveCopied,
+      );
+    }
   }
+  if (cleanupFailure !== undefined) {
+    throw new Error(`Linux E2E cleanup failed: ${cleanupFailure}`);
+  }
+}
+
+type ResourcePresence = "present" | "absent" | "unknown";
+
+async function resourcePresence(
+  kind: "container" | "volume",
+  name: string,
+): Promise<ResourcePresence> {
+  const result = kind === "container"
+    ? await $`sh -c ${signalShieldedExec} sh setsid --fork --wait podman container exists ${name}`
+      .quiet().noThrow()
+    : await $`sh -c ${signalShieldedExec} sh setsid --fork --wait podman volume exists ${name}`
+      .quiet().noThrow();
+  if (result.code === 0) return "present";
+  if (result.code === 1) return "absent";
+  return "unknown";
+}
+
+function reportRetainedResources(
+  logDirectory: string,
+  containerName: string,
+  volumeName: string,
+  containerPresence: ResourcePresence,
+  volumePresence: ResourcePresence,
+  archiveCopied: boolean,
+): void {
+  const lines = [
+    "",
+    "E2E resources retained for investigation:",
+    `  logs: ${logDirectory}`,
+    `  container: ${containerName} (${containerPresence})`,
+    `  volume: ${volumeName} (${volumePresence})`,
+  ];
+  if (containerPresence !== "absent") {
+    lines.push(
+      `  start (if stopped): podman start ${containerName}`,
+      `  shell: podman exec -it ${containerName} /bin/bash`,
+    );
+    if (archiveCopied) {
+      lines.push(
+        `  prepare source: podman exec ${containerName} mkdir -p /tmp/source`,
+        `  extract source: podman exec ${containerName} tar -xf /tmp/source.tar -C /tmp/source`,
+        `  retry install: podman exec --workdir /tmp/source ${containerName} /bin/sh ./install.sh`,
+      );
+    } else {
+      lines.push("  source archive: not copied; inspect the logs before retrying");
+    }
+    lines.push(`  remove container: podman rm --force ${containerName}`);
+  }
+  if (volumePresence !== "absent") {
+    lines.push(`  remove volume: podman volume rm ${volumeName}`);
+  }
+  console.error(lines.join("\n"));
 }
 
 class InterruptedError extends Error {

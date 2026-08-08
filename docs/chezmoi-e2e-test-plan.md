@@ -267,6 +267,8 @@ AWS credential、SSH private key、Windows credential、age identityをテスト
 
 age identity、復号済み個人secret、Windows password、AWS tokenはredactする。
 
+Linux E2Eは成功時にcontainerとhome volumeを削除し、cleanup失敗もテスト失敗として扱う。テストまたはcleanupの失敗時は即時調査できるように残存resourceを保持し、log directory、container/volume名、起動、shell接続、install再実行および削除コマンドを標準エラーへ表示する。保持したresourceは調査後に表示されたコマンドで明示的に削除する。
+
 ## 実装順序
 
 1. 共通archive、age fixture、guest assertion、cleanup処理を作る。
