@@ -10,4 +10,15 @@ if command -v git &>/dev/null; then
   if [[ -n "$token" ]]; then export GITHUB_TOKEN="$token"; fi
 fi
 
-mise install -y
+for attempt in 1 2 3; do
+  if mise install -y; then
+    exit 0
+  else
+    status=$?
+  fi
+  if ((attempt == 3)); then
+    exit "$status"
+  fi
+  echo "mise install failed; retrying (${attempt}/3)" >&2
+  sleep $((attempt * 2))
+done

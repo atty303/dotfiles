@@ -5,4 +5,15 @@
 # {{ $file }}: {{ $file | include | sha256sum }}
 {{ end -}}
 
-mise install
+for attempt in 1 2 3; do
+  if mise install; then
+    exit 0
+  else
+    status=$?
+  fi
+  if ((attempt == 3)); then
+    exit "$status"
+  fi
+  echo "mise install failed; retrying (${attempt}/3)" >&2
+  sleep $((attempt * 2))
+done

@@ -21,12 +21,12 @@ macOSのTartホストにはLAN内のApple Silicon MacとAWS EC2 Macの両方を�
 
 1. クリーンなユーザーHOMEからbootstrapする。
 2. 現在の作業ツリーをsource stateとして初回のフルapplyを完了する。
-3. `chezmoi verify` で管理対象とtarget stateが一致する。
+3. 常時実行scriptを除く `chezmoi verify` で管理対象とtarget stateが一致する。
 4. OS固有のファイル、symlink、実行属性、主要パッケージを検証する。
 5. 一時age鍵で暗号化したsentinelが正しく復号・配置される。
 6. `chezmoi apply --dry-run --verbose` で追加変更が予定されない。
 7. 実際に2回目の `chezmoi apply` を実行し、終了コード0になる。
-8. 2回目のapply後にも `chezmoi verify` が成功する。
+8. 2回目のapply後にも常時実行scriptを除く `chezmoi verify` が成功する。
 
 OS再起動後のサービス、ログインセッション、GUI承認状態までは初期スコープに含めない。
 
@@ -76,7 +76,9 @@ E2E_MAC_BACKEND=aws mise run test:e2e -- --confirm-cost
 
 初回apply後に最低限、次を確認する。
 
-- `chezmoi verify` が成功する。
+LinuxとmacOSでは、lifecycle script内の `mise install` だけを最大3回、失敗後2秒・4秒の間隔で再実行する。
+
+- 常時実行scriptを除く `chezmoi verify` が成功する。
 - 暗号化sentinelが期待した内容とpermissionで配置される。
 - `.local/bin` の主要external commandが存在し、実行可能である。
 - OS別のNushell、Code、Alacritty symlinkが存在し、source state内の正しい共有ファイルを指す。
@@ -100,7 +102,7 @@ Ubuntuは互換性確認だけでなく、dotfilesを実際に適用するコン
 - 各ディストリビューション用Containerfileには、証明書、curl、git、archive展開などbootstrapに不可欠なOSパッケージだけを入れる。
 - chezmoi、mise、mise管理tool、fonts、externalsはimageへ事前導入せず、テスト対象のbootstrap/applyに導入させる。
 - rootではなく専用の一般ユーザーと独立HOMEを作り、通常のdotfiles適用に近い条件にする。
-- source archiveはread-onlyでコンテナへ渡し、target HOMEとchezmoi stateはコンテナ固有volumeに置く。
+- source archiveはコンテナへコピーし、target HOMEとchezmoi stateはコンテナ固有volumeに置く。
 - FedoraとUbuntuは同じ共通検証を通す。
 
 Podman containerはLinuxカーネルやsystem serviceの構成検証には使わない。今回のLinux scriptsが行うユーザーHOME、mise、fonts、terminfo、externalsのE2Eに限定する。

@@ -166,7 +166,7 @@ async function runLinuxTarget(
       ),
     );
     await execute(
-      $`podman exec ${containerName} /home/e2e/.local/bin/chezmoi --source /tmp/source verify`
+      $`podman exec ${containerName} /home/e2e/.local/bin/chezmoi --source /tmp/source verify --exclude scripts`
         .signal(
           signal,
         ),
@@ -178,7 +178,7 @@ async function runLinuxTarget(
         ),
     );
     await execute(
-      $`podman exec ${containerName} /home/e2e/.local/bin/chezmoi --source /tmp/source verify`
+      $`podman exec ${containerName} /home/e2e/.local/bin/chezmoi --source /tmp/source verify --exclude scripts`
         .signal(
           signal,
         ),

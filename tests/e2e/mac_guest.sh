@@ -18,19 +18,6 @@ export CHEZMOI_E2E_RECIPIENT=$recipient
 export HEADLESS=1
 export PATH="$HOME/.local/bin:$PATH"
 
-retry() {
-  local attempt
-  for attempt in 1 2 3; do
-    if "$@"; then
-      return 0
-    fi
-    if ((attempt == 3)); then
-      return 1
-    fi
-    sleep $((attempt * 2))
-  done
-}
-
 # The pinned base image can contain an older package-managed mise that cannot self-update.
 for attempt in 1 2 3; do
   if /usr/bin/curl --retry 3 --retry-all-errors --retry-delay 2 -fsSL https://mise.run | \
@@ -47,7 +34,7 @@ done
 "$HOME/.local/bin/mise" trust "$source_directory"
 
 cd "$source_directory"
-retry /bin/sh ./install.sh
+/bin/sh ./install.sh
 
 echo "verify: chezmoi state"
 if ! "$chezmoi" --source "$source_directory" verify; then
