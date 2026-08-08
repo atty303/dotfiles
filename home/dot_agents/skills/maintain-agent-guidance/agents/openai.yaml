@@ -1,0 +1,4 @@
+interface:
+  display_name: "Maintain Agent Guidance"
+  short_description: "Audit and improve durable agent guidance"
+  default_prompt: "Use $maintain-agent-guidance to evaluate and propose this guidance improvement."

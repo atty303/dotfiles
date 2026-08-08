@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop Repository"
+  short_description: "Apply personal repository development workflow"
+  default_prompt: "Use $develop-repository to implement and verify this repository change."
