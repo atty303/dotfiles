@@ -1,0 +1,18 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- $current := dict -}}
+{{- if ne (trim .chezmoi.stdin) "" -}}
+{{-   $current = fromToml .chezmoi.stdin -}}
+{{- end -}}
+
+{{- $managed := includeTemplate "codex-config-managed.toml" | fromToml -}}
+{{- $ownedKeys := index $managed "_chezmoi_owned_top_level_keys" -}}
+{{- $managed = deleteValueAtPath "_chezmoi_owned_top_level_keys" $managed -}}
+
+{{- range $ownedKeys -}}
+{{-   $current = deleteValueAtPath . $current -}}
+{{- end -}}
+{{- range $key, $value := $managed -}}
+{{-   $current = setValueAtPath $key $value $current -}}
+{{- end -}}
+
+{{- $current | toToml -}}

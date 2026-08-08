@@ -1,0 +1,30 @@
+_chezmoi_owned_top_level_keys = [
+    "allow_login_shell",
+    "default_permissions",
+    "permissions",
+]
+
+allow_login_shell = false
+default_permissions = "personal-development"
+
+[permissions.personal-development]
+description = "Personal development with mise, version control, and SSH signing."
+extends = ":workspace"
+
+[permissions.personal-development.filesystem]
+"~/.config/mise" = "read"
+"~/.local/bin" = "read"
+"~/.local/share/mise" = "write"
+"~/.local/state/mise" = "write"
+"~/.local/state/mise/github-oauth-tokens.toml" = "read"
+"~/.cache/mise" = "write"
+
+[permissions.personal-development.filesystem.":workspace_roots"]
+".git" = "write"
+".jj" = "write"
+
+[permissions.personal-development.network]
+enabled = true
+
+[permissions.personal-development.network.unix_sockets]
+"/var/home/atty/.1password/agent.sock" = "allow"
