@@ -126,10 +126,16 @@ async function runLinuxTarget(
     }\n`,
   );
 
-  const execute = async (builder: CommandBuilder) => {
-    await builder
-      .stdout(createTee(stdoutLog, Deno.stdout))
-      .stderr(createTee(stderrLog, Deno.stderr));
+  const execute = async (step: string, builder: CommandBuilder) => {
+    console.log(`step: ${step}`);
+    try {
+      await builder
+        .stdout(createTee(stdoutLog, Deno.stdout))
+        .stderr(createTee(stderrLog, Deno.stderr));
+    } catch (error) {
+      console.error(`step failed: ${step}`);
+      throw error;
+    }
   };
 
   console.log(`\n==> ${config.label}`);
@@ -141,43 +147,54 @@ async function runLinuxTarget(
 
   try {
     await execute(
+      "build image",
       $`podman build --file ${containerfile} --tag ${config.image} ${repository}`.signal(
         signal,
       ),
     );
-    await execute($`podman volume create ${volumeName}`.signal(signal));
+    await execute("create home volume", $`podman volume create ${volumeName}`.signal(signal));
     await execute(
+      "create container",
       $`podman create --name ${containerName} --volume ${volumeName}:/home/e2e:U --env CHEZMOI_AGE_KEY --env CHEZMOI_E2E=1 --env CHEZMOI_E2E_RECIPIENT=${staged.recipient} ${config.image}`
         .env({ CHEZMOI_AGE_KEY: staged.identity })
         .signal(signal),
     );
     await execute(
+      "copy source archive",
       $`podman cp ${staged.archivePath} ${containerName}:/tmp/source.tar`.signal(signal),
     );
     archiveCopied = true;
-    await execute($`podman start ${containerName}`.signal(signal));
-    await execute($`podman exec ${containerName} mkdir -p /tmp/source`.signal(signal));
+    await execute("start container", $`podman start ${containerName}`.signal(signal));
     await execute(
+      "create source directory",
+      $`podman exec ${containerName} mkdir -p /tmp/source`.signal(signal),
+    );
+    await execute(
+      "extract source archive",
       $`podman exec ${containerName} tar -xf /tmp/source.tar -C /tmp/source`.signal(signal),
     );
     await execute(
+      "bootstrap with install.sh",
       $`podman exec --workdir /tmp/source ${containerName} /bin/sh ./install.sh`.signal(
         signal,
       ),
     );
     await execute(
+      "verify initial target state",
       $`podman exec ${containerName} /home/e2e/.local/bin/chezmoi --source /tmp/source verify --exclude scripts`
         .signal(
           signal,
         ),
     );
     await execute(
+      "apply a second time",
       $`podman exec ${containerName} /home/e2e/.local/bin/chezmoi --source /tmp/source apply`
         .signal(
           signal,
         ),
     );
     await execute(
+      "verify final target state",
       $`podman exec ${containerName} /home/e2e/.local/bin/chezmoi --source /tmp/source verify --exclude scripts`
         .signal(
           signal,

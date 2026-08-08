@@ -12,8 +12,10 @@ for attempt in 1 2 3; do
     status=$?
   fi
   if ((attempt == 3)); then
+    echo "mise install failed after 3 attempts (exit status ${status})" >&2
     exit "$status"
   fi
-  echo "mise install failed; retrying (${attempt}/3)" >&2
-  sleep $((attempt * 2))
+  delay=$((attempt * 2))
+  echo "mise install failed (attempt ${attempt}/3, exit status ${status}); retrying in ${delay}s" >&2
+  sleep "$delay"
 done

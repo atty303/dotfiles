@@ -18,6 +18,7 @@ export CHEZMOI_E2E_RECIPIENT=$recipient
 export HEADLESS=1
 export PATH="$HOME/.local/bin:$PATH"
 
+echo "step: install mise"
 # The pinned base image can contain an older package-managed mise that cannot self-update.
 for attempt in 1 2 3; do
   if /usr/bin/curl --retry 3 --retry-all-errors --retry-delay 2 -fsSL https://mise.run | \
@@ -31,9 +32,11 @@ for attempt in 1 2 3; do
   sleep $((attempt * 2))
 done
 
+echo "step: trust source directory"
 "$HOME/.local/bin/mise" trust "$source_directory"
 
 cd "$source_directory"
+echo "step: bootstrap with install.sh"
 /bin/sh ./install.sh
 
 echo "verify: chezmoi state"

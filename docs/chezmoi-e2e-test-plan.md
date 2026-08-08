@@ -85,7 +85,7 @@ LinuxとmacOSでは、lifecycle script内の `mise install` だけを最大3回�
 - `mise ls --missing` が未導入toolを報告しない。
 - 2回目のapplyで `run_once` / `run_onchange` の不要な再実行やtarget変更が発生しない。
 
-ハーネスはsignalと異常終了に対するcleanup trapを持ち、途中失敗でもコンテナ、overlay、Tart clone、一時鍵を削除する。
+ハーネスはsignalと異常終了に対するcleanup処理を持つ。失敗時のresource削除または保持はbackendごとの方針に従う。
 
 ## Linux E2E
 
@@ -270,6 +270,8 @@ AWS credential、SSH private key、Windows credential、age identityをテスト
 age identity、復号済み個人secret、Windows password、AWS tokenはredactする。
 
 Linux E2Eは成功時にcontainerとhome volumeを削除し、cleanup失敗もテスト失敗として扱う。テストまたはcleanupの失敗時は即時調査できるように残存resourceを保持し、log directory、container/volume名、起動、shell接続、install再実行および削除コマンドを標準エラーへ表示する。保持したresourceは調査後に表示されたコマンドで明示的に削除する。
+
+LinuxとmacOSのE2Eはchezmoi外の各工程の開始時に短い名前を表示する。失敗時は最後のstep表示、chezmoiのverbose出力、終了コードおよびlog directoryから失敗箇所を特定する。
 
 ## 実装順序
 
