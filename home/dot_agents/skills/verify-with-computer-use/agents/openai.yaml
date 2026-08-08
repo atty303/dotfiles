@@ -1,0 +1,7 @@
+interface:
+  display_name: "Computer Use検証"
+  short_description: "利用可能なComputer UseでGUI結果を確認し、不可なら人間へ移譲する"
+  default_prompt: "$verify-with-computer-use を使って、CLIでは確認できないGUI結果を検証してください。"
+
+policy:
+  allow_implicit_invocation: false
