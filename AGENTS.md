@@ -15,6 +15,12 @@ This is a cross-platform chezmoi dotfiles repository. `.chezmoiroot` points to `
 
 There is no compilation step. Validate on the relevant operating system, especially after changing `.chezmoiscripts` or platform-conditional templates.
 
+## Immutable Fedora Application Installation
+
+On immutable Fedora systems such as Bazzite, do not treat the availability of a Fedora RPM as making an application a suitable installation candidate. Host package installation does not use `dnf`, and `rpm-ostree` package layering must not be used to install applications. Prefer simple user-space options such as mise-compatible upstream binaries, portable upstream artifacts, Flatpak, or an existing container image.
+
+If no simple option is viable, the final fallback may be to propose adding an Arch-based Distrobox image to [`atty303/distrobox-image`](https://github.com/atty303/distrobox-image). Do not modify that repository or publish an image without a separate explicit request.
+
 ## Coding Style & Naming Conventions
 
 Preserve the format native to each tool (TOML, JSON, KDL, Lua, Nushell, POSIX shell, or PowerShell). Use existing indentation in nearby files and keep shell scripts portable when they declare `#!/bin/sh`. Follow chezmoi attributes exactly: `dot_`, `private_`, `executable_`, `symlink_`, `encrypted_`, and `remove_`. Name lifecycle scripts with chezmoi ordering semantics, for example `run_onchange_after_mise.sh.tmpl`.
