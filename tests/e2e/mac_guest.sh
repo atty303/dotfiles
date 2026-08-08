@@ -68,6 +68,10 @@ test -L "$nushell_config"
 test "$(/usr/bin/readlink "$code_settings")" = "$source_directory/home/dot_config/Code/User/managed/settings.json"
 test "$(/usr/bin/readlink "$nushell_config")" = "$HOME/.config/nushell/config.nu"
 
+echo "verify: GUI PATH"
+mise -C "$HOME" bootstrap macos launchd-agents status --missing
+launchctl print gui/"$(id -u)" | grep -F "PATH => $HOME/.local/bin:" >/dev/null
+
 echo "verify: mise packages and tools"
 mise -C "$HOME" bootstrap packages status --missing
 test "$(mise -C "$HOME" ls --missing --json)" = "{}"
