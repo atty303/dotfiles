@@ -16,6 +16,12 @@
 {{-     $scrollSelected = true -}}
 {{-   end -}}
 {{- end }}
+{{- $systemdSelected := $scrollSelected -}}
+{{- range $entry := $entries -}}
+{{-   if hasKey $entry "service" -}}
+{{-     $systemdSelected = true -}}
+{{-   end -}}
+{{- end }}
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/chezmoi/distrobox"
 scroll_helper="${HOME}/.local/libexec/chezmoi-distrobox-scroll-update"
 selected_entries=(
@@ -73,7 +79,7 @@ if ! command -v distrobox >/dev/null 2>&1; then
   exit 0
 fi
 
-{{ if $scrollSelected -}}
+{{ if $systemdSelected -}}
 systemctl --user daemon-reload
 {{- end }}
 
@@ -89,9 +95,21 @@ applied_file="$state_dir/{{ $entry.name }}.applied"
 applied=""
 [[ ! -f "$applied_file" ]] || applied="$(<"$applied_file")"
 if [[ "$applied" != "$desired" ]]; then
+{{- if hasKey $entry "service" }}
+  service_was_active=no
+  if systemctl --user is-active --quiet {{ $entry.service | quote }}; then
+    service_was_active=yes
+  fi
+{{- end }}
   distrobox assemble create --replace \
     --file "${XDG_CONFIG_HOME:-$HOME/.config}/distrobox/assemble/{{ $entry.manifest }}" \
     --name {{ $entry.name | quote }}
+{{- if hasKey $entry "service" }}
+  if [[ "$service_was_active" == yes ]]; then
+    systemctl --user reset-failed {{ $entry.service | quote }}
+    systemctl --user restart {{ $entry.service | quote }}
+  fi
+{{- end }}
   write_state "$applied_file" "$desired"
 fi
 {{- end }}

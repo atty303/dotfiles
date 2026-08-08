@@ -1,6 +1,6 @@
 [distrobox.hosts.cristina]
 entries = [
     { manifest = "dms.ini", name = "dms" },
-    { manifest = "noctalia.ini", name = "noctalia" },
+    { manifest = "noctalia.ini", name = "noctalia", service = "noctalia.service" },
     { manifest = "scroll.ini", name = "scroll" },
 ]
