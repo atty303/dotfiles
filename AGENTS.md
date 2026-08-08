@@ -32,3 +32,5 @@ Run `chezmoi diff` and the dry run before committing. Inspect rendered templates
 ## Commit & Pull Request Guidelines
 
 History favors short imperative Conventional Commit subjects such as `feat: add fzf configuration` and `fix: update background-opacity`. Use a focused subject and keep unrelated platform changes separate. Pull requests should describe affected OSes, summarize rendered-file impact, list validation commands, and include screenshots only for visible desktop or terminal changes. Never commit plaintext credentials, tokens, host keys, or decrypted `.age` content.
+
+The `origin` remote uses HTTPS and is reserved for fetch and pull. Push this repository through the SSH-only `ssh` remote with `git push ssh <branch>`; do not use `git push origin`.

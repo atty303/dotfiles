@@ -34,6 +34,7 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 
 ### Final Report
 
+- 最終報告の前に、[$maintain-agent-guidance](../maintain-agent-guidance/SKILL.md)をすべて読み、タスク中の具体的な失敗、確認、成功およびprocess上の問題から永続化候補を評価する。
 - 変更概要、実行した検証、未実行または未解決の項目を簡潔に報告する。
 
 ## `atty303` Repositories
