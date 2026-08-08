@@ -24,6 +24,8 @@
   では `jj commit` を使うか、説明を設定済みなら `jj new` で空の次changeへ進む。`git` ではcommitする。
 - 変更説明やコミットメッセージはリポジトリの慣習に従い、判定できない場合は英語のConventional
   Commits形式を使う。
+- Codexが生成した変更をcommitするときは、commit messageの末尾へ空行で区切って
+  `Co-authored-by: Codex <codex@openai.com>` trailerを付ける。
 - push、リモートbookmarkの更新、PR作成などのリモート操作は、明示的に依頼された場合にのみ行う。
 
 ## Durable Guidance
