@@ -1,76 +1,58 @@
-# atty303 Engineering Policy
+# `atty303` Repositories
 
-Apply this policy after any closer repository-specific guidance.
+### Implementation Style
 
-## Implementation Style
+- 不正な状態を表現できない型、純粋関数、不変データおよび網羅的な分岐を優先する。
+- 技術選定が自由な場合は、強く表現力のある静的型システムと関数型表現を優先する。
+- 初学者への分かりやすさや概念上の単純さだけを理由に技術選定や抽象化を避けず、実装量、重複または変更容易性を改善する高度な概念は積極的に採用する。
 
-- Prefer types that make invalid states unrepresentable, pure functions, immutable data, and
-  exhaustive branching.
-- When technology selection is open, prefer an expressive static type system and functional
-  representations.
-- Do not reject an abstraction merely because it is advanced or less familiar. Adopt it when it
-  materially reduces implementation size or duplication, or improves changeability.
+### Comments
 
-## Comments
+- コメントより先に、型、名前およびコード構造で意図を表現する。
+- コメントには、コードから導出できない設計意図、制約、不変条件および外部事情だけを記録し、動作の言い換えは書かない。
+- 公開APIのdocumentation
+  commentには、型で表現できない契約、副作用、エラー条件および単位だけを記録する。
 
-- Express intent through types, names, and code structure before adding comments.
-- Record only design intent, constraints, invariants, and external circumstances that cannot be
-  derived from the code. Do not paraphrase behavior.
-- In public API documentation, document only contracts, side effects, error conditions, and units
-  that the type cannot express.
+### Documentation
 
-## Documentation
+- READMEは概要、導入および主要操作を中心とし、詳細なreferenceは必要な機能だけ用意する。
+- 内部設計は、コードから分からない判断理由、代替案、制約および不変条件だけを記録する。
+- 設計情報は自然なら関連ソースの近くに置き、複数箇所へ影響する長期的な判断はADRとして独立させる。
+- 採用済みのADRは書き換えず、方針変更時は新しいADRから置き換え関係を示す。
+- ドキュメントの言語は既存の慣習と想定読者に合わせ、判断できない場合は英語を使う。
+- 既存のCHANGELOGやrelease note運用がある場合だけ更新し、新しい履歴管理を自動では導入しない。
+- 実装変更で古くなるドキュメントは、同じ論理変更内で更新または削除し、既知の不整合を残さない。
 
-- Keep the README focused on overview, setup, and primary operations. Add detailed reference
-  documentation only for features that need it.
-- Document internal design only when the rationale, alternatives, constraints, or invariants are not
-  evident from the code.
-- Keep design information near the relevant source when natural. Use an ADR for long-lived decisions
-  spanning multiple areas.
-- Do not rewrite an accepted ADR. Record a policy change in a new ADR that identifies the superseded
-  decision.
-- Match the existing documentation language and audience; use English when neither is clear.
-- Update an existing changelog or release-note process only; do not introduce a new history
-  mechanism automatically.
-- Update or remove documentation made stale by implementation changes in the same logical change.
+### Single Source of Truth
 
-## Single Source of Truth
+- 各概念には可能な限り一つの原典を定め、型、設定、コードなどの別表現は原典から導出する。
+- README、設計文書およびコードコメントは一つの原典へリンクするか、原典から生成する。
+- 重複排除で複雑性や結合が大きく増える場合は重複を許容し、乖離リスクがあれば静的検査または自動検証で同期を保証する。
+- Reproducibilityでコミット対象とするlockfileを除き、生成物は原則としてコミットせず、`mise`
+  経由で再生成できるようにする。
 
-- Establish one source of truth for each concept where practical and derive types, configuration,
-  code, and other representations from it.
-- Link README files, design documents, and comments to the source of truth or generate them from it.
-- Allow duplication when eliminating it would add disproportionate complexity or coupling. If drift
-  remains a risk, enforce synchronization with static checks or automated verification.
-- Do not commit generated artifacts by default. Lockfiles required for reproducibility are the
-  exception. Regenerate artifacts through `mise`.
+### Testing Strategy
 
-## Testing Strategy
+- 型検査や静的解析で保証できる事項を、動的テストで重複して確認しない。
+- ユニットテストは、静的に保証できない重要なロジックに限定する。
+- 単純な関数、薄い委譲、実装詳細、網羅率だけを目的とするテストは追加しない。
+- 不変条件や変換則を表現できる場合は、多数の例示テストより少数のproperty-based testを優先する。
+- 外部API、DB、ファイル、プロトコルなどの境界は、必要に応じて統合テストで確認する。
+- `mise run check`
+  を、静的検査、軽量テスト、リンク検査、生成差分検査、doctestおよび可能なコマンド・コード例検証の共通入口とし、ローカルとCIから同じtaskを実行する。外部依存または重い検証は別taskにする。
+- 利用者価値が高い重要フローと重大障害につながる経路はE2Eで保証する。E2Eは `mise run check`
+  から分離した `mise`
+  taskとし、重要フローへの変更、境界をまたぐ変更、リリース前、または重大な回帰リスクがある場合に実行する。
+- バグを型や設計で再発不能にできた場合、回帰テストを必須にしない。静的に排除できない再発リスクが残る場合だけ追加する。
 
-- Do not duplicate guarantees already provided by type checking or static analysis in dynamic tests.
-- Limit unit tests to important logic that static checks cannot guarantee. Do not add tests solely
-  for trivial functions, thin delegation, implementation details, or coverage metrics.
-- Prefer a small number of property-based tests over many examples when invariants or transformation
-  laws can be expressed.
-- Test boundaries such as external APIs, databases, files, and protocols with integration tests when
-  needed.
-- Use `mise run check` as the shared entry point for static checks, lightweight tests, link checks,
-  generated-diff checks, doctests, and feasible command or code-example validation. Run the same
-  task locally and in CI; keep heavy or externally dependent verification separate.
-- Protect high-value user flows and catastrophic-failure paths with E2E tests. Keep E2E outside
-  `mise run check` and run it for important-flow changes, cross-boundary changes, release
-  preparation, or serious regression risk.
-- When a bug becomes unrepresentable through types or design, a regression test is optional. Add one
-  only when a meaningful recurrence risk remains dynamically observable.
+### Reproducibility
 
-## Reproducibility
-
-- Ensure committed code and scripts can prepare dependencies and run on a host where only `mise` is
-  preinstalled.
-- Manage required runtimes, tools, dependencies, and tasks with `mise`.
-- Host tools may be used for temporary work, but committed artifacts must not depend on them.
-- Ask before proceeding when this policy cannot be satisfied.
-- Commit `mise` and package-manager lockfiles by default.
-- Include `mise` configuration, lockfiles, `mise run check`, and CI integration in a new
-  repository's initial setup.
-- If an existing repository does not comply, establish only the infrastructure required to perform,
-  verify, or reproduce the requested change. Otherwise leave it unchanged and report the gap.
+- コミットするコードやスクリプトは、`mise`
+  だけが導入されたホストで依存関係を準備し、実行できるようにする。
+- 必要なランタイム、ツール、依存関係およびタスクは `mise` で管理する。
+- 一時的な作業にはホスト上のツールを使用できるが、コミットする成果物からそのツールへの依存を持たせない。
+- この方針に従えない場合は、事前に承認を求める。
+- ライブラリ、開発ツール、テスト用パッケージを含む、すべての新規依存追加について事前に承認を求める。
+- `mise` および各package managerのlockfileを原則としてコミットする。
+- 新規リポジトリは、`mise` 設定、lockfile、`mise run check` およびCI連携を初期構成に含める。
+- 既存リポジトリがこの方針に準拠していない場合、依頼された変更の実行、検証または再現に必要なら同じタスク内で整備する。無関係なら変更せず、残件として報告する。

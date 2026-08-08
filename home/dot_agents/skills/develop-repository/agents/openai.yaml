@@ -1,4 +1,4 @@
 interface:
-  display_name: "Develop Repository"
-  short_description: "Apply personal repository development workflow"
-  default_prompt: "Use $develop-repository to implement and verify this repository change."
+  display_name: "リポジトリ開発"
+  short_description: "個人方針に従ってリポジトリの開発と検証を一貫して進める"
+  default_prompt: "$develop-repository を使って、このリポジトリの変更を実装・検証してください。"

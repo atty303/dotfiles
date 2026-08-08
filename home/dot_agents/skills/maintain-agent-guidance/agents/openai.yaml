@@ -1,4 +1,4 @@
 interface:
-  display_name: "Maintain Agent Guidance"
-  short_description: "Audit and improve durable agent guidance"
-  default_prompt: "Use $maintain-agent-guidance to evaluate and propose this guidance improvement."
+  display_name: "Agent Guidanceのメンテナンス"
+  short_description: "永続的なagent guidanceの配置と内容を監査・改善する"
+  default_prompt: "$maintain-agent-guidance を使って、このguidance改善案を評価してください。"
