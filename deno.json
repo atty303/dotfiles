@@ -1,0 +1,17 @@
+{
+  "imports": {
+    "@cliffy/command": "jsr:@cliffy/command@1.2.1",
+    "@david/dax": "jsr:@david/dax@0.48.3"
+  },
+  "fmt": {
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "semiColons": true,
+    "singleQuote": false
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  }
+}

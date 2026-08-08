@@ -1,0 +1,19 @@
+[tools]
+age = "1.3.1"
+deno = "2.9.3"
+
+[tasks."test:e2e:check"]
+description = "Check the Deno E2E harness"
+run = "deno fmt --check deno.json tests/e2e && deno lint tests/e2e && deno check tests/e2e/main.ts"
+
+[tasks."test:e2e:linux:fedora"]
+description = "Run the full chezmoi E2E test on Fedora 44"
+run = "deno run -A tests/e2e/main.ts linux fedora"
+
+[tasks."test:e2e:linux:ubuntu"]
+description = "Run the full chezmoi E2E test on Ubuntu 24.04"
+run = "deno run -A tests/e2e/main.ts linux ubuntu"
+
+[tasks."test:e2e:linux"]
+description = "Run the full chezmoi E2E test on all Linux targets"
+run = "deno run -A tests/e2e/main.ts linux all"

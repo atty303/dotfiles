@@ -4,6 +4,7 @@
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
 {{- $personal := false -}}{{/* true if this machine should have personal secrets */}}
 {{- $homebrew := false -}}
+{{- $e2e := eq (env "CHEZMOI_E2E") "1" -}}
 {{- "" -}}
 
 {{- $osID := .chezmoi.os -}}
@@ -15,6 +16,10 @@
 
 {{/* detect GitHub codespaces, VSCode remote containers, Docker containers, Multipass VMs, and Vagrant boxes */}}
 {{- if or (env "CODESPACES") (env "REMOTE_CONTAINERS_IPC") (eq .chezmoi.username "root" "ubuntu" "vagrant" "vscode") -}}
+{{-   $ephemeral = true -}}
+{{-   $headless = true -}}
+{{- end -}}
+{{- if $e2e -}}
 {{-   $ephemeral = true -}}
 {{-   $headless = true -}}
 {{- end -}}
@@ -53,13 +58,18 @@ encryption = "age"
 
 [age]
   identity = "~/.config/chezmoi/key.txt"
+{{- if $e2e }}
+  recipient = {{ env "CHEZMOI_E2E_RECIPIENT" | quote }}
+{{- else }}
   recipient = "age1hwzfym9sw8wjyckwfgul4qe6mn67h8rrkw9vfprl95nv3dd0qd7susuu8z"
+{{- end }}
 
 [onepassword]
   prompt = false
 
 [data]
     github_username = "atty303"
+    e2e = {{ $e2e }}
     ephemeral = {{ $ephemeral }}
     email = {{ $email | quote }}
     work = {{ $work }}
