@@ -22,6 +22,7 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 
 - 検証の目的を、利用者向けの実装結果をagent自身が観測し、期待どおりか判断できる証拠を得ることとする。人間による確認は、agentが観測できない場合の例外とする。
 - formatter、lint、型検査および静的解析、対象を限定したテスト、DOM、API、ログまたは永続状態による実行時観測、ビルドおよび通常check、利用者が接する最終出力の順に、安価な検証から進める。前段の失敗を解消してから高コストな検証を行い、範囲は変更箇所と回帰リスクに比例させる。
+- CI、外部service、container、権限または複数runtimeの境界をまたぐ広範な変更では、全面実装前に代表的な1経路のvertical spikeを実装し、各境界を実環境相当で検証する。spikeが成功してから同じ設計を残りの対象へ展開する。
 - CLIから操作および観測できる設計を優先する。必要に応じて、application固有の設定・データパス、test profile、状態照会またはexport用のCLI・API、structured logおよびscreenshot生成を、通常動作と同じcode pathへ追加する。
 - 状態を変更する検証は、temporary directory、test profile、専用database、containerまたはsimulatorなどの使い捨て可能な隔離環境で行う。実データ、通常profile、利用中の設定および実serviceを検証用に直接変更しない。隔離できず実環境での検証が必要な場合は、対象、操作、想定される状態変更および復旧方法を示して事前承認を求める。
 - CLIによる検証後もGUIの表示または操作結果が未確認の場合は、[$verify-with-computer-use](../verify-with-computer-use/SKILL.md)を使用する。Computer Useが設定済みまたは利用可能だと仮定しない。
@@ -31,7 +32,7 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 
 - 自分の変更をローカルのcommitまたはchangeとして確定する前に、[$review](../review/SKILL.md)をすべて読み、fresh subagentによる独立レビューを完了する。
 - 複数の論理単位がある場合は、変更の結合度とリスクから、タスク全体または論理単位ごとのレビューを選ぶ。
-- 有効な指摘を修正して関連検証を再実行し、レビュー後に確定対象へ変更を加えた場合は、変更の種類を問わず最終diffを再レビューする。
+- 有効な指摘を修正して関連検証を再実行し、`review`が定める再確認と最終diffの完了条件を満たす。
 - 独立レビューを完了できない場合は通常のblockerとして扱い、該当するcommitまたはchangeを完了扱いにしない。
 
 ### Compatibility and Documentation
