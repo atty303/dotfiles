@@ -175,7 +175,7 @@ LAN/AWS hostにはテスト対象のdotfilesを直接applyしない。
 
 ### LAN Mac backend
 
-`E2E_MAC_HOST` をSSH config上のhost名として受け取る。
+`E2E_MAC_HOST` をSSH config上のhost名または `user@host` として受け取る。
 
 前提条件は次のとおり。
 
@@ -185,7 +185,7 @@ LAN/AWS hostにはテスト対象のdotfilesを直接applyしない。
 
 Linuxから実行するhostでは、追加でSSHを有効化し、passwordless automationが可能な専用ユーザーを用意する。
 
-Mac上で直接実行する場合は `mise run test:e2e:mac:local` を使用する。Linuxから実行する場合は `E2E_MAC_HOST` で指定したhostへarchive、test identityおよびrunnerを一時転送し、同じMac host driverを `mise run test:e2e:mac:lan` から起動する。remote stagingは成否にかかわらず削除する。
+Mac上で直接実行する場合は `mise run test:e2e:mac:local` を使用する。Linuxから実行する場合は `E2E_MAC_HOST` で指定したhostへarchive、test identityおよびrunnerを一時転送し、同じMac host driverを `mise run test:e2e:mac:lan` から一時GUI LaunchAgentとして起動する。これによりpasswordをrunnerへ渡さず、GUI sessionのunlock済みlogin keychainを利用する。system default以外のSSH configが必要なら `E2E_SSH_CONFIG` で指定する。LaunchAgentとremote stagingは成否にかかわらず削除する。
 
 Macホストにはmiseだけを事前に導入する。TartはmacOS arm64限定のmise toolとしてversionを固定し、Homebrewには依存しない。global `miserc.toml` の `auto_env = true` で `config.macos.toml` を自動読込し、macOS packageはmise bootstrap経由で管理する。
 

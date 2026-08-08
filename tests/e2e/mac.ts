@@ -85,6 +85,7 @@ export async function runMacLan(): Promise<void> {
     await ssh(host, [
       "/bin/bash",
       `${runnerDirectory}/tests/e2e/mac_remote.sh`,
+      "launch",
       runnerDirectory,
       inputDirectory,
       staged.recipient,
@@ -183,16 +184,23 @@ function registerSignals(abort: AbortController): RegisteredSignals {
 }
 
 async function remoteTempDirectory(host: string, signal: AbortSignal): Promise<string> {
-  const result = await output("ssh", [host, "mktemp", "-d", "-t", "chezmoi-e2e"], signal);
+  const result = await output(
+    "ssh",
+    [...sshOptions(), host, "mktemp", "-d", "-t", "chezmoi-e2e"],
+    signal,
+  );
   const path = result.trim();
-  if (!path.startsWith("/var/folders/") || !path.includes("/T/chezmoi-e2e.")) {
+  if (
+    !/^\/var\/folders\/[A-Za-z0-9._-]+\/[A-Za-z0-9._-]+\/T\/chezmoi-e2e\.[A-Za-z0-9._-]+$/
+      .test(path)
+  ) {
     throw new Error(`unexpected remote temporary directory: ${path}`);
   }
   return path;
 }
 
 function ssh(host: string, args: string[], signal?: AbortSignal): Promise<void> {
-  return run("ssh", [host, ...args], signal);
+  return run("ssh", [...sshOptions(), host, ...args], signal);
 }
 
 function scp(
@@ -201,7 +209,7 @@ function scp(
   remoteDirectory: string,
   signal: AbortSignal,
 ): Promise<void> {
-  return run("scp", [...paths, `${host}:${remoteDirectory}/`], signal);
+  return run("scp", [...sshOptions(), ...paths, `${host}:${remoteDirectory}/`], signal);
 }
 
 function downloadDirectory(
@@ -210,7 +218,18 @@ function downloadDirectory(
   localDirectory: string,
   signal: AbortSignal,
 ): Promise<void> {
-  return run("scp", ["-r", `${host}:${remoteDirectory}/.`, `${localDirectory}/`], signal);
+  return run(
+    "scp",
+    [...sshOptions(), "-r", `${host}:${remoteDirectory}/.`, `${localDirectory}/`],
+    signal,
+  );
+}
+
+function sshOptions(): string[] {
+  const options = ["-o", "BatchMode=yes", "-o", "ConnectTimeout=15"];
+  const config = Deno.env.get("E2E_SSH_CONFIG");
+  if (config !== undefined && config !== "") options.unshift("-F", config);
+  return options;
 }
 
 async function run(command: string, args: string[], signal?: AbortSignal): Promise<void> {
@@ -246,8 +265,8 @@ function assertRecipient(value: string): void {
 }
 
 function assertSshHost(value: string): void {
-  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(value)) {
-    throw new Error("E2E_MAC_HOST must be an SSH config host alias");
+  if (!/^(?:[A-Za-z0-9][A-Za-z0-9._-]*@)?[A-Za-z0-9][A-Za-z0-9._-]*$/.test(value)) {
+    throw new Error("E2E_MAC_HOST must be an SSH host or user@host");
   }
 }
 
