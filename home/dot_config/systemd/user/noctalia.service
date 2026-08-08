@@ -1,0 +1,20 @@
+[Unit]
+Description=Noctalia Shell
+PartOf=graphical-session.target
+After=graphical-session.target
+After=dms.service
+Requisite=graphical-session.target
+Conflicts=dms.service
+
+[Service]
+Type=exec
+ExecStart=/home/atty/.local/bin/noctalia
+Restart=on-failure
+RestartForceExitStatus=1
+RestartSec=1.23
+SuccessExitStatus=1
+TimeoutStopSec=10
+Environment=TERMINAL=ghostty
+
+[Install]
+WantedBy=graphical-session.target
