@@ -4,7 +4,7 @@
 {{-   $current = fromToml .chezmoi.stdin -}}
 {{- end -}}
 
-{{- $managed := includeTemplate "codex-config-managed.toml" | fromToml -}}
+{{- $managed := includeTemplate "codex-config-managed.toml" . | fromToml -}}
 {{- $ownedKeys := index $managed "_chezmoi_owned_top_level_keys" -}}
 {{- $managed = deleteValueAtPath "_chezmoi_owned_top_level_keys" $managed -}}
 

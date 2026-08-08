@@ -2,6 +2,7 @@ _chezmoi_owned_top_level_keys = [
     "allow_login_shell",
     "default_permissions",
     "permissions",
+    "skills",
 ]
 
 allow_login_shell = false
@@ -29,3 +30,8 @@ enabled = true
 
 [permissions.personal-development.network.unix_sockets]
 "/var/home/atty/.1password/agent.sock" = "allow"
+
+# Use author-skills instead; the bundled skill-creator validator requires undeclared PyYAML.
+[[skills.config]]
+path = "{{ .chezmoi.homeDir }}/.codex/skills/.system/skill-creator/SKILL.md"
+enabled = false

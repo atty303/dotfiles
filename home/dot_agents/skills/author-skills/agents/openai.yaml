@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skillの作成・更新"
+  short_description: "Pythonに依存せずskillを作成・更新・検証する"
+  default_prompt: "$author-skills を使って、skillを作成または更新してください。"
