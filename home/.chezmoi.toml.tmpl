@@ -3,7 +3,6 @@
 {{- $work := false -}}{{/* true if this machine is a work machine */}}
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
 {{- $personal := false -}}{{/* true if this machine should have personal secrets */}}
-{{- $homebrew := false -}}
 {{- $e2e := eq (env "CHEZMOI_E2E") "1" -}}
 {{- "" -}}
 
@@ -35,10 +34,6 @@
 {{-   else -}}
 {{-     $hostname = $computerName -}}
 {{-   end -}}
-{{- end -}}
-
-{{- if eq .chezmoi.os "darwin" "linux" -}}
-{{-   $homebrew = true -}}
 {{- end -}}
 
 {{- $email := "twpayne@gmail.com" -}}
@@ -83,8 +78,6 @@ encryption = "age"
         "vi-mode",
         "zsh-syntax-highlighting",
     ]
-    homebrew = {{ $homebrew }}
-
 {{- if eq .chezmoi.os "windows" -}}
 {{- $allProfiles := list "essentials" "gaming" "development" -}}
 {{ $profiles := promptMultichoiceOnce . "profiles" "What profiles enable" $allProfiles }}

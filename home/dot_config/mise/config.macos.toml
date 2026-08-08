@@ -1,0 +1,7 @@
+[bootstrap.packages]
+"brew:pinentry-mac" = "latest"
+"brew-cask:1password-cli" = "latest"
+"brew-cask:google-japanese-ime" = "latest"
+"brew-cask:karabiner-elements" = "latest"
+"brew-cask:raycast" = "latest"
+"brew-cask:visual-studio-code" = "latest"

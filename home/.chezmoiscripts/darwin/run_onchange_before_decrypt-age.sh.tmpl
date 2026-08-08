@@ -1,9 +1,14 @@
 #!/usr/bin/env -S bash -euo pipefail
 
 if [ ! -f "${HOME}/.config/chezmoi/key.txt" ]; then
+  umask 077
   mkdir -p "${HOME}/.config/chezmoi"
 
-  chezmoi age decrypt --output "${HOME}/.config/chezmoi/key.txt" --passphrase "{{ .chezmoi.config.sourceDir }}/key.txt.age"
+  if [[ -n "${CHEZMOI_AGE_KEY:-}" ]]; then
+    printf '%s' "$CHEZMOI_AGE_KEY" >"${HOME}/.config/chezmoi/key.txt"
+  else
+    chezmoi age decrypt --output "${HOME}/.config/chezmoi/key.txt" --passphrase "{{ .chezmoi.config.sourceDir }}/key.txt.age"
+  fi
 
   chmod 600 "${HOME}/.config/chezmoi/key.txt"
 fi

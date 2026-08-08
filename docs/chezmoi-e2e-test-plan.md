@@ -166,9 +166,9 @@ LANとAWSの両backendを「SSH接続可能なApple Silicon Mac上でTartを実�
 
 - macOS 26のTart base imageをOCI digestで固定する。
 - テストごとに一意な名前でbase imageをcloneする。
-- guest resourceの初期値をCPU 6、RAM 10GBとし、LAN hostでは設定で上書き可能にする。
-- guest起動後にSSH到達を待ち、source archiveとage fixtureを転送する。
-- フルapply、`chezmoi verify`、`brew bundle check`、`mise ls --missing`、2回目applyを実行する。
+- guest resourceをCPU 6、RAM 10GBに固定する。
+- source archiveとage fixtureをread-only directoryとしてguestへmountし、Tart Guest Agentの `tart exec` でguest処理を起動する。
+- フルapply、`chezmoi verify`、`mise bootstrap packages status --missing`、`mise ls --missing`、2回目applyを実行する。
 - 成否にかかわらずguestを停止し、テスト用Tart cloneを削除する。
 
 LAN/AWS hostにはテスト対象のdotfilesを直接applyしない。
@@ -185,7 +185,9 @@ LAN/AWS hostにはテスト対象のdotfilesを直接applyしない。
 
 Linuxから実行するhostでは、追加でSSHを有効化し、passwordless automationが可能な専用ユーザーを用意する。
 
-Macホストにはmiseだけを事前に導入する。TartはmacOS arm64限定のmise toolとしてversionを固定し、Homebrewには依存しない。
+Mac上で直接実行する場合は `mise run test:e2e:mac:local` を使用する。Linuxから実行する場合は `E2E_MAC_HOST` で指定したhostへarchive、test identityおよびrunnerを一時転送し、同じMac host driverを `mise run test:e2e:mac:lan` から起動する。remote stagingは成否にかかわらず削除する。
+
+Macホストにはmiseだけを事前に導入する。TartはmacOS arm64限定のmise toolとしてversionを固定し、Homebrewには依存しない。global `miserc.toml` の `auto_env = true` で `config.macos.toml` を自動読込し、macOS packageはmise bootstrap経由で管理する。
 
 macOS 15以降では、Virtualization.frameworkがVM起動時にunlock済みのlogin keychainを要求する。専用ユーザーで一度GUIログインし、そのsessionとlogin keychainをunlockした状態に保つ。Linuxから実行する場合は、同じユーザーへSSH configのhost名でpasswordなしに接続できるようRemote Loginと公開鍵認証を設定する。keychain passwordはE2E runnerへ渡さない。
 

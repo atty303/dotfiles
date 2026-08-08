@@ -1,5 +1,6 @@
 import { Command, EnumType } from "@cliffy/command";
 import { type LinuxTarget, runLinuxTargets } from "./linux.ts";
+import { runMacHost, runMacLan, runMacLocal } from "./mac.ts";
 import { prepareMacHost } from "./mac_prepare.ts";
 
 const linuxTarget = new EnumType(["fedora", "ubuntu", "all"] as const);
@@ -19,6 +20,24 @@ const macCommand = new Command()
     new Command()
       .description("Pull the pinned image and validate Tart VM execution")
       .action(prepareMacHost),
+  )
+  .command(
+    "local",
+    new Command().description("Run the macOS E2E on this Apple Silicon Mac").action(runMacLocal),
+  )
+  .command(
+    "lan",
+    new Command().description("Run the macOS E2E on E2E_MAC_HOST over SSH").action(runMacLan),
+  )
+  .command(
+    "host",
+    new Command()
+      .description("Run a staged macOS E2E on the current Mac host")
+      .hidden()
+      .arguments("<staging-directory:string> <recipient:string>")
+      .action((_options, stagingDirectory: string, recipient: string) =>
+        runMacHost(stagingDirectory, recipient)
+      ),
   );
 
 await new Command()

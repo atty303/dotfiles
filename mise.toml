@@ -24,3 +24,11 @@ run = "deno run -A tests/e2e/main.ts linux all"
 [tasks."test:e2e:mac:prepare"]
 description = "Prepare and validate an Apple Silicon Mac for Tart E2E tests"
 run = "deno run -A tests/e2e/main.ts mac prepare"
+
+[tasks."test:e2e:mac:local"]
+description = "Run the full chezmoi E2E test on this Apple Silicon Mac"
+run = "deno run -A tests/e2e/main.ts mac local"
+
+[tasks."test:e2e:mac:lan"]
+description = "Run the full chezmoi macOS E2E test on E2E_MAC_HOST over SSH"
+run = "deno run -A tests/e2e/main.ts mac lan"

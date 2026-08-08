@@ -5,9 +5,34 @@ const READY_TIMEOUT_MS = 5 * 60 * 1000;
 const READY_INTERVAL_MS = 2_000;
 
 export async function prepareMacHost(): Promise<void> {
+  await runMacVm({ namePrefix: "prepare" }, () => {
+    console.log("Tart macOS E2E host is ready.");
+  });
+}
+
+export interface MacVm {
+  exec(args: string[], timeoutMs?: number): Promise<Deno.CommandOutput>;
+  run(args: string[], timeoutMs?: number): Promise<void>;
+}
+
+export interface MacVmOptions {
+  namePrefix: string;
+  sharedDirectories?: Array<{
+    name: string;
+    path: string;
+    readOnly: boolean;
+  }>;
+}
+
+export async function runMacVm(
+  options: MacVmOptions,
+  action: (vm: MacVm) => Promise<void> | void,
+): Promise<void> {
   const abort = new AbortController();
+  const hangup = () => abort.abort(new Error("received SIGHUP"));
   const interrupt = () => abort.abort(new Error("received SIGINT"));
   const terminate = () => abort.abort(new Error("received SIGTERM"));
+  Deno.addSignalListener("SIGHUP", hangup);
   Deno.addSignalListener("SIGINT", interrupt);
   Deno.addSignalListener("SIGTERM", terminate);
   const finalErrors: unknown[] = [];
@@ -16,7 +41,7 @@ export async function prepareMacHost(): Promise<void> {
   try {
     const host = await inspectHost();
     workspace = await createTartWorkspace();
-    const probeName = `chezmoi-e2e-prepare-${crypto.randomUUID().slice(0, 8)}`;
+    const probeName = `chezmoi-e2e-${options.namePrefix}-${crypto.randomUUID().slice(0, 8)}`;
     let runProcess: Deno.ChildProcess | undefined;
     let operationError: unknown;
 
@@ -51,15 +76,32 @@ export async function prepareMacHost(): Promise<void> {
         String(MAC_E2E.memoryMiB),
       ], { signal: abort.signal });
 
+      const runArgs = ["run", "--no-graphics", "--no-audio", "--no-clipboard"];
+      for (const share of options.sharedDirectories ?? []) {
+        runArgs.push("--dir", `${share.name}:${share.path}${share.readOnly ? ":ro" : ""}`);
+      }
+      runArgs.push(probeName);
       runProcess = new Deno.Command("tart", {
-        args: ["run", "--no-graphics", "--no-audio", "--no-clipboard", probeName],
+        args: runArgs,
         stdin: "null",
         stdout: "inherit",
         stderr: "inherit",
       }).spawn();
 
       await waitForGuestAgent(probeName, runProcess, abort.signal);
-      console.log("Tart macOS E2E host is ready.");
+      const vm: MacVm = {
+        exec: (args, timeoutMs = READY_TIMEOUT_MS) =>
+          command(
+            "tart",
+            ["exec", probeName, ...args],
+            AbortSignal.any([abort.signal, AbortSignal.timeout(timeoutMs)]),
+          ),
+        run: (args, timeoutMs = READY_TIMEOUT_MS) =>
+          run("tart", ["exec", probeName, ...args], {
+            signal: AbortSignal.any([abort.signal, AbortSignal.timeout(timeoutMs)]),
+          }),
+      };
+      await action(vm);
     } catch (error) {
       operationError = error;
     }
@@ -109,13 +151,14 @@ export async function prepareMacHost(): Promise<void> {
         finalErrors.push(error);
       }
     }
+    Deno.removeSignalListener("SIGHUP", hangup);
     Deno.removeSignalListener("SIGINT", interrupt);
     Deno.removeSignalListener("SIGTERM", terminate);
   }
 
   if (finalErrors.length === 1) throw finalErrors[0];
   if (finalErrors.length > 1) {
-    throw new AggregateError(finalErrors, "Mac E2E preparation failed");
+    throw new AggregateError(finalErrors, "macOS E2E VM run failed");
   }
 }
 
@@ -262,7 +305,7 @@ function command(
   return waitForCommand(process, process.output(), signal);
 }
 
-async function waitForCommand<T>(
+export async function waitForCommand<T>(
   process: Deno.ChildProcess,
   completion: Promise<T>,
   signal?: AbortSignal,

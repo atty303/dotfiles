@@ -1,8 +1,0 @@
-if OS.mac? and !ENV["HEADLESS"]
-  brew "pinentry-mac"
-  cask "1password-cli"
-  cask "karabiner-elements"
-  cask "visual-studio-code"
-  cask "google-japanese-ime"
-  cask "raycast"
-end
