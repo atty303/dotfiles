@@ -68,9 +68,12 @@ test -L "$nushell_config"
 test "$(/usr/bin/readlink "$code_settings")" = "$source_directory/home/dot_config/Code/User/managed/settings.json"
 test "$(/usr/bin/readlink "$nushell_config")" = "$HOME/.config/nushell/config.nu"
 
-echo "verify: GUI PATH"
-mise -C "$HOME" bootstrap macos launchd-agents status --missing
-launchctl print gui/"$(id -u)" | grep -F "PATH => $HOME/.local/bin:" >/dev/null
+echo "verify: persistent user PATH"
+persistent_path=$(plutil -extract PathEnvironmentVariable raw /var/db/com.apple.xpc.launchd/config/user.plist)
+case "$persistent_path" in
+  "$HOME/.local/bin:"*) ;;
+  *) exit 1 ;;
+esac
 
 echo "verify: mise packages and tools"
 mise -C "$HOME" bootstrap packages status --missing

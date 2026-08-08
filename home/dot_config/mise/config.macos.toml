@@ -5,9 +5,3 @@
 "brew-cask:karabiner-elements" = "latest"
 "brew-cask:raycast" = "latest"
 "brew-cask:visual-studio-code" = "latest"
-
-[bootstrap.macos.launchd.agents.gui-path]
-program = "/bin/sh"
-args = ["-c", "/bin/launchctl setenv PATH \"$HOME/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:/opt/homebrew/sbin\""]
-run_at_load = true
-kickstart = true
