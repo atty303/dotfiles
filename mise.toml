@@ -9,6 +9,10 @@ deno = "2.9.3"
 description = "Check the Deno E2E harness"
 run = "deno fmt --check deno.json tests/e2e && deno lint tests/e2e && deno check tests/e2e/main.ts"
 
+[tasks."test:distrobox"]
+description = "Test transactional Scroll Distrobox updates"
+run = "bash tests/distrobox-scroll-update.sh"
+
 [tasks."test:e2e:linux:fedora"]
 description = "Run the full chezmoi E2E test on Fedora 44"
 run = "deno run -A tests/e2e/main.ts linux fedora"

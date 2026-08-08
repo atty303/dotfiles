@@ -1,27 +1,49 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -Eeuo pipefail
 
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/chezmoi/distrobox"
 manifest="${XDG_CONFIG_HOME:-$HOME/.config}/distrobox/assemble/scroll.ini"
 bin_dir="${HOME}/.local/bin"
 wrapper_backup_dir="${state_dir}/scroll-wrappers"
-lock_dir="${state_dir}/scroll.lock"
+lock_file="${state_dir}/scroll.lock"
 pending_file="${state_dir}/scroll.pending"
-updating_file="${state_dir}/scroll.updating"
-prepared_file="${state_dir}/scroll.prepared"
+transaction_file="${state_dir}/scroll.transaction"
 failed_file="${state_dir}/scroll.failed"
 applied_file="${state_dir}/scroll.applied"
-had_backup_file="${state_dir}/scroll.had-backup"
 rollback_container="scroll-chezmoi-rollback"
 scroll_wrappers=(scroll scrollmsg scrollnag scrollbar)
+transaction_phase=""
+transaction_desired=""
+transaction_had_old=""
+container_presence=""
+current_command=""
 
 log() {
   printf 'chezmoi-distrobox-scroll-update: %s\n' "$*" >&2
 }
 
-container_exists() {
-  podman container exists "$1"
+query_container() {
+  local name="${1:?container name is required}"
+  local status
+
+  if podman container exists "$name"; then
+    status=0
+  else
+    status=$?
+  fi
+  case "$status" in
+    0)
+      container_presence=present
+      ;;
+    1)
+      container_presence=absent
+      ;;
+    *)
+      log "cannot query container ${name}: podman exited ${status}"
+      return "$status"
+      ;;
+  esac
 }
 
 write_state() {
@@ -30,160 +52,400 @@ write_state() {
   local temporary="${destination}.tmp"
 
   printf '%s\n' "$value" >"$temporary"
+  sync -f "$temporary"
   mv -f "$temporary" "$destination"
+  sync -f "$state_dir"
+}
+
+write_transaction() {
+  local phase="${1:?phase is required}"
+  local desired="${2:?desired is required}"
+  local had_old="${3:?had_old is required}"
+  local temporary="${transaction_file}.tmp"
+
+  printf '%s\n%s\n%s\n' "$phase" "$desired" "$had_old" >"$temporary"
+  sync -f "$temporary"
+  mv -f "$temporary" "$transaction_file"
+  sync -f "$state_dir"
+  transaction_phase="$phase"
+  transaction_desired="$desired"
+  transaction_had_old="$had_old"
+}
+
+read_transaction() {
+  local extra=""
+
+  transaction_phase=""
+  transaction_desired=""
+  transaction_had_old=""
+  {
+    IFS= read -r transaction_phase
+    IFS= read -r transaction_desired
+    IFS= read -r transaction_had_old
+    IFS= read -r extra || true
+  } <"$transaction_file"
+
+  case "$transaction_phase" in
+    backup-ready|old-renamed|prepared|committed|rollback-started|rollback-candidate-removed|rollback-container-restored|rollback-wrappers-restored) ;;
+    *)
+      log "invalid transaction phase: ${transaction_phase:-<empty>}"
+      return 1
+      ;;
+  esac
+  [[ -n "$transaction_desired" ]] || { log "transaction digest is empty"; return 1; }
+  [[ "$transaction_had_old" == yes || "$transaction_had_old" == no ]] || {
+    log "invalid transaction backup flag: ${transaction_had_old:-<empty>}"
+    return 1
+  }
+  [[ -z "$extra" ]] || { log "transaction has unexpected trailing data"; return 1; }
 }
 
 acquire_lock() {
   mkdir -p "$state_dir"
-  if ! mkdir "$lock_dir" 2>/dev/null; then
-    log "another Scroll update operation is already running"
-    exit 75
-  fi
-  trap 'rmdir "$lock_dir"' EXIT
+  exec 9>"$lock_file"
+  flock 9
 }
 
 backup_wrappers() {
   local wrapper
+  local temporary="${wrapper_backup_dir}.tmp"
 
-  rm -rf "$wrapper_backup_dir"
-  mkdir -p "$wrapper_backup_dir"
+  rm -rf "$wrapper_backup_dir" "$temporary"
+  mkdir -p "$temporary"
   for wrapper in "${scroll_wrappers[@]}"; do
     if [[ -e "${bin_dir}/${wrapper}" ]]; then
-      cp -a "${bin_dir}/${wrapper}" "$wrapper_backup_dir/"
+      cp -a "${bin_dir}/${wrapper}" "$temporary/"
+      sync -f "${temporary}/${wrapper}"
     fi
   done
+  sync -f "$temporary"
+  mv "$temporary" "$wrapper_backup_dir"
+  sync -f "$state_dir"
 }
 
 restore_wrappers() {
   local wrapper
 
+  [[ -d "$wrapper_backup_dir" ]] || {
+    log "wrapper backup is missing"
+    return 1
+  }
   for wrapper in "${scroll_wrappers[@]}"; do
     rm -f "${bin_dir}/${wrapper}"
     if [[ -e "${wrapper_backup_dir}/${wrapper}" ]]; then
       cp -a "${wrapper_backup_dir}/${wrapper}" "${bin_dir}/${wrapper}"
+      sync -f "${bin_dir}/${wrapper}"
     fi
   done
+  sync -f "$bin_dir"
 }
 
-clear_transaction_files() {
-  rm -f "$updating_file" "$prepared_file" "$had_backup_file"
-  rm -rf "$wrapper_backup_dir"
+finish_transaction() {
+  rm -rf "$wrapper_backup_dir" "${wrapper_backup_dir}.tmp"
+  sync -f "$state_dir"
+  rm -f "$transaction_file" "${transaction_file}.tmp"
+  sync -f "$state_dir"
+}
+
+commit_locked() {
+  if [[ ! -f "$transaction_file" ]]; then
+    return 0
+  fi
+  read_transaction
+  case "$transaction_phase" in
+    prepared)
+      write_transaction committed "$transaction_desired" "$transaction_had_old"
+      ;;
+    committed) ;;
+    *)
+      log "cannot commit transaction in phase ${transaction_phase}"
+      return 1
+      ;;
+  esac
+
+  write_state "$applied_file" "$transaction_desired"
+  rm -f "$pending_file" "$failed_file"
+  sync -f "$state_dir"
+  if [[ "$transaction_had_old" == yes ]]; then
+    query_container "$rollback_container"
+    if [[ "$container_presence" == present ]]; then
+      podman rm --force "$rollback_container" >/dev/null
+    fi
+  fi
+  finish_transaction
+  log "committed the successfully started Scroll container"
 }
 
 rollback_locked() {
-  local desired=""
+  if [[ ! -f "$transaction_file" ]]; then
+    return 0
+  fi
+  read_transaction
+  if [[ "$transaction_phase" == committed ]]; then
+    commit_locked
+    return
+  fi
+  log "rolling back failed Scroll update"
+  case "$transaction_phase" in
+    backup-ready|old-renamed|prepared)
+      [[ -d "$wrapper_backup_dir" ]] || {
+        log "cannot roll back without the wrapper backup"
+        return 1
+      }
+      if [[ "$transaction_had_old" == yes ]]; then
+        query_container "$rollback_container"
+        if [[ "$container_presence" == present ]]; then
+          write_transaction rollback-started "$transaction_desired" "$transaction_had_old"
+        else
+          query_container scroll
+          if [[ "$transaction_phase" == backup-ready && "$container_presence" == present ]]; then
+            write_transaction rollback-container-restored "$transaction_desired" "$transaction_had_old"
+          else
+            log "cannot locate the last known working Scroll container"
+            return 1
+          fi
+        fi
+      elif [[ "$transaction_phase" == backup-ready ]]; then
+        write_transaction rollback-container-restored "$transaction_desired" "$transaction_had_old"
+      else
+        write_transaction rollback-started "$transaction_desired" "$transaction_had_old"
+      fi
+      ;;
+  esac
 
-  if [[ -f "$prepared_file" ]]; then
-    desired="$(<"$prepared_file")"
-  elif [[ -f "$updating_file" ]]; then
-    desired="$(<"$updating_file")"
-  else
+  if [[ "$transaction_phase" == rollback-started ]]; then
+    query_container scroll
+    if [[ "$container_presence" == present ]]; then
+      distrobox rm --force scroll
+    fi
+    write_transaction rollback-candidate-removed "$transaction_desired" "$transaction_had_old"
+  fi
+
+  if [[ "$transaction_phase" == rollback-candidate-removed ]]; then
+    if [[ "$transaction_had_old" == yes ]]; then
+      query_container "$rollback_container"
+      if [[ "$container_presence" == present ]]; then
+        query_container scroll
+        if [[ "$container_presence" == present ]]; then
+          log "both candidate and rollback containers exist after candidate removal"
+          return 1
+        fi
+        podman rename "$rollback_container" scroll
+      else
+        query_container scroll
+        if [[ "$container_presence" == absent ]]; then
+          log "cannot locate the last known working Scroll container"
+          return 1
+        fi
+      fi
+    fi
+    write_transaction rollback-container-restored "$transaction_desired" "$transaction_had_old"
+  fi
+
+  if [[ "$transaction_phase" == rollback-container-restored ]]; then
+    restore_wrappers
+    write_transaction rollback-wrappers-restored "$transaction_desired" "$transaction_had_old"
+  fi
+
+  if [[ "$transaction_phase" == rollback-wrappers-restored ]]; then
+    write_state "$failed_file" "$transaction_desired"
+    rm -f "$pending_file"
+    sync -f "$state_dir"
+    finish_transaction
+    log "restored the last known working Scroll container"
+  fi
+}
+
+recover_locked() {
+  if [[ ! -f "$transaction_file" ]]; then
+    return 0
+  fi
+  read_transaction
+  case "$transaction_phase" in
+    prepared)
+      return 0
+      ;;
+    committed)
+      commit_locked
+      ;;
+    backup-ready|old-renamed|rollback-started|rollback-candidate-removed|rollback-container-restored|rollback-wrappers-restored)
+      log "recovering an interrupted Scroll update"
+      rollback_locked
+      ;;
+  esac
+}
+
+reconcile_locked() {
+  local scroll_state
+
+  recover_locked
+  if [[ ! -f "$transaction_file" ]]; then
+    return 0
+  fi
+  read_transaction
+  [[ "$transaction_phase" == prepared ]] || {
+    log "cannot reconcile transaction in phase ${transaction_phase}"
+    return 1
+  }
+
+  scroll_state="$(systemctl --user show wayland-wm@scroll.service --property=ActiveState --value)"
+  case "$scroll_state" in
+    active)
+      commit_locked
+      ;;
+    failed)
+      rollback_locked
+      ;;
+    activating|inactive|deactivating) ;;
+    *)
+      log "cannot safely determine Scroll session state: ${scroll_state}"
+      return 1
+      ;;
+  esac
+}
+
+apply_locked() {
+  local desired="${1:?desired digest is required}"
+  local applied=""
+
+  reconcile_locked
+  if [[ -f "$transaction_file" ]]; then
+    return 0
+  fi
+  [[ ! -f "$applied_file" ]] || applied="$(<"$applied_file")"
+  if [[ "$applied" == "$desired" ]]; then
     return 0
   fi
 
-  log "rolling back failed Scroll update"
-  if container_exists scroll; then
-    distrobox rm --force scroll
+  rm -f "$failed_file"
+  sync -f "$state_dir"
+  write_state "$pending_file" "$desired"
+  query_container scroll
+  if [[ "$container_presence" == absent ]]; then
+    prepare_locked
   fi
+}
 
-  if [[ -f "$had_backup_file" ]]; then
-    if ! container_exists "$rollback_container"; then
-      log "rollback container ${rollback_container} is missing"
-      return 1
-    fi
-    podman rename "$rollback_container" scroll
-    restore_wrappers
-  else
-    restore_wrappers
+deselect_locked() {
+  if [[ -f "$transaction_file" ]]; then
+    return 0
   fi
-
-  write_state "$failed_file" "$desired"
-  rm -f "$pending_file"
-  clear_transaction_files
-  log "restored the last known working Scroll container"
+  rm -f "$pending_file" "$failed_file" "$applied_file"
+  sync -f "$state_dir"
 }
 
 prepare_locked() {
   local desired
+  local had_old=no
   local create_status
 
-  if [[ -f "$updating_file" ]]; then
-    log "recovering an interrupted Scroll update"
-    rollback_locked
+  recover_locked
+  if [[ -f "$transaction_file" || ! -f "$pending_file" || -f "$failed_file" ]]; then
     return 0
   fi
-  if [[ -f "$prepared_file" || ! -f "$pending_file" || -f "$failed_file" ]]; then
-    return 0
-  fi
-  if container_exists "$rollback_container"; then
+  query_container "$rollback_container"
+  if [[ "$container_presence" == present ]]; then
     log "unexpected rollback container ${rollback_container} already exists"
     return 1
   fi
 
   desired="$(<"$pending_file")"
-  write_state "$updating_file" "$desired"
+  [[ -n "$desired" ]] || {
+    log "pending digest is empty"
+    return 1
+  }
+  query_container scroll
+  if [[ "$container_presence" == present ]]; then
+    had_old=yes
+  fi
   backup_wrappers
+  write_transaction backup-ready "$desired" "$had_old"
 
-  if container_exists scroll; then
+  if [[ "$had_old" == yes ]]; then
     podman stop --ignore --time 10 scroll >/dev/null
     podman rename scroll "$rollback_container"
-    : >"$had_backup_file"
   fi
+  write_transaction old-renamed "$desired" "$had_old"
 
   log "creating candidate Scroll container"
-  set +e
-  distrobox assemble create --file "$manifest" --name scroll
-  create_status=$?
-  set -e
+  if distrobox assemble create --file "$manifest" --name scroll; then
+    create_status=0
+  else
+    create_status=$?
+  fi
   if ((create_status != 0)); then
     log "candidate creation failed"
     rollback_locked
     return "$create_status"
   fi
 
-  mv -f "$updating_file" "$prepared_file"
+  write_transaction prepared "$desired" "$had_old"
   log "candidate is ready for the next Scroll session"
 }
 
-commit_locked() {
-  local desired
+handle_error() {
+  local status=$?
 
-  if [[ ! -f "$prepared_file" ]]; then
-    return 0
+  trap - ERR
+  if [[ ( "$current_command" == prepare || "$current_command" == apply ) && -f "$transaction_file" ]]; then
+    rollback_locked
   fi
+  exit "$status"
+}
 
-  desired="$(<"$prepared_file")"
-  if [[ -f "$had_backup_file" ]]; then
-    if ! container_exists "$rollback_container"; then
-      log "rollback container ${rollback_container} is missing"
-      return 1
-    fi
-    podman rm --force "$rollback_container" >/dev/null
+handle_signal() {
+  local signal="${1:?signal is required}"
+  local status="${2:?status is required}"
+
+  trap - ERR HUP INT TERM
+  if [[ ( "$current_command" == prepare || "$current_command" == apply ) && -f "$transaction_file" ]]; then
+    rollback_locked
   fi
-
-  write_state "$applied_file" "$desired"
-  rm -f "$pending_file" "$failed_file"
-  clear_transaction_files
-  log "committed the successfully started Scroll container"
+  log "interrupted by ${signal}"
+  exit "$status"
 }
 
 usage() {
-  printf 'Usage: %s prepare|commit|rollback\n' "${0##*/}" >&2
+  printf 'Usage: %s prepare|commit|rollback|recover|reconcile|apply DIGEST|deselect\n' "${0##*/}" >&2
   exit 2
 }
 
-(( $# == 1 )) || usage
+(( $# >= 1 )) || usage
+current_command="$1"
 acquire_lock
+trap handle_error ERR
+trap 'handle_signal HUP 129' HUP
+trap 'handle_signal INT 130' INT
+trap 'handle_signal TERM 143' TERM
 
-case "$1" in
+case "$current_command" in
   prepare)
+    (( $# == 1 )) || usage
     prepare_locked
     ;;
   commit)
+    (( $# == 1 )) || usage
     commit_locked
     ;;
   rollback)
+    (( $# == 1 )) || usage
     rollback_locked
+    ;;
+  recover)
+    (( $# == 1 )) || usage
+    recover_locked
+    ;;
+  reconcile)
+    (( $# == 1 )) || usage
+    reconcile_locked
+    ;;
+  apply)
+    (( $# == 2 )) || usage
+    apply_locked "$2"
+    ;;
+  deselect)
+    (( $# == 1 )) || usage
+    deselect_locked
     ;;
   *)
     usage
