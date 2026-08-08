@@ -10,7 +10,7 @@
 - ホームディレクトリのdotfilesは原則としてchezmoiで管理されている。
 - 編集前に `chezmoi source-path <target>` で管理対象か確認する。パスには `~` または `/home/atty`
   を使い、`/var/home/atty` は使わない。
-- 管理対象の場合は、返されたsource stateを編集し、target実体を直接編集しない。
+- 管理対象の場合は、返されたsource stateに適用される `AGENTS.md` を読んでからsource stateを編集し、target実体を直接編集しない。
 - `chezmoi diff <target>` で反映内容を確認し、`chezmoi apply <target>`
   で明示したtargetだけを反映した後、再度diffが空であることを確認する。
 - targetを指定しない一括 `chezmoi apply` は行わない。
