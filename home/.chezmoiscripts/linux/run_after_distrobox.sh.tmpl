@@ -1,0 +1,116 @@
+#!/usr/bin/env -S bash -euo pipefail
+
+{{- $entries := list -}}
+{{- if hasKey .distrobox.hosts .hostname -}}
+{{-   $entries = (index .distrobox.hosts .hostname).entries -}}
+{{- end -}}
+{{- $scrollSelected := false -}}
+{{- range $entry := $entries -}}
+{{-   if eq $entry.name "scroll" -}}
+{{-     $scrollSelected = true -}}
+{{-   end -}}
+{{- end }}
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/chezmoi/distrobox"
+scroll_helper="${HOME}/.local/libexec/chezmoi-distrobox-scroll-update"
+selected_entries=(
+{{- range $entry := $entries }}
+  {{ $entry.name | quote }}
+{{- end }}
+)
+
+is_selected() {
+  local candidate="${1:?candidate is required}"
+  local selected
+
+  for selected in "${selected_entries[@]}"; do
+    [[ "$candidate" == "$selected" ]] && return 0
+  done
+  return 1
+}
+
+write_state() {
+  local destination="${1:?destination is required}"
+  local value="${2:?value is required}"
+  local temporary="${destination}.tmp"
+
+  printf '%s\n' "$value" >"$temporary"
+  mv -f "$temporary" "$destination"
+}
+
+if ((${#selected_entries[@]} == 0)) && [[ ! -d "$state_dir" ]]; then
+  exit 0
+fi
+mkdir -p "$state_dir"
+
+for applied_file in "$state_dir"/*.applied; do
+  [[ -e "$applied_file" ]] || continue
+  entry="${applied_file##*/}"
+  entry="${entry%.applied}"
+  if ! is_selected "$entry"; then
+    if [[ "$entry" == scroll && ( -f "$state_dir/scroll.prepared" || -f "$state_dir/scroll.updating" ) ]]; then
+      continue
+    fi
+    rm -f "$applied_file" "$state_dir/${entry}.pending" "$state_dir/${entry}.failed"
+  fi
+done
+
+{{ if not $scrollSelected -}}
+if [[ ! -f "$state_dir/scroll.prepared" && ! -f "$state_dir/scroll.updating" ]]; then
+  rm -f "$state_dir/scroll.pending" "$state_dir/scroll.failed" "$state_dir/scroll.applied"
+fi
+{{- end }}
+
+if ((${#selected_entries[@]} == 0)); then
+  exit 0
+fi
+if ! command -v distrobox >/dev/null 2>&1; then
+  exit 0
+fi
+
+{{ if $scrollSelected -}}
+systemctl --user daemon-reload
+if [[ -f "$state_dir/scroll.updating" ]]; then
+  "$scroll_helper" rollback
+fi
+if [[ -f "$state_dir/scroll.prepared" ]]; then
+  scroll_state="$(systemctl --user show wayland-wm@scroll.service --property=ActiveState --value)"
+  case "$scroll_state" in
+    active|activating)
+      "$scroll_helper" commit
+      ;;
+    inactive|failed|deactivating)
+      ;;
+    *)
+      printf 'Cannot safely determine Scroll session state: %s\n' "$scroll_state" >&2
+      exit 1
+      ;;
+  esac
+fi
+{{- end }}
+
+{{ range $entry := $entries -}}
+{{- $manifestPath := joinPath $.chezmoi.sourceDir "dot_config" "distrobox" "assemble" $entry.manifest -}}
+{{- $manifestContent := include $manifestPath -}}
+{{- $desired := sha256sum (printf "%s\n%s" $entry.name $manifestContent) }}
+desired={{ $desired | quote }}
+applied_file="$state_dir/{{ $entry.name }}.applied"
+applied=""
+[[ ! -f "$applied_file" ]] || applied="$(<"$applied_file")"
+if [[ "$applied" != "$desired" ]]; then
+{{- if eq $entry.name "scroll" }}
+  if [[ ! -f "$state_dir/scroll.prepared" && ! -f "$state_dir/scroll.updating" ]]; then
+    rm -f "$state_dir/scroll.failed"
+    write_state "$state_dir/scroll.pending" "$desired"
+    if ! podman container exists scroll; then
+      "$scroll_helper" prepare
+    fi
+  fi
+{{- else }}
+  distrobox assemble create --replace \
+    --file "${XDG_CONFIG_HOME:-$HOME/.config}/distrobox/assemble/{{ $entry.manifest }}" \
+    --name {{ $entry.name | quote }}
+  write_state "$applied_file" "$desired"
+{{- end }}
+fi
+
+{{ end -}}

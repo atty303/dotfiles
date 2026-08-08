@@ -1,0 +1,7 @@
+[Unit]
+Description=Roll back a failed Scroll Distrobox update
+After=wayland-wm@scroll.service
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/libexec/chezmoi-distrobox-scroll-update rollback

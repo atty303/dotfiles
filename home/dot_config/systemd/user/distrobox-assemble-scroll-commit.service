@@ -1,0 +1,9 @@
+[Unit]
+Description=Commit a successfully started Scroll Distrobox update
+After=wayland-wm@scroll.service
+Before=graphical-session.target
+
+[Service]
+Type=oneshot
+ExecCondition=/usr/bin/systemctl --user is-active --quiet wayland-wm@scroll.service
+ExecStart=%h/.local/libexec/chezmoi-distrobox-scroll-update commit

@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/chezmoi/distrobox"
+manifest="${XDG_CONFIG_HOME:-$HOME/.config}/distrobox/assemble/scroll.ini"
+bin_dir="${HOME}/.local/bin"
+wrapper_backup_dir="${state_dir}/scroll-wrappers"
+lock_dir="${state_dir}/scroll.lock"
+pending_file="${state_dir}/scroll.pending"
+updating_file="${state_dir}/scroll.updating"
+prepared_file="${state_dir}/scroll.prepared"
+failed_file="${state_dir}/scroll.failed"
+applied_file="${state_dir}/scroll.applied"
+had_backup_file="${state_dir}/scroll.had-backup"
+rollback_container="scroll-chezmoi-rollback"
+scroll_wrappers=(scroll scrollmsg scrollnag scrollbar)
+
+log() {
+  printf 'chezmoi-distrobox-scroll-update: %s\n' "$*" >&2
+}
+
+container_exists() {
+  podman container exists "$1"
+}
+
+write_state() {
+  local destination="${1:?destination is required}"
+  local value="${2:?value is required}"
+  local temporary="${destination}.tmp"
+
+  printf '%s\n' "$value" >"$temporary"
+  mv -f "$temporary" "$destination"
+}
+
+acquire_lock() {
+  mkdir -p "$state_dir"
+  if ! mkdir "$lock_dir" 2>/dev/null; then
+    log "another Scroll update operation is already running"
+    exit 75
+  fi
+  trap 'rmdir "$lock_dir"' EXIT
+}
+
+backup_wrappers() {
+  local wrapper
+
+  rm -rf "$wrapper_backup_dir"
+  mkdir -p "$wrapper_backup_dir"
+  for wrapper in "${scroll_wrappers[@]}"; do
+    if [[ -e "${bin_dir}/${wrapper}" ]]; then
+      cp -a "${bin_dir}/${wrapper}" "$wrapper_backup_dir/"
+    fi
+  done
+}
+
+restore_wrappers() {
+  local wrapper
+
+  for wrapper in "${scroll_wrappers[@]}"; do
+    rm -f "${bin_dir}/${wrapper}"
+    if [[ -e "${wrapper_backup_dir}/${wrapper}" ]]; then
+      cp -a "${wrapper_backup_dir}/${wrapper}" "${bin_dir}/${wrapper}"
+    fi
+  done
+}
+
+clear_transaction_files() {
+  rm -f "$updating_file" "$prepared_file" "$had_backup_file"
+  rm -rf "$wrapper_backup_dir"
+}
+
+rollback_locked() {
+  local desired=""
+
+  if [[ -f "$prepared_file" ]]; then
+    desired="$(<"$prepared_file")"
+  elif [[ -f "$updating_file" ]]; then
+    desired="$(<"$updating_file")"
+  else
+    return 0
+  fi
+
+  log "rolling back failed Scroll update"
+  if container_exists scroll; then
+    distrobox rm --force scroll
+  fi
+
+  if [[ -f "$had_backup_file" ]]; then
+    if ! container_exists "$rollback_container"; then
+      log "rollback container ${rollback_container} is missing"
+      return 1
+    fi
+    podman rename "$rollback_container" scroll
+    restore_wrappers
+  else
+    restore_wrappers
+  fi
+
+  write_state "$failed_file" "$desired"
+  rm -f "$pending_file"
+  clear_transaction_files
+  log "restored the last known working Scroll container"
+}
+
+prepare_locked() {
+  local desired
+  local create_status
+
+  if [[ -f "$updating_file" ]]; then
+    log "recovering an interrupted Scroll update"
+    rollback_locked
+    return 0
+  fi
+  if [[ -f "$prepared_file" || ! -f "$pending_file" || -f "$failed_file" ]]; then
+    return 0
+  fi
+  if container_exists "$rollback_container"; then
+    log "unexpected rollback container ${rollback_container} already exists"
+    return 1
+  fi
+
+  desired="$(<"$pending_file")"
+  write_state "$updating_file" "$desired"
+  backup_wrappers
+
+  if container_exists scroll; then
+    podman stop --ignore --time 10 scroll >/dev/null
+    podman rename scroll "$rollback_container"
+    : >"$had_backup_file"
+  fi
+
+  log "creating candidate Scroll container"
+  set +e
+  distrobox assemble create --file "$manifest" --name scroll
+  create_status=$?
+  set -e
+  if ((create_status != 0)); then
+    log "candidate creation failed"
+    rollback_locked
+    return "$create_status"
+  fi
+
+  mv -f "$updating_file" "$prepared_file"
+  log "candidate is ready for the next Scroll session"
+}
+
+commit_locked() {
+  local desired
+
+  if [[ ! -f "$prepared_file" ]]; then
+    return 0
+  fi
+
+  desired="$(<"$prepared_file")"
+  if [[ -f "$had_backup_file" ]]; then
+    if ! container_exists "$rollback_container"; then
+      log "rollback container ${rollback_container} is missing"
+      return 1
+    fi
+    podman rm --force "$rollback_container" >/dev/null
+  fi
+
+  write_state "$applied_file" "$desired"
+  rm -f "$pending_file" "$failed_file"
+  clear_transaction_files
+  log "committed the successfully started Scroll container"
+}
+
+usage() {
+  printf 'Usage: %s prepare|commit|rollback\n' "${0##*/}" >&2
+  exit 2
+}
+
+(( $# == 1 )) || usage
+acquire_lock
+
+case "$1" in
+  prepare)
+    prepare_locked
+    ;;
+  commit)
+    commit_locked
+    ;;
+  rollback)
+    rollback_locked
+    ;;
+  *)
+    usage
+    ;;
+esac

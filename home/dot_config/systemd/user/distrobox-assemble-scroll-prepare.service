@@ -1,0 +1,7 @@
+[Unit]
+Description=Prepare a pending Scroll Distrobox update
+Before=wayland-session-pre@scroll.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/libexec/chezmoi-distrobox-scroll-update prepare
