@@ -33,7 +33,6 @@ exec uwsm finalize SWAYSOCK I3SOCK SCROLLSOCK XCURSOR_SIZE XCURSOR_THEME
 # ====================
 animations {
     enabled yes
-    frequency_ms 8
 }
 bar {
     font "Noto Sans 14"
