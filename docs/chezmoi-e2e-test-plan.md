@@ -37,6 +37,8 @@ OS再起動後のサービス、ログインセッション、GUI承認状態ま
 ```sh
 mise run test:e2e:linux
 mise run test:e2e:windows
+mise run test:e2e:mac:prepare
+mise run test:e2e:mac:local
 E2E_MAC_HOST=mac-host mise run test:e2e:mac:lan
 mise run test:e2e:mac:aws -- --confirm-cost
 E2E_MAC_BACKEND=lan mise run test:e2e
@@ -178,12 +180,24 @@ LAN/AWS hostにはテスト対象のdotfilesを直接applyしない。
 前提条件は次のとおり。
 
 - Apple Silicon Mac
-- macOS 13以降
-- SSH有効
-- passwordless automationが可能な専用ユーザー
+- macOS 14以降
 - Tartを実行できる空きdisk、memory、Virtualization.framework
 
-通常テストは既存hostへTartが入っていることを確認するだけとする。hostへのTart導入やbase image pullは明示的な `test:e2e:mac:prepare` タスクへ分離し、E2E実行中にLAN Macの恒久設定を暗黙に変更しない。
+Linuxから実行するhostでは、追加でSSHを有効化し、passwordless automationが可能な専用ユーザーを用意する。
+
+Macホストにはmiseだけを事前に導入する。TartはmacOS arm64限定のmise toolとしてversionを固定し、Homebrewには依存しない。
+
+macOS 15以降では、Virtualization.frameworkがVM起動時にunlock済みのlogin keychainを要求する。専用ユーザーで一度GUIログインし、そのsessionとlogin keychainをunlockした状態に保つ。Linuxから実行する場合は、同じユーザーへSSH configのhost名でpasswordなしに接続できるようRemote Loginと公開鍵認証を設定する。keychain passwordはE2E runnerへ渡さない。
+
+初回はMac上のcheckoutで次を実行する。
+
+```sh
+mise trust
+mise install
+mise run test:e2e:mac:prepare
+```
+
+prepare taskはhostのOS、architecture、CPU、memory、disk、login keychainを検査し、digest固定のmacOS 26 imageを取得する。さらに一時VMをCPU 6、RAM 10GBで起動し、Tart Guest Agent経由のcommand実行まで確認してからVMを削除する。実行ごとに専用の一時TART_HOMEを使用し、Tartのcacheと取得済みbase imageだけを永続cacheから再利用する。prepare taskはRemote Login、GUI session、keychainやmacOS defaultsを変更しない。
 
 ### AWS backend
 
