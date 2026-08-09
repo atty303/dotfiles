@@ -164,12 +164,19 @@ fzfとTelevisionは代替候補ではない。filterを既存commandへ合成す
 
 ### shell history、completion、session
 
+Nushellのcompletionは、CLI自身が生成する `extern` とnu_scriptsの定義を優先する。全external commandを別processへ渡すと
+通常のfile completionにも遅延が加わるため、global external completerは設定しない。利用頻度が高いmiseはcommandとtaskを
+Nushellから直接取得し、それ以外の完全な補完だけusageへfallbackする。Carapaceは専用定義が有効なcommandへ `@complete` で
+割り当て、Carapace bridgeとFish completion bridgeは有効にしない。
+
 | Tool | 状態 | 選定理由と境界 |
 | --- | --- | --- |
 | Atuin | 採用 | SQLite history、host/workspace filter、同期可能な検索をshell間で共有する。shell固有の平坦なhistory fileだけに依存しない。 |
 | gum | 採用 | shell functionに必要な一時的promptだけを小さなCLIで提供する。恒久的なTUI frameworkは導入しない。 |
 | Zellij | 採用 | remote接続や長時間taskを含むterminal workspaceとsessionを管理する。terminal emulatorのtab機能へsession永続性を依存させない。 |
-| carapace | 休眠 | cross-shell completion候補として設定は残るが、現在はintegrationを有効にしない。採用済みcompletion基盤として扱わない。 |
+| nu_scripts | 採用 | CLI自身がNushell定義を生成しない場合の共有 `extern` を供給する。利用する定義だけを固定commitから取得する。 |
+| usage | 役割限定 | miseのusage specから動的な候補を解決する。頻用経路には使わず、網羅性が必要な補完のfallbackに限定する。 |
+| Carapace | 役割限定 | `deno` と `chezmoi` のcompletionへ個別に割り当てる。global completerや他shellへのbridgeとしては使わない。 |
 
 ### runtimeと開発tool
 

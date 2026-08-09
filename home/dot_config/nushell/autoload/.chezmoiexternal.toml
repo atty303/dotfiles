@@ -2,3 +2,31 @@
     type = "file"
     url = "https://raw.githubusercontent.com/catppuccin/nushell/refs/heads/main/themes/catppuccin_mocha.nu"
     refreshPeriod = "168h"
+
+["30-bat-completions.nu"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/nushell/nu_scripts/381eb7577705b00bea437da7c0439c39ff05f06b/custom-completions/bat/bat-completions.nu"
+
+["30-eza-completions.nu"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/nushell/nu_scripts/381eb7577705b00bea437da7c0439c39ff05f06b/custom-completions/eza/eza-completions.nu"
+
+["30-gh-completions.nu"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/nushell/nu_scripts/381eb7577705b00bea437da7c0439c39ff05f06b/custom-completions/gh/gh-completions.nu"
+
+["30-git-completions.nu"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/nushell/nu_scripts/381eb7577705b00bea437da7c0439c39ff05f06b/custom-completions/git/git-completions.nu"
+
+["30-rg-completions.nu"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/nushell/nu_scripts/381eb7577705b00bea437da7c0439c39ff05f06b/custom-completions/rg/rg-completions.nu"
+
+["30-television-completions.nu"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/nushell/nu_scripts/381eb7577705b00bea437da7c0439c39ff05f06b/custom-completions/television/television-completions.nu"
+
+["30-zellij-completions.nu"]
+    type = "file"
+    url = "https://raw.githubusercontent.com/nushell/nu_scripts/381eb7577705b00bea437da7c0439c39ff05f06b/custom-completions/zellij/zellij-completions.nu"

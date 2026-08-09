@@ -52,21 +52,21 @@ if (which mise | is-not-empty) {
 
 const atuin_init_path = $vendor_autoload | path join atuin.nu
 if (which atuin | is-not-empty) {
-    ^atuin pty-proxy init nu | save $atuin_init_path --force
-    ^atuin init --disable-up-arrow nu | save $atuin_init_path --append
+    [
+        (^atuin pty-proxy init nu)
+        (^atuin init --disable-up-arrow nu)
+        (^atuin gen-completions --shell nushell)
+    ] | str join "\n" | save $atuin_init_path --force
 } else {
     rm -fp $atuin_init_path
 }
 
-# if (which carapace | is-not-empty) {
-#     $env.CARAPACE_BRIDGES = 'zsh,inshellisense'
-#     const init_path = $vendor_autoload | path join carapace.nu
-#     ^carapace _carapace nushell | save $init_path --force
-# }
-
 const starship_init_path = $vendor_autoload | path join starship.nu
 if (which starship | is-not-empty) {
-    ^starship init nu | save $starship_init_path --force
+    [
+        (^starship init nu)
+        (^starship completions nushell)
+    ] | str join "\n" | save $starship_init_path --force
 
     $env.config.render_right_prompt_on_last_line = false
     $env.TRANSIENT_PROMPT_COMMAND = {|| ^starship module character }
