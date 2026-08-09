@@ -5,9 +5,11 @@ description: AGENTS.md、global guidance、skill、scriptまたはautomationの�
 
 # Learning Feedback
 
-- タスク完了時に、将来の複数タスクで有効、既存の原典から自明でない、かつ具体的な失敗、確認または成功で裏付けられた学びだけを永続化候補として評価する。
+- 検証失敗の原因が確定した時点、論理変更の確定前およびタスク完了時を学びのcheckpointとする。将来の複数タスクで有効、既存の原典から自明でない、かつ具体的な失敗、確認または成功で裏付けられた学びだけを永続化候補として評価する。
 - 実装結果だけでなく、失敗した操作、ユーザーによる訂正、不要な往復、手動で促された処理、および既存規則が実行されなかった事例をprocess上の証拠として監査する。
-- 候補がある場合だけ、保存先、根拠、理由および具体的な追加・修正文を最終報告に提示する。自動反映せず、承認後に元の成果物とは別の論理変更として確定する。
+- 依頼範囲内で修正できる決定的な欠陥は永続化候補へ延期せず、source、test、task、build processまたは実行環境の最も近い原典で通常の開発workflowとして解消する。
+- 依頼範囲内の原典で通常の開発workflowとして解消する決定的な欠陥を除き、永続化候補は保存先にかかわらず自動反映しない。保存先、根拠、理由および具体的な追加・修正文を提示し、承認後に元の成果物とは別の論理変更として確定する。
+- 最終報告では、checkpointで解消できなかった横断的または非決定的な候補だけを提示する。
 - 失敗履歴や一時的な環境情報をそのまま残さず、適用条件、正しい手順および禁止事項へ一般化する。
 - 候補を提示する前に振り返り手順自体への訂正も一度だけ同じ基準で評価し、再帰的な振り返りは行わない。
 
@@ -16,7 +18,7 @@ description: AGENTS.md、global guidance、skill、scriptまたはautomationの�
 - 全タスクに共通する個人方針はglobal
   guidance、リポジトリ固有のAI向け規約、コマンドおよび検証条件は適用範囲に最も近い `AGENTS.md`
   の候補にする。
-- 学びごとにsourceまたはdocumentation、repo `AGENTS.md`、global guidance、skill、scriptまたはautomation、永続化不要のいずれかを原典として選ぶ。
+- 学びごとにsourceまたはdocumentation、test、taskまたはbuild process、実行環境、repo `AGENTS.md`、global guidance、skill、scriptまたはautomation、永続化不要のいずれかを原典として選ぶ。
 - 人間にも重要な仕様、設計および業務知識はsource、documentationまたは外部システムを原典とし、`AGENTS.md`
   へ重複させない。
 - 単一環境の決定的な反復処理はscript、taskまたはautomationへ移し、guidanceにはtriggerと入口だけを置く。
@@ -28,7 +30,7 @@ description: AGENTS.md、global guidance、skill、scriptまたはautomationの�
 ### Maintenance
 
 - 各反映提案で対象ファイル全体を監査し、新規追記より既存指示の統合、置換、簡略化および削除を優先する。
-- 既存規則があったのに実行されなかった場合は同じ規則を重複させず、実際のworkflowの入口または終了条件へtriggerを組み込む。
+- 既存規則があったのに実行されなかった場合は同じ規則を重複させない。agentの行動を開始させるtriggerは実際のworkflowを定義するskillの入口または終了条件へ組み込み、単一環境で機械的に強制できる処理は最も近いtask、scriptまたはautomationへ移す。
 - 行動を変えない情報、原典から容易に発見できる事実および一度限りの判断はguidanceへ追加しない。
 - 同じ規則は一度だけ記載し、詳細な手順、例および参考資料はskill、scriptまたはdocumentationへ移す。
 - 重複、矛盾、陳腐化、長い手順またはスコープ不明な規則を検出した場合だけ、全体的な棚卸しを提案する。固定の長さではなく情報密度と適用範囲で判断する。
