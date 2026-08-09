@@ -11,22 +11,51 @@ def temporary-prompt [] {
 }
 
 def fzf-filter-completions [buffer: string] {
-  let all_completions = $buffer | commandline complete --detailed
+  let command_completions = $buffer | commandline complete --detailed
+  let complete_arguments = $command_completions | any {|completion| $completion.value == $buffer }
+  let buffer_end = $buffer | encode utf-8 | bytes length
+  let all_completions = if $complete_arguments {
+    $"($buffer) "
+    | commandline complete --detailed
+    | each {|completion|
+        let span = $completion.span
+        if $span.start > $buffer_end {
+          $completion | merge {
+            value: $" ($completion.value)"
+            span: { start: $buffer_end, end: $buffer_end }
+          }
+        } else {
+          $completion | merge {
+            span: {
+              start: $span.start
+              end: ([$span.end $buffer_end] | math min)
+            }
+          }
+        }
+      }
+  } else {
+    $command_completions
+  }
   if ($all_completions | is-empty) {
     return []
   }
 
-  let preferred_span = (
+  let literal_completions = (
     $all_completions
-    | get span
-    | uniq
-    | sort-by {|span| $span.end - $span.start } --reverse
-    | get -o 0
+    | where {|completion| $completion.value | str starts-with $buffer }
   )
-  let completions = if $preferred_span == null {
+  let described_argument_completions = (
     $all_completions
+    | where {|completion|
+        $completion.span.start > 0 and $completion.span.end == $buffer_end and ($completion.description? | default null) != null
+      }
+  )
+  let completions = if not ($literal_completions | is-empty) {
+    $literal_completions
+  } else if not ($described_argument_completions | is-empty) {
+    $described_argument_completions
   } else {
-    $all_completions | where span == $preferred_span
+    $all_completions
   }
 
   let span = $completions.0.span
@@ -63,7 +92,7 @@ $env.config.history.file_format = "sqlite"
 $env.config.table.mode = 'markdown'
 $env.config.datetime_format.table = "%y-%m-%d %I:%M:%S"
 $env.config.datetime_format.normal = "%y-%m-%d %I:%M:%S"
-$env.config.completions.algorithm = "fuzzy"
+$env.config.completions.algorithm = "prefix"
 $env.config.menus ++= [{
   name: completion_menu
   input_mode: cursor_prefix
