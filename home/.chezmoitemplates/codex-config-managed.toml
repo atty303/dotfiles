@@ -13,9 +13,11 @@ description = "Personal development with mise, version control, and SSH signing.
 extends = ":workspace"
 
 [permissions.personal-development.filesystem]
+"~/.cache/hk" = "write"
 "~/.config/mise" = "read"
 "~/.local/bin" = "read"
 "~/.local/share/mise" = "write"
+"~/.local/state/hk" = "write"
 "~/.local/state/mise" = "write"
 "~/.local/state/mise/github-oauth-tokens.toml" = "read"
 "~/.cache/mise" = "write"
