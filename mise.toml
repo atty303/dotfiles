@@ -2,12 +2,52 @@ min_version = "2026.8.3"
 
 [tools]
 age = "1.3.1"
+actionlint = "1.7.12"
+chezmoi = "2.72.0"
 deno = "2.9.3"
+hk = "1.54.1"
+shellcheck = "0.11.0"
+taplo = "0.10.0"
 "aqua:openai/tart" = { version = "2.35.0", os = ["macos/arm64"] }
 
-[tasks."test:e2e:check"]
-description = "Check the Deno E2E harness"
-run = "deno fmt --check deno.json tests/e2e && deno lint tests/e2e && deno check tests/e2e/main.ts"
+[env]
+HK_MISE = 1
+
+[hooks]
+postinstall = "hk install --mise"
+
+[tasks.check]
+description = "Check the repository or selected files"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+
+if (($#)); then
+  exec hk check "$@"
+fi
+exec hk check --all
+'''
+
+[tasks.fix]
+description = "Fix the repository or selected files"
+run = '''
+#!/usr/bin/env bash
+set -euo pipefail
+
+if (($#)); then
+  exec hk fix "$@"
+fi
+exec hk fix --all
+'''
+
+[tasks.test]
+description = "Run all reproducible repository checks and Linux tests"
+run = '''
+mise run check
+mise run test:distrobox
+mise run test:flatpak
+mise run test:e2e:linux
+'''
 
 [tasks."test:distrobox"]
 description = "Test Distrobox lifecycle updates"

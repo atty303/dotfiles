@@ -133,16 +133,19 @@ chezmoi diff ~/.config/example/config.toml
 Repository checks are exposed through mise. The main suites are:
 
 ```sh
-mise run test:e2e:check
-mise run test:distrobox
-mise run test:e2e:linux
+mise run check
+mise run fix
+mise run test
 mise run test:e2e:mac:prepare
 mise run test:e2e:mac:local
 mise run test:e2e:mac:lan
 ```
 
-The Linux E2E suite requires Podman. The local macOS tasks require an Apple Silicon Mac
-with Tart. The LAN task additionally requires SSH access to a designated Apple Silicon
-Mac that can run Tart. See the
+`check` and `fix` accept optional file paths and otherwise operate on the whole
+repository. Installing the mise tools also installs the repository's hk pre-commit
+hook. The complete `test` task requires Podman and includes the Fedora and Ubuntu E2E
+suites. The local macOS tasks require an Apple Silicon Mac with Tart. The LAN task
+additionally requires SSH access to a designated Apple Silicon Mac that can run Tart.
+See the
 [chezmoi template reference](https://www.chezmoi.io/reference/templates/) when editing
 Go templates in the source state.
