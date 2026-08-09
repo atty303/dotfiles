@@ -10,6 +10,41 @@ def temporary-prompt [] {
   }
 }
 
+def fzf-filter-completions [buffer: string] {
+  let completions = $buffer | commandline complete --detailed
+  if ($completions | is-empty) {
+    return []
+  }
+
+  let span = $completions.0.span
+  let query = $buffer | str substring $span.start..<$span.end
+  if ($query | is-empty) or (which fzf | is-empty) {
+    return $completions
+  }
+
+  let result = (
+    $completions
+    | enumerate
+    | each {|row| { index: $row.index, value: ($row.item.value | to nuon) } }
+    | to tsv --noheaders
+    | ^fzf --delimiter "\t" --nth 2 --filter $query
+    | complete
+  )
+  if $result.exit_code == 1 {
+    return []
+  } else if $result.exit_code != 0 {
+    return $completions
+  }
+
+  let indices = (
+    $result.stdout
+    | lines
+    | each {|line| $line | split row "\t" | first | into int }
+  )
+
+  $indices | each {|index| $completions | get $index }
+}
+
 $env.config.show_banner = "short"
 $env.config.history.file_format = "sqlite"
 $env.config.table.mode = 'markdown'
@@ -26,7 +61,7 @@ $env.config.menus ++= [{
     page_size: 10
     description_position: after
   }
-  source: {|buffer, _position| $buffer | commandline complete --detailed }
+  source: {|buffer, _position| fzf-filter-completions $buffer }
   style: {
     text: "#cdd6f4"
     selected_text: { fg: "#cdd6f4" bg: "#45475a" attr: b }
