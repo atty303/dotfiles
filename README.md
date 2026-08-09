@@ -46,6 +46,9 @@ The repository follows these principles:
   they cannot be made reproducible without coupling the repository to an external
   service or device.
 
+The rationale behind the current tool and platform choices is recorded in
+[`docs/technology-selection.md`](docs/technology-selection.md).
+
 ## Responsibility boundaries
 
 | Layer | Responsibility |
