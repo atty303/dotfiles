@@ -101,7 +101,7 @@ def --env menu-completions [buffer: string] {
   } else {
     null
   }
-  let base_buffer = if $saved_query == null or $saved_query =~ '\s' {
+  let base_buffer = if $saved_query == null or $saved_query =~ '\s' or ($saved_query | str starts-with "-") {
     $env.__NU_COMPLETION_BASE = $buffer
     $buffer
   } else {
@@ -119,6 +119,7 @@ def --env menu-completions [buffer: string] {
 
   $filtered_completions | each {|completion|
     $completion | merge {
+      value: $"($completion.value) "
       span: ($completion.span | merge { end: $query_end })
     }
   }
@@ -163,6 +164,16 @@ $env.config.keybindings ++= [
         { send: menu name: completion_menu }
       ]
     }
+  }
+  {
+    name: reset_completion_menu
+    modifier: none
+    keycode: Esc
+    mode: [emacs vi_insert]
+    event: [
+      { send: executehostcommand, cmd: "hide-env --ignore-errors __NU_COMPLETION_BASE" }
+      { send: esc }
+    ]
   }
   # alacritty on windows, Control-h sends Control+Backspace
   { name: user, modifier: control, keycode: Backspace, mode: [emacs], event: { edit: Backspace } },
