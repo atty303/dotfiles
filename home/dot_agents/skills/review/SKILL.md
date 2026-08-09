@@ -14,7 +14,7 @@ description: branch、pull request、commit、patchまたはworking treeのコ�
 - main agentが作成した変更と既存のユーザー変更を区別し、レビュー対象を明示する。
 - 複数の論理commitまたはchangeがある場合は、変更の結合度とリスクから、タスク全体または論理単位ごとのどちらでレビューするか判断する。
 - formatter check、lint、型検査および軽量testを先に成功させ、比較対象とexact diffをレビュー候補snapshotとして記録する。初回reviewerの最終報告と並行検証結果を収集するまで対象diffを変更しない。
-- integration、E2Eおよびbuildなどの重い検証は、同じsnapshotに対するfresh reviewと並行して実行する。重い検証の完了をreviewer起動前の条件にしない。
+- snapshotを固定したらreviewerを直ちに起動し、integration、E2Eおよびbuildなどの重い検証を同じsnapshotに対して並行実行する。重い検証の完了をreviewer起動前の条件にしない。
 
 ## Fresh reviewerを起動する
 
@@ -27,7 +27,7 @@ description: branch、pull request、commit、patchまたはworking treeのコ�
 - 実装計画、採用した設計の正当化、途中の推論、疑わしい箇所、main agentの自己レビューおよび期待する指摘は渡さない。
 - reviewerにはterminal reviewerとして自分でレビューを完了し、subagentへ再委譲しないよう指示する。このSkill自体の使用を要求せず、独立レビューの担当範囲と出力契約を直接渡す。
 - reviewerには1 turn内でレビュー範囲全体の調査、候補の検証および重複排除を完了し、全指摘を1つの最終報告に集約させる。途中経過ではactionableな指摘や未確定の候補を送らせない。
-- 変更の規模、境界およびリスクに応じて、追加reviewerの人数、観点、モデル、reasoning effortおよび並列性を判断する。固定の観点や人数は設けない。
+- 変更の規模、境界およびリスクに応じて、追加reviewerの人数、観点、モデル、reasoning effortおよび並列性を判断する。小規模かつ低リスクな差分は1体・既定effortを基本とし、high以上のeffortや追加reviewerはsecurity、並行処理、resource lifecycle、migrationまたは複数境界へ及ぶ複雑な差分など、高リスクな変更に限定する。固定の観点や人数は設けない。
 
 ## 指摘を収集する
 
