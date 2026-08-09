@@ -75,7 +75,8 @@ description: dotfilesで管理するmise tool stubとimmutable Distrobox image�
 - After applying a tool stub, determine a version flag that does not intentionally initialize or migrate user state, run it with temporary `HOME` and XDG directories, and confirm it reports the selected version. If the tool has no isolatable version check, report that runtime verification as unavailable instead of executing it against the real profile.
 - After applying a Distrobox update, inspect the container image reference, lifecycle state files, and associated user service. Treat pending, rollback, failed, or inactive states distinctly.
 - Confirm `chezmoi diff <target>` is empty after application. On failure, preserve the previous working target/container, report the observed state and recovery path, and do not continue to the next candidate.
-- Follow the repository's version-control and independent-review requirements. Commit each completed logical update locally when required, but never push without an explicit request.
+- A fresh independent review is not required when the complete source change is limited to one mise tool stub regenerated with the required `mise generate tool-stub ... --lock --version <exact-version>` command. Still inspect the exact diff and complete every static, lock-consistency, chezmoi, and isolated runtime verification required by this skill.
+- Follow the repository's independent-review requirements when the change also includes a configuration or invocation migration, another source file, a hand-edited generated field, or a Distrobox image update. Follow its version-control requirements for every change, commit each completed logical update locally when required, and never push without an explicit request.
 
 ## Stop conditions
 
