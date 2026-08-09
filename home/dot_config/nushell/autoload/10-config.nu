@@ -101,7 +101,7 @@ def --env menu-completions [buffer: string] {
   } else {
     null
   }
-  let base_buffer = if $saved_query == null or $saved_query =~ '\s' {
+  let base_buffer = if $saved_query == null or $saved_query =~ '[\s/]' {
     $env.__NU_COMPLETION_BASE = $buffer
     $buffer
   } else {
