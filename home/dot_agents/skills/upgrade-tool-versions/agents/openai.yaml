@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tool versionの更新"
+  short_description: "dotfilesのtoolとDistroboxを調査して安全に更新する"
+  default_prompt: "$upgrade-tool-versions を使って、更新価値と破壊的変更を確認してからdotfilesのtool versionを更新してください。"
