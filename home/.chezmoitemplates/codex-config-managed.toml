@@ -13,6 +13,7 @@ description = "Personal development with mise, version control, and SSH signing.
 extends = ":workspace"
 
 [permissions.personal-development.filesystem]
+"/etc/ssh/ssh_config.d" = "read"
 "~/.cache/hk" = "write"
 "~/.config/mise" = "read"
 "~/.local/bin" = "read"
