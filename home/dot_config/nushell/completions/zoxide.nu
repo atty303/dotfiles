@@ -26,3 +26,7 @@ def "nu-complete zoxide path" [context: string] {
         completions: $completions,
     }
 }
+
+export def --env --wrapped z [...rest: string@"nu-complete zoxide path"] {
+    __zoxide_z ...$rest
+}

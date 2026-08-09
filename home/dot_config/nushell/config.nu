@@ -77,8 +77,12 @@ if (which starship | is-not-empty) {
 }
 
 const zoxide_init_path = $vendor_autoload | path join zoxide.nu
+const zoxide_completion_path = $nu.default-config-dir | path join completions zoxide.nu
 if (which zoxide | is-not-empty) {
-    ^zoxide init nushell | save $zoxide_init_path --force
+    [
+        (^zoxide init nushell)
+        (open --raw $zoxide_completion_path)
+    ] | str join "\n" | save $zoxide_init_path --force
 } else {
     rm -fp $zoxide_init_path
 }
