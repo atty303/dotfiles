@@ -11,9 +11,22 @@ def temporary-prompt [] {
 }
 
 def fzf-filter-completions [buffer: string] {
-  let completions = $buffer | commandline complete --detailed
-  if ($completions | is-empty) {
+  let all_completions = $buffer | commandline complete --detailed
+  if ($all_completions | is-empty) {
     return []
+  }
+
+  let preferred_span = (
+    $all_completions
+    | get span
+    | uniq
+    | sort-by {|span| $span.end - $span.start } --reverse
+    | get -o 0
+  )
+  let completions = if $preferred_span == null {
+    $all_completions
+  } else {
+    $all_completions | where span == $preferred_span
   }
 
   let span = $completions.0.span
