@@ -101,7 +101,7 @@ def --env menu-completions [buffer: string] {
   } else {
     null
   }
-  let base_buffer = if $saved_query == null or $saved_query =~ '[\s/]' {
+  let base_buffer = if $saved_query == null or $saved_query =~ '\s' {
     $env.__NU_COMPLETION_BASE = $buffer
     $buffer
   } else {
@@ -111,6 +111,10 @@ def --env menu-completions [buffer: string] {
   let query = $buffer | str substring $base_end..
   let query_end = $buffer | encode utf-8 | bytes length
   let completions = completion-candidates $base_buffer
+  if ($completions | any {|completion| $completion.kind? == file }) {
+    $env.__NU_COMPLETION_BASE = $buffer
+    return (completion-candidates $buffer)
+  }
   let filtered_completions = fzf-filter-completions $completions $query
 
   $filtered_completions | each {|completion|
