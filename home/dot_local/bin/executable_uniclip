@@ -1,36 +1,36 @@
 #!/usr/bin/env -S mise tool-stub
 
 tool = "github:UniClipboard/UniClipboard"
-version = "0.18.0"
+version = "0.19.1"
 
 [lock]
 
 [lock.platforms]
 
 [lock.platforms.linux-arm64]
-url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.18.0/uniclipboard-cli-0.18.0-aarch64-unknown-linux-musl.tar.gz"
-checksum = "sha256:ca85cd98a8a526c83770903c9b95c2eb599fad7e368966173510aea5d9b854ef"
+url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.19.1/uniclipboard-cli-0.19.1-aarch64-unknown-linux-musl.tar.gz"
+checksum = "sha256:67d2b9a217cf1c68601c719d62aa364482e2fc438ac07ac51551ad8a217493f4"
 
 [lock.platforms.linux-arm64-musl]
-url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.18.0/uniclipboard-cli-0.18.0-aarch64-unknown-linux-musl.tar.gz"
-checksum = "sha256:ca85cd98a8a526c83770903c9b95c2eb599fad7e368966173510aea5d9b854ef"
+url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.19.1/uniclipboard-cli-0.19.1-aarch64-unknown-linux-musl.tar.gz"
+checksum = "sha256:67d2b9a217cf1c68601c719d62aa364482e2fc438ac07ac51551ad8a217493f4"
 
 [lock.platforms.linux-x64]
-url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.18.0/uniclipboard-cli-0.18.0-x86_64-unknown-linux-musl.tar.gz"
-checksum = "sha256:4e7ff8f71fed58269bb2bd84f6427ba8295de4e6cccd318026d19b414d2aef58"
+url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.19.1/uniclipboard-cli-0.19.1-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:cd706799cec8bec72cfe1c488bfd770b629343a882457c6d2079e29a5b35f1f3"
 
 [lock.platforms.linux-x64-musl]
-url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.18.0/uniclipboard-cli-0.18.0-x86_64-unknown-linux-musl.tar.gz"
-checksum = "sha256:4e7ff8f71fed58269bb2bd84f6427ba8295de4e6cccd318026d19b414d2aef58"
+url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.19.1/uniclipboard-cli-0.19.1-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:cd706799cec8bec72cfe1c488bfd770b629343a882457c6d2079e29a5b35f1f3"
 
 [lock.platforms.macos-arm64]
-url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.18.0/UniClipboard_aarch64-apple-darwin.app.tar.gz"
-checksum = "sha256:bb9b26359f1e0f2084962f1507f628d51a89e521335bb9c5b20557745f5f0260"
+url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.19.1/UniClipboard_aarch64-apple-darwin.app.tar.gz"
+checksum = "sha256:71d05a2533e7fc86a801d3bba41a3da75b3fa15ccfd19d6601ef687785d32f36"
 
 [lock.platforms.macos-x64]
-url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.18.0/UniClipboard_x86_64-apple-darwin.app.tar.gz"
-checksum = "sha256:4b2562f5806a456ad41f4e52daad96a885678396390addc174f43d2eda5858f3"
+url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.19.1/UniClipboard_x86_64-apple-darwin.app.tar.gz"
+checksum = "sha256:ae462819a717e69d1dc16e053b32795eda45eaf57bb91e1a4ba52641bfafd4d2"
 
 [lock.platforms.windows-x64]
-url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.18.0/uniclipboard-cli-0.18.0-x86_64-pc-windows-msvc.zip"
-checksum = "sha256:f39b34de7b85faa7228f52343b4534b3fe377bddc978457cb188850fc92e98df"
+url = "https://github.com/UniClipboard/UniClipboard/releases/download/v0.19.1/uniclipboard-cli-0.19.1-x86_64-pc-windows-msvc.zip"
+checksum = "sha256:6ae7bb78c7962469a0636d1b7255e26f353ea117696057c0b8d27531c5058b6f"
