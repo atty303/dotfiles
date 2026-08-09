@@ -41,6 +41,8 @@ Preserve the format native to each tool (TOML, JSON, KDL, Lua, Nushell, POSIX sh
 
 Run `chezmoi diff` and the dry run before committing. Inspect rendered templates for every affected OS and confirm secret material remains encrypted. Run `mise run test:e2e:linux` after changing files under `home/.chezmoiscripts/linux/` or changing `install.sh`. For executable changes, also run the language's parser or formatter when available.
 
+For Nushell menu or keybinding changes, do not treat isolated function calls as final verification. Use an interactive Nushell session with all autoload files loaded, then verify the actual key input, candidate updates while typing, selection result, and resulting command-line buffer.
+
 ## Commit & Pull Request Guidelines
 
 History favors short imperative Conventional Commit subjects such as `feat: add fzf configuration` and `fix: update background-opacity`. Use a focused subject and keep unrelated platform changes separate. Pull requests should describe affected OSes, summarize rendered-file impact, list validation commands, and include screenshots only for visible desktop or terminal changes. Never commit plaintext credentials, tokens, host keys, or decrypted `.age` content.
