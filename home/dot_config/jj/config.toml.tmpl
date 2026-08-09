@@ -10,7 +10,13 @@ key = "~/.ssh/atty303.pub"
 behavior = "drop"
 
 [signing.backends.ssh]
+{{ if eq .chezmoi.os "darwin" -}}
 program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+{{ else if (and (eq .chezmoi.os "linux") .wsl) -}}
+program = "/mnt/c/Users/atty/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
+{{ else if eq .chezmoi.os "linux" -}}
+program = "{{ .chezmoi.destDir }}/.local/bin/ssh-keygen-force-agent"
+{{- end }}
 
 [git]
 sign-on-push = true
