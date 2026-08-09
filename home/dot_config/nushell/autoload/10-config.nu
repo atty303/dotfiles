@@ -22,20 +22,11 @@ $env.config.menus ++= [{
   output_mode: suggested_span
   marker: "| "
   type: {
-    layout: ide
-    min_completion_width: 0
-    max_completion_width: 50
-    max_completion_height: 10
-    padding: 1
-    border: true
-    cursor_offset: 0
-    description_mode: prefer_right
-    min_description_width: 15
-    max_description_width: 50
-    max_description_height: 10
-    description_offset: 1
-    correct_cursor_pos: true
+    layout: list
+    page_size: 10
+    description_position: after
   }
+  source: {|buffer, _position| $buffer | commandline complete --detailed }
   style: {
     text: "#cdd6f4"
     selected_text: { fg: "#cdd6f4" bg: "#45475a" attr: b }
