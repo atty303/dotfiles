@@ -16,6 +16,10 @@ bash tests/distrobox-scroll-update.sh
 bash tests/distrobox-service-restart.sh
 """
 
+[tasks."test:flatpak"]
+description = "Test Flatpak lifecycle installation"
+run = "bash tests/flatpak-install.sh"
+
 [tasks."test:e2e:linux:fedora"]
 description = "Run the full chezmoi E2E test on Fedora 44"
 run = "deno run -A tests/e2e/main.ts linux fedora"

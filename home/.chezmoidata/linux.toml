@@ -1,6 +1,142 @@
 [distrobox.hosts.cristina]
 entries = [
-    { manifest = "dms.ini", name = "dms" },
-    { manifest = "noctalia.ini", name = "noctalia", service = "noctalia.service" },
-    { manifest = "scroll.ini", name = "scroll" },
+  { manifest = "dms.ini", name = "dms" },
+  { manifest = "noctalia.ini", name = "noctalia", service = "noctalia.service" },
+  { manifest = "scroll.ini", name = "scroll" },
 ]
+
+[flatpak.remotes.flathub]
+descriptor_url = "https://dl.flathub.org/repo/flathub.flatpakrepo"
+
+[flatpak.remotes.GeForceNOW]
+descriptor_url = "https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow.flatpakrepo"
+
+[[flatpak.apps]]
+id = "app.zen_browser.zen"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "com.feaneron.Boatswain"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "com.github.Matoking.protontricks"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "com.google.Chrome"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "com.heroicgameslauncher.hgl"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "com.obsproject.Studio"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "com.slack.Slack"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "com.vysp3r.ProtonPlus"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "com.discordapp.Discord"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "com.diy_fever.DIYLayoutCreator"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "com.nvidia.geforcenow"
+remote = "GeForceNOW"
+branch = "master"
+
+[[flatpak.apps]]
+id = "com.orcaslicer.OrcaSlicer"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "com.saivert.pwvucontrol"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "com.usebottles.bottles"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "io.github.Faugus.faugus-launcher"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "io.github.astralvixen.geforce-infinity"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "io.github.berarma.Oversteer"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "io.github.dimtpap.coppwr"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "io.github.dyegoaurelio.simple-wireplumber-gui"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "md.obsidian.Obsidian"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "org.fedoraproject.MediaWriter"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "org.flameshot.Flameshot"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "org.kicad.KiCad"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "org.rncbc.qpwgraph"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "org.virt_manager.virt-manager"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+id = "org.winehq.Wine"
+remote = "flathub"
+branch = "stable-25.08"

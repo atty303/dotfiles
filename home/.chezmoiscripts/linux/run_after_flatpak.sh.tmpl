@@ -1,0 +1,109 @@
+#!/usr/bin/env -S bash -euo pipefail
+
+if ! command -v flatpak >/dev/null 2>&1; then
+  exit 0
+fi
+
+remote_names=(
+{{- range $name, $_ := .flatpak.remotes }}
+  {{ $name | quote }}
+{{- end }}
+)
+remote_descriptors=(
+{{- range $name, $remote := .flatpak.remotes }}
+  {{ $remote.descriptor_url | quote }}
+{{- end }}
+)
+
+if ! system_remotes="$(flatpak remotes --system --show-disabled --columns=name)"; then
+  printf 'Could not read system Flatpak remotes.\n' >&2
+  exit 1
+fi
+
+remote_exists() {
+  local candidate="${1:?remote name is required}"
+  local installed
+
+  while IFS= read -r installed; do
+    [[ "$candidate" != "$installed" ]] || return 0
+  done <<<"$system_remotes"
+  return 1
+}
+
+for index in "${!remote_names[@]}"; do
+  if ! remote_exists "${remote_names[$index]}"; then
+    sudo flatpak remote-add \
+      --system \
+      --if-not-exists \
+      "${remote_names[$index]}" \
+      "${remote_descriptors[$index]}"
+  fi
+done
+
+if ! system_remotes="$(flatpak remotes --system --show-disabled --columns=name)"; then
+  printf 'Could not verify system Flatpak remotes.\n' >&2
+  exit 1
+fi
+for remote in "${remote_names[@]}"; do
+  if ! remote_exists "$remote"; then
+    printf 'System Flatpak remote is still missing: %s\n' "$remote" >&2
+    exit 1
+  fi
+done
+
+app_ids=(
+{{- range .flatpak.apps }}
+  {{ .id | quote }}
+{{- end }}
+)
+app_remotes=(
+{{- range .flatpak.apps }}
+  {{ .remote | quote }}
+{{- end }}
+)
+app_branches=(
+{{- range .flatpak.apps }}
+  {{ .branch | quote }}
+{{- end }}
+)
+
+if ! system_apps="$(flatpak list --system --app --columns=application,branch)"; then
+  printf 'Could not read system Flatpak applications.\n' >&2
+  exit 1
+fi
+
+app_exists() {
+  local candidate_id="${1:?application ID is required}"
+  local candidate_branch="${2:?application branch is required}"
+  local installed_id installed_branch
+
+  while IFS=$'\t' read -r installed_id installed_branch; do
+    if [[ "$candidate_id" == "$installed_id" && "$candidate_branch" == "$installed_branch" ]]; then
+      return 0
+    fi
+  done <<<"$system_apps"
+  return 1
+}
+
+for index in "${!app_ids[@]}"; do
+  if ! app_exists "${app_ids[$index]}" "${app_branches[$index]}"; then
+    sudo flatpak install \
+      --system \
+      --assumeyes \
+      --noninteractive \
+      "${app_remotes[$index]}" \
+      "${app_ids[$index]}//${app_branches[$index]}"
+  fi
+done
+
+if ! system_apps="$(flatpak list --system --app --columns=application,branch)"; then
+  printf 'Could not verify system Flatpak applications.\n' >&2
+  exit 1
+fi
+for index in "${!app_ids[@]}"; do
+  if ! app_exists "${app_ids[$index]}" "${app_branches[$index]}"; then
+    printf 'System Flatpak application is still missing: %s//%s\n' \
+      "${app_ids[$index]}" "${app_branches[$index]}" >&2
+    exit 1
+  fi
+done
