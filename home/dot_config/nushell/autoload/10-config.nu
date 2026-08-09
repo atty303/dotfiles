@@ -111,9 +111,9 @@ def --env menu-completions [buffer: string] {
   let query = $buffer | str substring $base_end..
   let query_end = $buffer | encode utf-8 | bytes length
   let completions = completion-candidates $base_buffer
-  if ($completions | any {|completion| $completion.kind? == file }) {
+  if ($completions | any {|completion| $completion.kind? in [file directory] }) {
     $env.__NU_COMPLETION_BASE = $buffer
-    return (completion-candidates $buffer)
+    return ($buffer | commandline complete --detailed)
   }
   let filtered_completions = fzf-filter-completions $completions $query
 
