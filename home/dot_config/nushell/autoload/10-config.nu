@@ -64,8 +64,8 @@ $env.config.menus ++= [{
   source: {|buffer, _position| fzf-filter-completions $buffer }
   style: {
     text: "#cdd6f4"
-    selected_text: { fg: "#cdd6f4" bg: "#45475a" attr: b }
-    description_text: "#a6adc8"
+    selected_text: { fg: "#b4befe" bg: "#45475a" attr: b }
+    description_text: "#cba6f7"
     match_text: { fg: "#f38ba8" attr: u }
     selected_match_text: { fg: "#f38ba8" bg: "#45475a" attr: bu }
   }
