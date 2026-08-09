@@ -10,7 +10,37 @@ def temporary-prompt [] {
   }
 }
 
-def fzf-filter-completions [buffer: string] {
+def fzf-filter-completions [completions: list<record>, query: string] {
+  if ($query | is-empty) or (which fzf | is-empty) {
+    return $completions
+  }
+
+  let input = (
+    $completions
+    | enumerate
+    | each {|row| { index: $row.index, value: ($row.item.value | to nuon) } }
+    | to tsv --noheaders
+  )
+  let result = do {
+    hide-env --ignore-errors __NU_COMPLETION_BASE
+    $input | ^fzf --delimiter "\t" --nth 2 --filter $query | complete
+  }
+  if $result.exit_code == 1 {
+    return []
+  } else if $result.exit_code != 0 {
+    return $completions
+  }
+
+  let indices = (
+    $result.stdout
+    | lines
+    | each {|line| $line | split row "\t" | first | into int }
+  )
+
+  $indices | each {|index| $completions | get $index }
+}
+
+def completion-candidates [buffer: string] {
   let command_completions = $buffer | commandline complete --detailed
   let complete_arguments = $command_completions | any {|completion| $completion.value == $buffer }
   let buffer_end = $buffer | encode utf-8 | bytes length
@@ -60,31 +90,34 @@ def fzf-filter-completions [buffer: string] {
 
   let span = $completions.0.span
   let query = $buffer | str substring $span.start..<$span.end
-  if ($query | is-empty) or (which fzf | is-empty) {
-    return $completions
+  fzf-filter-completions $completions $query
+}
+
+def --env menu-completions [buffer: string] {
+  let saved_base = $env.__NU_COMPLETION_BASE? | default null
+  let saved_query = if $saved_base != null and ($buffer | str starts-with $saved_base) {
+    let saved_base_end = $saved_base | encode utf-8 | bytes length
+    $buffer | str substring $saved_base_end..
+  } else {
+    null
   }
-
-  let result = (
-    $completions
-    | enumerate
-    | each {|row| { index: $row.index, value: ($row.item.value | to nuon) } }
-    | to tsv --noheaders
-    | ^fzf --delimiter "\t" --nth 2 --filter $query
-    | complete
-  )
-  if $result.exit_code == 1 {
-    return []
-  } else if $result.exit_code != 0 {
-    return $completions
+  let base_buffer = if $saved_query == null or $saved_query =~ '\s' {
+    $env.__NU_COMPLETION_BASE = $buffer
+    $buffer
+  } else {
+    $saved_base
   }
+  let base_end = $base_buffer | encode utf-8 | bytes length
+  let query = $buffer | str substring $base_end..
+  let query_end = $buffer | encode utf-8 | bytes length
+  let completions = completion-candidates $base_buffer
+  let filtered_completions = fzf-filter-completions $completions $query
 
-  let indices = (
-    $result.stdout
-    | lines
-    | each {|line| $line | split row "\t" | first | into int }
-  )
-
-  $indices | each {|index| $completions | get $index }
+  $filtered_completions | each {|completion|
+    $completion | merge {
+      span: ($completion.span | merge { end: $query_end })
+    }
+  }
 }
 
 $env.config.show_banner = "short"
@@ -93,6 +126,8 @@ $env.config.table.mode = 'markdown'
 $env.config.datetime_format.table = "%y-%m-%d %I:%M:%S"
 $env.config.datetime_format.normal = "%y-%m-%d %I:%M:%S"
 $env.config.completions.algorithm = "prefix"
+$env.config.hooks.pre_prompt ++= [{|| hide-env --ignore-errors __NU_COMPLETION_BASE }]
+$env.config.hooks.pre_execution ++= [{|| hide-env --ignore-errors __NU_COMPLETION_BASE }]
 $env.config.menus ++= [{
   name: completion_menu
   input_mode: cursor_prefix
@@ -103,7 +138,7 @@ $env.config.menus ++= [{
     page_size: 10
     description_position: after
   }
-  source: {|buffer, _position| fzf-filter-completions $buffer }
+  source: {|buffer, _position| menu-completions $buffer }
   style: {
     text: "#cdd6f4"
     selected_text: { fg: "#b4befe" bg: "#45475a" attr: b }
@@ -113,6 +148,18 @@ $env.config.menus ++= [{
   }
 }]
 $env.config.keybindings ++= [
+  {
+    name: completion_menu
+    modifier: none
+    keycode: Tab
+    mode: [emacs vi_insert]
+    event: {
+      until: [
+        { send: menunext }
+        { send: menu name: completion_menu }
+      ]
+    }
+  }
   # alacritty on windows, Control-h sends Control+Backspace
   { name: user, modifier: control, keycode: Backspace, mode: [emacs], event: { edit: Backspace } },
   { name: user, modifier: alt, keycode: char_b, mode: [emacs], event: { edit: MoveBigWordLeft } }
