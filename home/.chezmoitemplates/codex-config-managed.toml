@@ -14,14 +14,13 @@ extends = ":workspace"
 
 [permissions.personal-development.filesystem]
 "/etc/ssh/ssh_config.d" = "read"
-"~/.cache/hk" = "write"
+"~/.cache" = "write"
 "~/.config/mise" = "read"
 "~/.local/bin" = "read"
 "~/.local/share/mise" = "write"
 "~/.local/state/hk" = "write"
 "~/.local/state/mise" = "write"
 "~/.local/state/mise/github-oauth-tokens.toml" = "read"
-"~/.cache/mise" = "write"
 "~/.npm" = "write"
 
 [permissions.personal-development.filesystem.":workspace_roots"]
