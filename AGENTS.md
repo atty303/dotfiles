@@ -35,6 +35,13 @@ On immutable Fedora systems such as Bazzite, do not treat the availability of a 
 
 If no simple option is viable, the final fallback may be to propose adding an Arch-based Distrobox image to [`atty303/distrobox-image`](https://github.com/atty303/distrobox-image). Do not modify that repository or publish an image without a separate explicit request.
 
+## Distrobox Runtime Inspection
+
+Run commands inside a Distrobox container with `distrobox enter <name> -- <command>`. Do not use
+`podman exec` to inspect GUI, D-Bus, Wayland, or XDG session state because it bypasses Distrobox's
+login and session environment setup. Use read-only `podman` commands only for container-engine
+lifecycle, storage, or metadata inspection.
+
 ## Coding Style & Naming Conventions
 
 Preserve the format native to each tool (TOML, JSON, KDL, Lua, Nushell, POSIX shell, or PowerShell). Use existing indentation in nearby files and keep shell scripts portable when they declare `#!/bin/sh`. Follow chezmoi attributes exactly: `dot_`, `private_`, `executable_`, `symlink_`, `encrypted_`, and `remove_`. Name lifecycle scripts with chezmoi ordering semantics, for example `run_onchange_after_mise.sh.tmpl`.
