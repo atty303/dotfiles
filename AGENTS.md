@@ -14,6 +14,7 @@ This is a cross-platform chezmoi dotfiles repository. `.chezmoiroot` points to `
 - `chezmoi doctor`: check the local chezmoi installation and dependencies.
 - `mise run test:e2e:linux`: run the standard chezmoi E2E test on Fedora 44 and the Ubuntu 24.04 desktop/headless devcontainers.
 - `mise run test:e2e:linux:bazzite`: run the slow privileged Bazzite E2E test locally.
+- `mise run test:e2e`: run the standard Linux E2E on Linux or the local Tart E2E on macOS. Linux hosts do not run macOS E2E remotely.
 - `./install.sh`: bootstrap and apply this checkout on a new machine.
 
 There is no compilation step. Validate on the relevant operating system, especially after changing `.chezmoiscripts` or platform-conditional templates.
@@ -49,7 +50,7 @@ Preserve the format native to each tool (TOML, JSON, KDL, Lua, Nushell, POSIX sh
 
 ## Testing Guidelines
 
-Run `chezmoi diff` and the dry run before committing. Inspect rendered templates for every affected OS and confirm secret material remains encrypted. Run `mise run test:e2e:linux` after changing files under `home/.chezmoiscripts/linux/` or changing `install.sh`. The Bazzite E2E is exceptionally slow: run `mise run test:e2e:linux:bazzite` only when the change affects Bazzite-specific Flatpak, Distrobox, privileged systemd, or related integration behavior, and obtain explicit user approval immediately before every run. For executable changes, also run the language's parser or formatter when available.
+Run `chezmoi diff` and the dry run before committing. Inspect rendered templates for every affected OS and confirm secret material remains encrypted. Use `mise run test` for the host-native full verification: Linux hosts run the standard Linux E2E and macOS hosts run the local Tart E2E; do not require a Linux host to run macOS E2E remotely. Run `mise run test:e2e:linux` after changing files under `home/.chezmoiscripts/linux/` or changing `install.sh`. The Bazzite E2E is exceptionally slow: run `mise run test:e2e:linux:bazzite` only when the change affects Bazzite-specific Flatpak, Distrobox, privileged systemd, or related integration behavior, and obtain explicit user approval immediately before every run. For executable changes, also run the language's parser or formatter when available.
 
 For Nushell menu or keybinding changes, do not treat isolated function calls as final verification. Use an interactive Nushell session with all autoload files loaded, then verify the actual key input, candidate updates while typing, selection result, and resulting command-line buffer.
 
