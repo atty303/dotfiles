@@ -68,12 +68,16 @@ that cannot live there are kept separately under [`root/`](root/).
 The direction above is stricter than the current implementation. The present validation
 level is:
 
-| Platform | Current automation and validation |
+| Environment | Current automation and validation |
 | --- | --- |
-| Fedora 44 | Full bootstrap and repeat-apply E2E in a clean Podman container |
-| Ubuntu 24.04 | Full bootstrap and repeat-apply E2E in a clean Podman container |
-| Apple Silicon macOS | Bootstrap, encrypted-file, package, symlink, and idempotence E2E using Tart locally or on a designated Mac |
-| Windows 11 24H2 | winget, DSC, mise, fonts, and profile automation; no equivalent clean-environment E2E yet |
+| Fedora 44 compatibility | Full bootstrap and repeat-apply E2E in a clean Podman container |
+| Ubuntu 24.04 desktop devcontainer | Full bootstrap and repeat-apply E2E with desktop command capabilities |
+| Ubuntu 24.04 headless devcontainer | Full bootstrap and repeat-apply E2E without desktop command capabilities |
+| Bazzite 44 desktop | Local-only privileged integration E2E for Flatpak, Distrobox, and systemd behavior |
+| Apple Silicon macOS | Local Tart E2E for bootstrap, encrypted files, packages, symlinks, and idempotence |
+
+Windows has package and configuration automation, but its clean-environment E2E remains a
+future design rather than part of the current validation guarantee.
 
 Individual physical machines can have additional hostname-selected desktop components
 that are intentionally outside the generic E2E environments.
@@ -136,16 +140,19 @@ Repository checks are exposed through mise. The main suites are:
 mise run check
 mise run fix
 mise run test
+mise run test:e2e
+mise run test:e2e:harness
+mise run test:e2e:linux:bazzite
 mise run test:e2e:mac:prepare
 mise run test:e2e:mac:local
-mise run test:e2e:mac:lan
 ```
 
 `check` and `fix` accept optional file paths and otherwise operate on the whole
 repository. Installing the mise tools also installs the repository's hk pre-commit
-hook. The complete `test` task requires Podman and includes the Fedora and Ubuntu E2E
-suites. The local macOS tasks require an Apple Silicon Mac with Tart. The LAN task
-additionally requires SSH access to a designated Apple Silicon Mac that can run Tart.
+hook. The complete `test` task selects its full E2E from the host OS: Linux runs the
+Fedora and Ubuntu suites, while macOS runs the local Tart suite. Linux does not reach a
+remote Mac. The Bazzite task is a slow, local-only integration check and is not included
+in the standard Linux or CI path. The macOS tasks require an Apple Silicon Mac with Tart.
 See the
 [chezmoi template reference](https://www.chezmoi.io/reference/templates/) when editing
 Go templates in the source state.

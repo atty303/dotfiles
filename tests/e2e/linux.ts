@@ -1,6 +1,11 @@
 import { CommandBuilder } from "@david/dax";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  cleanupSuccessfulResources,
+  type ResourcePresence,
+  retainedResourceReport,
+} from "./linux_cleanup.ts";
 import { type StagedSource, stageSource } from "./staging.ts";
 
 export type LinuxTarget = "bazzite" | "fedora" | "ubuntu-desktop" | "ubuntu-headless";
@@ -73,7 +78,11 @@ const TARGETS: Record<LinuxTarget, TargetConfig> = {
   },
 };
 
-const CI_TARGETS: readonly LinuxTarget[] = ["fedora", "ubuntu-desktop", "ubuntu-headless"];
+export const STANDARD_LINUX_TARGETS: readonly LinuxTarget[] = [
+  "fedora",
+  "ubuntu-desktop",
+  "ubuntu-headless",
+];
 const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 const repository = join(moduleDirectory, "..", "..");
 const signalShieldedExec = 'trap "" HUP INT TERM; exec "$@"';
@@ -81,7 +90,7 @@ const cleanupTimeoutSeconds = 120;
 const presenceTimeoutSeconds = 15;
 
 export async function runLinuxTargets(target?: LinuxTarget): Promise<void> {
-  const targets = target === undefined ? CI_TARGETS : [target];
+  const targets = selectLinuxTargets(target);
   const abort = new AbortController();
   let receivedSignal: Deno.Signal | undefined;
   let successfulCleanupStarted = false;
@@ -141,6 +150,10 @@ export async function runLinuxTargets(target?: LinuxTarget): Promise<void> {
     const names = failures.map(({ target }) => TARGETS[target].label).join(", ");
     throw new Error(`Linux E2E failed for: ${names}`);
   }
+}
+
+export function selectLinuxTargets(target?: LinuxTarget): readonly LinuxTarget[] {
+  return target === undefined ? STANDARD_LINUX_TARGETS : [target];
 }
 
 async function runLinuxTarget(
@@ -322,7 +335,7 @@ async function runLinuxTarget(
       userExec(config, containerName, [
         "/bin/sh",
         "-c",
-        `test \"$(cat ${config.home}/.config/chezmoi-e2e/sentinel.txt)\" = chezmoi-e2e-sentinel`,
+        `sentinel=${config.home}/.config/chezmoi-e2e/sentinel.txt; test \"$(cat \"$sentinel\")\" = chezmoi-e2e-sentinel; test \"$(stat -c %a \"$sentinel\")\" = 600`,
       ]).signal(signal),
     );
     await execute(
@@ -334,6 +347,30 @@ async function runLinuxTarget(
         "verify",
         "--exclude",
         "scripts",
+      ]).signal(signal),
+    );
+    await execute(
+      "verify platform symlinks",
+      userExec(config, containerName, [
+        "/bin/sh",
+        "-c",
+        `set -eu; code=${config.home}/.config/Code/User; test -L \"$code/settings.json\"; test \"$(readlink \"$code/settings.json\")\" = /tmp/source/home/dot_config/Code/User/managed/settings.json; test -L \"$code/keybindings.json\"; test \"$(readlink \"$code/keybindings.json\")\" = /tmp/source/home/dot_config/Code/User/managed/keybindings.json; test -L ${config.home}/.asdf; test \"$(readlink ${config.home}/.asdf)\" = ${config.home}/.local/share/mise`,
+      ]).signal(signal),
+    );
+    await execute(
+      "verify mise tools and externals",
+      userExec(config, containerName, [
+        "/bin/sh",
+        "-c",
+        `set -eu; test \"$(${config.home}/.local/bin/mise -C ${config.home} ls --missing --json)\" = '{}'; for command in age bat rg; do test -x ${config.home}/.local/bin/$command; done`,
+      ]).signal(signal),
+    );
+    await execute(
+      "verify idempotent dry run",
+      userExec(config, containerName, [
+        "/bin/bash",
+        "-c",
+        `set -euo pipefail; expected=$(printf '%s\\n' ' R .chezmoiscripts/linux/distrobox.sh' ' R .chezmoiscripts/linux/flatpak.sh'); actual=$(${config.home}/.local/bin/chezmoi --source /tmp/source status); test \"$actual\" = \"$expected\"; ${config.home}/.local/bin/chezmoi --source /tmp/source apply --dry-run --verbose`,
       ]).signal(signal),
     );
     await execute(
@@ -360,40 +397,40 @@ async function runLinuxTarget(
     completed = true;
   } finally {
     if (completed) beginSuccessfulCleanup();
-    let containerPresence = await resourcePresence(config, "container", containerName);
-    let volumePresence = await resourcePresence(config, "volume", volumeName);
 
     if (completed) {
-      const cleanupErrors: string[] = [];
-      let containerRemoved = containerPresence === "absent";
-      if (containerPresence !== "absent") {
-        const result = await shieldedPodman(
+      const cleanup = await cleanupSuccessfulResources({
+        presence: (kind) =>
+          resourcePresence(config, kind, kind === "container" ? containerName : volumeName),
+        remove: async (kind) => {
+          const arguments_ = kind === "container"
+            ? ["rm", "--force", containerName]
+            : ["volume", "rm", volumeName];
+          const result = await shieldedPodman(config, arguments_, cleanupTimeoutSeconds)
+            .quiet()
+            .noThrow();
+          return result.code;
+        },
+      });
+      if (cleanup.errors.length > 0) {
+        reportRetainedResources(
           config,
-          ["rm", "--force", containerName],
-          cleanupTimeoutSeconds,
-        ).quiet()
-          .noThrow();
-        if (result.code !== 0) {
-          cleanupErrors.push(`container cleanup exited ${result.code}`);
-        } else {
-          containerPresence = await resourcePresence(config, "container", containerName);
-          containerRemoved = containerPresence === "absent";
-          if (!containerRemoved) {
-            cleanupErrors.push(`container cleanup left resource ${containerPresence}`);
-          }
-        }
+          logDirectory,
+          containerName,
+          volumeName,
+          cleanup.containerPresence,
+          cleanup.volumePresence,
+          archiveCopied,
+          sourcePrepared,
+        );
+        cleanupFailure = cleanup.errors.join(", ");
       }
-      if (containerRemoved && volumePresence !== "absent") {
-        const result = await shieldedPodman(
-          config,
-          ["volume", "rm", volumeName],
-          cleanupTimeoutSeconds,
-        ).quiet().noThrow();
-        if (result.code !== 0) cleanupErrors.push(`volume cleanup exited ${result.code}`);
-      }
-      if (cleanupErrors.length > 0) {
-        containerPresence = await resourcePresence(config, "container", containerName);
-        volumePresence = await resourcePresence(config, "volume", volumeName);
+    } else {
+      const [containerPresence, volumePresence] = await Promise.all([
+        resourcePresence(config, "container", containerName),
+        resourcePresence(config, "volume", volumeName),
+      ]);
+      if (containerPresence !== "absent" || volumePresence !== "absent") {
         reportRetainedResources(
           config,
           logDirectory,
@@ -404,19 +441,7 @@ async function runLinuxTarget(
           archiveCopied,
           sourcePrepared,
         );
-        cleanupFailure = cleanupErrors.join(", ");
       }
-    } else if (containerPresence !== "absent" || volumePresence !== "absent") {
-      reportRetainedResources(
-        config,
-        logDirectory,
-        containerName,
-        volumeName,
-        containerPresence,
-        volumePresence,
-        archiveCopied,
-        sourcePrepared,
-      );
     }
   }
   if (cleanupFailure !== undefined) throw new Error(`Linux E2E cleanup failed: ${cleanupFailure}`);
@@ -512,8 +537,6 @@ function command(arguments_: string[]): CommandBuilder {
   return new CommandBuilder().command(arguments_);
 }
 
-type ResourcePresence = "present" | "absent" | "unknown";
-
 async function resourcePresence(
   config: TargetConfig,
   kind: "container" | "volume",
@@ -536,37 +559,18 @@ function reportRetainedResources(
   archiveCopied: boolean,
   sourcePrepared: boolean,
 ): void {
-  const engine = "podman";
-  const lines = [
-    "",
-    "E2E resources retained for investigation:",
-    `  logs: ${logDirectory}`,
-    `  container: ${containerName} (${containerPresence})`,
-    `  volume: ${volumeName} (${volumePresence})`,
-  ];
-  if (containerPresence !== "absent") {
-    lines.push(
-      `  start (if stopped): ${engine} start ${containerName}`,
-      `  shell: ${engine} exec -it ${containerName} /bin/bash`,
-    );
-    if (sourcePrepared) {
-      lines.push(
-        `  retry install: ${engine} exec --user ${config.user} ${containerName} /bin/sh -c 'if test -x ${config.home}/.local/bin/mise; then ${config.home}/.local/bin/mise trust /tmp/source/mise.toml; fi; cd /tmp/source && exec /bin/sh ./install.sh'`,
-      );
-    } else if (archiveCopied) {
-      lines.push(
-        `  prepare source: ${engine} exec ${containerName} /bin/sh -c 'mkdir -p /tmp/source && tar -xf /tmp/source.tar -C /tmp/source && chown -R ${config.user}:${config.user} /tmp/source ${config.home}${
-          config.privilegedSystemd ? " /usr/local/secrets/CHEZMOI_AGE_KEY" : ""
-        }'`,
-        `  retry install after preparation: ${engine} exec --user ${config.user} ${containerName} /bin/sh -c 'if test -x ${config.home}/.local/bin/mise; then ${config.home}/.local/bin/mise trust /tmp/source/mise.toml; fi; cd /tmp/source && exec /bin/sh ./install.sh'`,
-      );
-    } else {
-      lines.push("  source archive: not copied; inspect the logs before retrying");
-    }
-    lines.push(`  remove container: ${engine} rm --force ${containerName}`);
-  }
-  if (volumePresence !== "absent") lines.push(`  remove volume: ${engine} volume rm ${volumeName}`);
-  console.error(lines.join("\n"));
+  console.error(retainedResourceReport({
+    archiveCopied,
+    containerName,
+    containerPresence,
+    home: config.home,
+    logDirectory,
+    privilegedSystemd: config.privilegedSystemd,
+    sourcePrepared,
+    user: config.user,
+    volumeName,
+    volumePresence,
+  }));
 }
 
 class InterruptedError extends Error {

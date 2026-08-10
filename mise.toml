@@ -41,13 +41,14 @@ exec hk fix --all
 '''
 
 [tasks.test]
-description = "Run all reproducible repository checks and Linux tests"
+description = "Run all reproducible repository checks and host E2E tests"
 run = '''
 mise run check
 mise run test:distrobox
 mise run test:flatpak
 mise run test:chrome-web-apps
-mise run test:e2e:linux
+mise run test:e2e:harness
+mise run test:e2e
 '''
 
 [tasks."test:distrobox"]
@@ -85,6 +86,14 @@ run = "deno run -A tests/e2e/main.ts linux bazzite"
 description = "Run the standard Linux E2E targets supported in CI"
 run = "deno run -A tests/e2e/main.ts linux"
 
+[tasks."test:e2e"]
+description = "Run the full E2E test selected for the current host OS"
+run = "deno run -A tests/e2e/main.ts"
+
+[tasks."test:e2e:harness"]
+description = "Test E2E staging, target selection, and cleanup behavior"
+run = "deno test -A tests/e2e"
+
 [tasks."test:e2e:mac:prepare"]
 description = "Prepare and validate an Apple Silicon Mac for Tart E2E tests"
 run = "deno run -A tests/e2e/main.ts mac prepare"
@@ -92,7 +101,3 @@ run = "deno run -A tests/e2e/main.ts mac prepare"
 [tasks."test:e2e:mac:local"]
 description = "Run the full chezmoi E2E test on this Apple Silicon Mac"
 run = "deno run -A tests/e2e/main.ts mac local"
-
-[tasks."test:e2e:mac:lan"]
-description = "Run the full chezmoi macOS E2E test on E2E_MAC_HOST over SSH"
-run = "deno run -A tests/e2e/main.ts mac lan"

@@ -4,15 +4,14 @@
 
 ローカルの作業ツリーを毎回クリーンな対象環境へ転送し、実際の `chezmoi init --apply` を最後まで実行する E2E テストスイートを追加する。
 
-対象環境は次の4系統とする。
+現在実装済みの対象環境は次の4系統とする。
 
 - Bazzite 44 desktopコンテナ
 - Fedora 44互換性コンテナ
 - Ubuntu 24.04 devcontainer（desktop/headless）
-- ローカルKVM上のWindows 11
 - Tart上のmacOS VM
 
-macOSのTartホストにはLAN内のApple Silicon MacとAWS EC2 Macの両方を使用できるようにする。GitHub ActionsなどのCIサービスは前提にせず、このLinuxマシンからテストを起動する。
+macOS E2EはApple Silicon Mac自身から実行する。LinuxからMacへ接続するremote backendは持たない。WindowsとAWS EC2 MacのE2Eは未実装の将来構想として、現在の検証保証から分離する。
 
 テンプレート描画だけ、scriptsを除外したapply、dry-runだけのスモークテストは作らない。lifecycle scripts、externals、パッケージ導入を含むフルapplyを検証対象とする。ただし個人用secretはゲストへ渡さず、テスト専用の一時的な暗号化fixtureへ置き換える。
 
@@ -25,7 +24,7 @@ macOSのTartホストにはLAN内のApple Silicon MacとAWS EC2 Macの両方を�
 3. 常時実行scriptを除く `chezmoi verify` で管理対象とtarget stateが一致する。
 4. OS固有のファイル、symlink、実行属性、主要パッケージを検証する。
 5. 一時age鍵で暗号化したsentinelが正しく復号・配置される。
-6. `chezmoi apply --dry-run --verbose` で追加変更が予定されない。
+6. `chezmoi apply --dry-run --verbose` が成功し、Linuxでは意図した `run_always` script以外の追加変更が予定されない。
 7. 実際に2回目の `chezmoi apply` を実行し、終了コード0になる。
 8. 2回目のapply後にも常時実行scriptを除く `chezmoi verify` が成功する。
 
@@ -36,18 +35,15 @@ OS再起動後のサービス、ログインセッション、GUI承認状態ま
 トップレベルのmise設定から次のタスクを公開する。
 
 ```sh
+mise run test:e2e
+mise run test:e2e:harness
 mise run test:e2e:linux
 mise run test:e2e:linux:bazzite
-mise run test:e2e:windows
 mise run test:e2e:mac:prepare
 mise run test:e2e:mac:local
-E2E_MAC_HOST=mac-host mise run test:e2e:mac:lan
-mise run test:e2e:mac:aws -- --confirm-cost
-E2E_MAC_BACKEND=lan mise run test:e2e
-E2E_MAC_BACKEND=aws mise run test:e2e -- --confirm-cost
 ```
 
-`test:e2e` はLinux、Windows、選択されたmacOS backendを順に実行する。`E2E_MAC_BACKEND` が未指定の場合、AWSを暗黙に起動せずエラーにする。課金を伴うAWS backendは `--confirm-cost` がない限りリソースを作成しない。
+`test:e2e` はhost OSだけを基準に対象を選択する。LinuxではBazziteを除く標準3対象、macOSではlocal Tart E2Eを実行し、それ以外のOSでは未対応として終了する。`test:e2e:harness` はarchive、age fixture、対象選択およびcleanupをcontainerやVMなしで検証する。
 
 テストログ、VM overlay、展開済みsource、生成した鍵などの実行時データは、リポジトリ管理外の `.cache/chezmoi-e2e/` 以下へ保存する。
 
@@ -83,7 +79,7 @@ LinuxとmacOSでは、lifecycle script内の `mise install` だけを最大3回�
 - 常時実行scriptを除く `chezmoi verify` が成功する。
 - 暗号化sentinelが期待した内容とpermissionで配置される。
 - `.local/bin` の主要external commandが存在し、実行可能である。
-- OS別のNushell、Code、Alacritty symlinkが存在し、source state内の正しい共有ファイルを指す。
+- OSごとに定義されたNushell、Code、mise互換layoutなどのsymlinkが存在し、正しい共有ファイルまたはdirectoryを指す。
 - `mise ls --missing` が未導入toolを報告しない。
 - 2回目のapplyで `run_once` / `run_onchange` の不要な再実行やtarget変更が発生しない。
 
@@ -117,7 +113,9 @@ Bazziteは汎用desktop imageをdigest固定し、rootless Podmanのprivileged s
 
 Podman containerはLinuxカーネルやsystem serviceの構成検証には使わない。今回のLinux scriptsが行うユーザーHOME、mise、fonts、terminfo、externalsのE2Eに限定する。
 
-## Windows E2E
+## 将来構想: Windows E2E（未実装）
+
+この節は現在の実行インターフェースおよび検証保証に含まれない。着手時には前提、使用image、実行方式および費用を再検証する。
 
 ### 対象
 
@@ -174,8 +172,6 @@ VMの初回作成と日常E2Eは別タスクにし、通常のテストでWindow
 
 ### 共通方式
 
-LANとAWSの両backendを「SSH接続可能なApple Silicon Mac上でTartを実行するhost」として抽象化する。hostの取得方法だけを切り替え、VM作成以降は同じdriverを使う。
-
 - macOS 26のTart base imageをOCI digestで固定する。
 - テストごとに一意な名前でbase imageをcloneする。
 - guest resourceをCPU 6、RAM 10GBに固定する。
@@ -183,11 +179,9 @@ LANとAWSの両backendを「SSH接続可能なApple Silicon Mac上でTartを実�
 - フルapply、`chezmoi verify`、`mise bootstrap packages status --missing`、`mise ls --missing`、2回目applyを実行する。
 - 成否にかかわらずguestを停止し、テスト用Tart cloneを削除する。
 
-LAN/AWS hostにはテスト対象のdotfilesを直接applyしない。
+Tart hostにはテスト対象のdotfilesを直接applyしない。
 
-### LAN Mac backend
-
-`E2E_MAC_HOST` をSSH config上のhost名または `user@host` として受け取る。
+### Local Mac host
 
 前提条件は次のとおり。
 
@@ -195,13 +189,11 @@ LAN/AWS hostにはテスト対象のdotfilesを直接applyしない。
 - macOS 14以降
 - Tartを実行できる空きdisk、memory、Virtualization.framework
 
-Linuxから実行するhostでは、追加でSSHを有効化し、passwordless automationが可能な専用ユーザーを用意する。
-
-Mac上で直接実行する場合は `mise run test:e2e:mac:local` を使用する。Linuxから実行する場合は `E2E_MAC_HOST` で指定したhostへarchive、test identityおよびrunnerを一時転送し、同じMac host driverを `mise run test:e2e:mac:lan` から一時GUI LaunchAgentとして起動する。これによりpasswordをrunnerへ渡さず、GUI sessionのunlock済みlogin keychainを利用する。system default以外のSSH configが必要なら `E2E_SSH_CONFIG` で指定する。LaunchAgentとremote stagingは成否にかかわらず削除する。
+Mac上で `mise run test:e2e:mac:local` を使用する。`mise run test` からはhost OS判定により同じlocal E2Eが選択される。
 
 Macホストにはmiseだけを事前に導入する。TartはmacOS arm64限定のmise toolとしてversionを固定し、Homebrewには依存しない。global `miserc.toml` の `auto_env = true` で `config.macos.toml` を自動読込し、macOS packageはmise bootstrap経由で管理する。
 
-macOS 15以降では、Virtualization.frameworkがVM起動時にunlock済みのlogin keychainを要求する。専用ユーザーで一度GUIログインし、そのsessionとlogin keychainをunlockした状態に保つ。Linuxから実行する場合は、同じユーザーへSSH configのhost名でpasswordなしに接続できるようRemote Loginと公開鍵認証を設定する。keychain passwordはE2E runnerへ渡さない。
+macOS 15以降では、Virtualization.frameworkがVM起動時にunlock済みのlogin keychainを要求する。専用ユーザーで一度GUIログインし、そのsessionとlogin keychainをunlockした状態に保つ。keychain passwordはE2E runnerへ渡さない。
 
 初回はMac上のcheckoutで次を実行する。
 
@@ -213,7 +205,9 @@ mise run test:e2e:mac:prepare
 
 prepare taskはhostのOS、architecture、CPU、memory、disk、login keychainを検査し、digest固定のmacOS 26 imageを取得する。さらに一時VMをCPU 6、RAM 10GBで起動し、Tart Guest Agent経由のcommand実行まで確認してからVMを削除する。実行ごとに専用の一時TART_HOMEを使用し、Tartのcacheと取得済みbase imageだけを永続cacheから再利用する。prepare taskはRemote Login、GUI session、keychainやmacOS defaultsを変更しない。
 
-### AWS backend
+## 将来構想: AWS Mac backend（未実装）
+
+この節は現在の実行インターフェースおよび検証保証に含まれない。以下は設計候補であり、着手時にregion、instance、接続方式、IAMおよび費用を再検証する。
 
 AWS Singaporeリージョン `ap-southeast-1` の `mac2.metal` Dedicated Hostを使用する。東京 `ap-northeast-1` は現時点でIntel Mac1のみであるため、Apple Silicon/Tart構成の標準backendにはしない。
 
@@ -227,7 +221,7 @@ AWS構成は次のとおり。
 - internetへのSSH ingressなし
 - ローカルからの接続はSession ManagerのSSH ProxyCommandを使用
 
-host起動後に固定versionのTartを導入し、LAN backendと同じTart driverへSSH endpointを渡す。Marketplace AMIへの依存は必須にせず、通常のAWS macOS AMIから再現できるようにする。
+host起動後に固定versionのTartを導入し、local Mac E2Eと同じguest処理を再利用する案とする。Marketplace AMIへの依存は必須にせず、通常のAWS macOS AMIから再現できるようにする。
 
 Dedicated Hostには最低24時間のallocationがあるため、作成時にクラウド側のcleanupを必ず予約する。
 
@@ -257,7 +251,6 @@ AWS backendは次の場合に自動fallbackしない。
 - virtio ISO pathとSHA-256
 - Windows administrator password
 - Windows license/product key
-- `E2E_MAC_HOST`
 - AWS profile、account、subnet、IAM設定
 - AWS Session Manager接続情報
 
@@ -283,24 +276,17 @@ Linux E2Eは成功時にcontainerとhome volumeを削除し、cleanup失敗も�
 
 LinuxとmacOSのE2Eはchezmoi外の各工程の開始時に短い名前を表示する。失敗時は最後のstep表示、chezmoiのverbose出力、終了コードおよびlog directoryから失敗箇所を特定する。
 
-## 実装順序
+## 実装状況
 
-1. 共通archive、age fixture、guest assertion、cleanup処理を作る。
-2. Fedora 44とUbuntu 24.04 desktop/headlessのPodman E2Eを通す。
-3. Bazzite 44のlocal Podman E2Eを通す。
-4. Windows golden image builderとKVM driverを追加し、全profilesを通す。
-5. LAN Mac用Tart driverを追加してmacOS E2Eを通す。
-6. AWS EC2 Mac provisioner、SSM transport、自動cleanup scheduleを追加する。
-7. 全backendをmiseタスクへ統合し、READMEへ初期設定、費用、実行方法、復旧方法を記載する。
+共通archive、age fixture、OS別guest assertion、cleanup、標準Linux 3対象、local Bazziteおよびlocal Mac Tart driverは実装済みである。WindowsとAWS Macは上記の将来構想を実装する決定が行われた場合だけ、前提を再検証して個別に設計・実装する。
 
 ## 前提と制約
 
-- Windows 11 ISOと有効な利用権はユーザーが用意する。
-- LAN MacはApple Siliconとし、Intel Mac backendは作らない。
-- AWS accountにはSingaporeでのDedicated Host quota、`mac2.metal` capacity、必要なIAM権限がある。
-- EC2 MacはDedicated Host単位で課金され、最低24時間解放できない。AWS backendは短時間テストでも最低allocation分の費用が発生する。
+- Local MacはApple Siliconとし、Intel Mac backendは作らない。
 - Fedora/Ubuntu containerではsystemdやhost kernel設定の妥当性を保証しない。
 - GUIアプリの初回起動、macOS system extensionのユーザー承認、Windows再起動後のdesktop状態は初期スコープ外とする。
+
+Windows ISO、license、AWS quota、capacity、IAMおよび課金条件は現在の前提には含めず、各将来構想へ着手するときに確認する。
 
 ## 参考資料
 

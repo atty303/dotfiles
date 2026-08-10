@@ -25,7 +25,9 @@ local linters = new Mapping<String, Step> {
       "home/dot_local/bin/executable_login-nu",
       "home/dot_local/bin/executable_ssh-keygen-force-agent",
       "home/dot_local/bin/executable_wayland-session-exec",
-      "home/dot_local/libexec/executable_chezmoi-distrobox-scroll-update"
+      "home/dot_local/libexec/executable_chezmoi-distrobox-scroll-update",
+      "tests/e2e/containers/bazzite-crun",
+      "tests/e2e/containers/bazzite-podman"
     )
     check = "shellcheck {{files}}"
   }

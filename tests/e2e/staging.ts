@@ -18,10 +18,16 @@ export function repositoryRoot(): string {
 }
 
 export async function stageSource(signal: AbortSignal): Promise<StagedSource> {
+  return await stageRepository(repositoryRoot(), signal);
+}
+
+export async function stageRepository(
+  repository: string,
+  signal: AbortSignal,
+): Promise<StagedSource> {
   const tempDir = await Deno.makeTempDir({ prefix: "chezmoi-e2e-" });
 
   try {
-    const repository = repositoryRoot();
     const stagedRepository = join(tempDir, "source");
     const initialArchive = join(tempDir, "worktree.tar");
     const archivePath = join(tempDir, "source.tar");
