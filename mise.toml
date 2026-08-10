@@ -47,7 +47,7 @@ mise run check
 mise run test:distrobox
 mise run test:flatpak
 mise run test:chrome-web-apps
-mise run test:e2e:linux:ci
+mise run test:e2e:linux
 '''
 
 [tasks."test:distrobox"]
@@ -81,13 +81,9 @@ run = "deno run -A tests/e2e/main.ts linux ubuntu-headless"
 description = "Run the local full chezmoi E2E test on Bazzite 44"
 run = "deno run -A tests/e2e/main.ts linux bazzite"
 
-[tasks."test:e2e:linux:ci"]
-description = "Run the Linux E2E targets supported in CI"
-run = "deno run -A tests/e2e/main.ts linux ci"
-
 [tasks."test:e2e:linux"]
-description = "Run all local Linux E2E targets, including privileged Bazzite"
-run = "deno run -A tests/e2e/main.ts linux all"
+description = "Run the standard Linux E2E targets supported in CI"
+run = "deno run -A tests/e2e/main.ts linux"
 
 [tasks."test:e2e:mac:prepare"]
 description = "Prepare and validate an Apple Silicon Mac for Tart E2E tests"

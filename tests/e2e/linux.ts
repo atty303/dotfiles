@@ -4,7 +4,6 @@ import { fileURLToPath } from "node:url";
 import { type StagedSource, stageSource } from "./staging.ts";
 
 export type LinuxTarget = "bazzite" | "fedora" | "ubuntu-desktop" | "ubuntu-headless";
-export type LinuxTargetGroup = LinuxTarget | "ci" | "all";
 
 interface Capabilities {
   distrobox: boolean;
@@ -75,15 +74,14 @@ const TARGETS: Record<LinuxTarget, TargetConfig> = {
 };
 
 const CI_TARGETS: readonly LinuxTarget[] = ["fedora", "ubuntu-desktop", "ubuntu-headless"];
-const ALL_TARGETS: readonly LinuxTarget[] = ["bazzite", ...CI_TARGETS];
 const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 const repository = join(moduleDirectory, "..", "..");
 const signalShieldedExec = 'trap "" HUP INT TERM; exec "$@"';
 const cleanupTimeoutSeconds = 120;
 const presenceTimeoutSeconds = 15;
 
-export async function runLinuxTargets(group: LinuxTargetGroup): Promise<void> {
-  const targets = resolveTargets(group);
+export async function runLinuxTargets(target?: LinuxTarget): Promise<void> {
+  const targets = target === undefined ? CI_TARGETS : [target];
   const abort = new AbortController();
   let receivedSignal: Deno.Signal | undefined;
   let successfulCleanupStarted = false;
@@ -143,12 +141,6 @@ export async function runLinuxTargets(group: LinuxTargetGroup): Promise<void> {
     const names = failures.map(({ target }) => TARGETS[target].label).join(", ");
     throw new Error(`Linux E2E failed for: ${names}`);
   }
-}
-
-function resolveTargets(group: LinuxTargetGroup): readonly LinuxTarget[] {
-  if (group === "all") return ALL_TARGETS;
-  if (group === "ci") return CI_TARGETS;
-  return [group];
 }
 
 async function runLinuxTarget(
@@ -462,7 +454,7 @@ async function verifyOutcomes(
       userExec(config, containerName, [
         "/bin/bash",
         "-c",
-        `set -euo pipefail; for name in dms noctalia scroll; do distrobox list --no-color | grep -Eq "(^|[[:space:]|])$name([[:space:]|]|$)"; test -f ${config.home}/.local/state/chezmoi/distrobox/$name.applied; done`,
+        `set -euo pipefail; containers="$(distrobox list --no-color)"; for name in dms noctalia scroll; do grep -Eq "(^|[[:space:]|])$name([[:space:]|]|$)" <<<"$containers"; test -f ${config.home}/.local/state/chezmoi/distrobox/$name.applied; done`,
       ]).signal(signal),
     );
   }
@@ -559,14 +551,14 @@ function reportRetainedResources(
     );
     if (sourcePrepared) {
       lines.push(
-        `  retry install: ${engine} exec --user ${config.user} ${containerName} /bin/sh -c 'cd /tmp/source && exec /bin/sh ./install.sh'`,
+        `  retry install: ${engine} exec --user ${config.user} ${containerName} /bin/sh -c 'if test -x ${config.home}/.local/bin/mise; then ${config.home}/.local/bin/mise trust /tmp/source/mise.toml; fi; cd /tmp/source && exec /bin/sh ./install.sh'`,
       );
     } else if (archiveCopied) {
       lines.push(
         `  prepare source: ${engine} exec ${containerName} /bin/sh -c 'mkdir -p /tmp/source && tar -xf /tmp/source.tar -C /tmp/source && chown -R ${config.user}:${config.user} /tmp/source ${config.home}${
           config.privilegedSystemd ? " /usr/local/secrets/CHEZMOI_AGE_KEY" : ""
         }'`,
-        `  retry install after preparation: ${engine} exec --user ${config.user} ${containerName} /bin/sh -c 'cd /tmp/source && exec /bin/sh ./install.sh'`,
+        `  retry install after preparation: ${engine} exec --user ${config.user} ${containerName} /bin/sh -c 'if test -x ${config.home}/.local/bin/mise; then ${config.home}/.local/bin/mise trust /tmp/source/mise.toml; fi; cd /tmp/source && exec /bin/sh ./install.sh'`,
       );
     } else {
       lines.push("  source archive: not copied; inspect the logs before retrying");

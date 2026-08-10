@@ -37,7 +37,7 @@ OS再起動後のサービス、ログインセッション、GUI承認状態ま
 
 ```sh
 mise run test:e2e:linux
-mise run test:e2e:linux:ci
+mise run test:e2e:linux:bazzite
 mise run test:e2e:windows
 mise run test:e2e:mac:prepare
 mise run test:e2e:mac:local
@@ -98,7 +98,7 @@ LinuxとmacOSでは、lifecycle script内の `mise install` だけを最大3回�
 - Ubuntu 24.04 devcontainer desktop（local/CI）
 - Ubuntu 24.04 devcontainer headless（local/CI）
 
-`test:e2e:linux` は4対象すべて、`test:e2e:linux:ci` はBazziteを除く3対象を実行する。
+`test:e2e:linux` はBazziteを除く標準3対象を実行する。Bazziteはlocal専用の特殊対象として、必要な場合だけ`test:e2e:linux:bazzite`から明示的に実行する。
 Ubuntuのdesktop/headlessはGUI sessionの有無ではなく、desktop関連commandの有無で区別する。
 FedoraはFedora系の軽量な互換性対象とし、Bazziteは実際のdesktop hostに近い統合対象とする。
 
