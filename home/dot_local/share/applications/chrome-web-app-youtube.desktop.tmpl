@@ -1,0 +1,12 @@
+{{- range .chrome_web_apps.apps -}}
+{{- if eq .key "youtube" -}}
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name={{ .name }}
+Exec={{ $.chezmoi.homeDir }}/.local/bin/chrome-web-app {{ .key }}
+Icon=chrome-web-app-{{ .key }}
+Terminal=false
+StartupWMClass=crx_{{ .app_id }}{{ "\n" -}}
+{{- end -}}
+{{- end -}}

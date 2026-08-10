@@ -1,59 +1,48 @@
-# Linux Chrome PWA declarative configuration plan
-
-Status: planned, not implemented
+# Linux Chrome PWA declarative configuration
 
 ## Goal
 
-Manage Chrome PWAs on Linux from the chezmoi source state. X and YouTube run as independent applications with separate Chrome user data directories, cookies, Google logins, histories, and extension settings. The normal browser is Zen and remains unaffected.
+Manage X and YouTube as independent Chrome Flatpak applications on Linux. Each application uses a
+dedicated Chrome user data directory, so cookies, site logins, histories, and local settings do not
+leak between the applications or Zen. The same Google Account and Chrome Sync provide the shared
+extension set; extension independence is intentionally not provided.
 
-Prefer standard host integration and maintainability over additional Flatpak sandbox isolation. The initial implementation covers X and YouTube; another PWA can be added through the same application definition, policy, and desktop-entry structure.
+## Application definitions
 
-## Design
-
-Use the system Flatpak installation of Google Chrome, `com.google.Chrome`, through its standard launcher. Chrome supports force-installing PWAs with [`WebAppInstallForceList`](https://chromeenterprise.google/policies/web-app-install-force-list/), applying policies at profile level, and selecting independent storage with [`--user-data-dir`](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/docs/user_data_dir.md).
-
-Install one host policy at `/etc/opt/chrome/policies/managed/web-apps.json`. The Flatpak package already exposes host `/etc` and imports this standard Chrome policy path, so no custom sandbox, private policy injection, package-internal entry point, or Flatpak override is required.
-
-Chrome host policies apply to every Chrome profile. Therefore, both dedicated PWA profiles and the existing Chrome `Default` profile receive the two PWA definitions, the union of the six extensions, and both notification origins. This policy-driven change to `Default` is an accepted simplicity tradeoff: the profiles still do not share runtime data, Chrome is not the normal browser, and Zen does not read Chrome policies. Do not add per-profile policy emulation or compatibility layers.
-
-Store the application definitions in `home/.chezmoidata/linux.toml` as the single source of truth. Each definition contains:
-
-- key and display name;
-- start URL and known Chrome web app ID;
-- notification origin;
-- Chrome Web Store extension IDs associated with the application.
-
-Initial definitions:
+`home/.chezmoidata/linux.toml` is the single source of truth for application keys, names, URLs,
+Chrome web app IDs, and notification origins.
 
 | Key | Name | URL | Web app ID |
 | --- | --- | --- | --- |
 | `x` | X | `https://x.com/` | `lodlkdfmihgonocnmddehnfgiljnadcf` |
 | `youtube` | YouTube | `https://www.youtube.com/` | `agimnkijcaahngcdmfeangaknmldooml` |
 
-Generate the host policy with:
+Chezmoi renders `~/.config/chrome-web-apps/web-apps.json` with only:
 
-- `WebAppInstallForceList` containing X and YouTube, launched in windows, with `create_desktop_shortcut` set to `false`;
-- [`ExtensionSettings`](https://chromeenterprise.google/policies/extension-settings/) entries using `normal_installed` and the Chrome Web Store update URL, so extensions are installed automatically but may be disabled by the user;
-- `NotificationsAllowedForUrls` containing `https://x.com` and `https://www.youtube.com`;
-- `BackgroundModeEnabled` set to `false`;
-- no policy for language, camera, microphone, downloads, or other site permissions.
+- `WebAppInstallForceList`, which installs both applications as windows without Chrome-generated
+  desktop shortcuts;
+- `BackgroundModeEnabled: false`, which stops a dedicated Chrome process after its last window
+  closes.
 
-Declare these extensions:
+Extensions, notifications, browser sign-in, and Sync are not controlled by policy. Chrome Sync is
+the source of truth for extensions. Site notification permissions and extension-specific options
+are configured manually.
 
-| Application | Extension | ID |
-| --- | --- | --- |
-| X | Xetter | `bigjedfebadeogmcnfaepncnhkjnneik` |
-| X | TwitterTimelineLoader | `ipmgjpmedafkmmadinmeoannpofakpbh` |
-| X | Control Panel for Twitter | `kpmjjdhbcfebfjgdnpjagcndoelnidfj` |
-| X | X Auto Refresher | `mihjenkihajdgclhgheccildhbocbheb` |
-| YouTube | YouTube LiveChat Flusher | `kkjglcpgfpjlaloboikfcoofameeljbe` |
-| YouTube | Enhancer for YouTube | `ponfpcnoihfmfllpaingbgckeeldkhle` |
+## Portable Flatpak policy injection
 
-Render the policy first to a user-readable target under `~/.config/chrome-web-apps/web-apps.json`. A Linux `run_onchange_after_...` script keyed by the rendered policy hash runs after target generation and installs that exact file to the host policy path with `sudo install -Dm0644`; this ordering applies on both initial creation and updates. The script must show the source and destination paths, request elevation normally, and never modify another Chrome policy file. Removing this feature requires a separate explicit uninstall operation; an empty policy must not silently replace the host file.
+Google Chrome reads Linux policies from `/etc/opt/chrome/policies`, but the host filesystem is not
+modified. `chrome-web-app` exposes the user-owned policy directory read-only to the Flatpak sandbox,
+copies the policy to the sandbox's temporary managed-policy directory with mode `0444`, and then
+starts Chrome. The sandbox-local copy disappears with the Flatpak instance.
+
+This design does not use host `/etc`, `sudo`, a persistent Flatpak override, a lifecycle script, or
+package modification. The policy applies only to Chrome processes started by `chrome-web-app`; a
+normally launched Chrome `Default` profile does not receive it directly. Chrome Sync may still make
+the applications and extensions visible in `Default`, which is accepted.
 
 ## Launcher and desktop integration
 
-Add an executable with this interface:
+The launcher interface is:
 
 ```text
 chrome-web-app x
@@ -62,68 +51,58 @@ chrome-web-app x --browser
 chrome-web-app youtube --browser
 ```
 
-The launcher must:
+It supports only the system installation of `com.google.Chrome`. Dedicated user data directories
+are stored at:
 
-1. accept only `x` or `youtube` and reject extra or unknown arguments;
-2. use `flatpak --system` for availability checks and launch, without falling back to a user installation;
-3. fail clearly when the system installation of `com.google.Chrome` is unavailable;
-4. construct the dedicated user data directory on the host as the absolute path `$HOME/.var/app/com.google.Chrome/config/google-chrome-web-apps/<key>` and pass it directly as `--user-data-dir`; do not expand host `$XDG_CONFIG_HOME` or defer path expansion to the Flatpak environment;
-5. add `--no-first-run` and `--no-default-browser-check`;
-6. in default mode, open `--app=<URL>` until `<user-data-dir>/Default/Web Applications/Manifest Resources/<target-app-id>` exists, then use `--app-id=<target-app-id>`; another policy-installed PWA's manifest must not satisfy readiness;
-7. in `--browser` mode, use the same user data directory but open a normal browser window for `chrome://policy`, `chrome://extensions`, Google login, and extension option maintenance.
+```text
+$HOME/.var/app/com.google.Chrome/config/google-chrome-web-apps/<key>
+```
 
-Manage the visible X and YouTube desktop entries and their application icons with chezmoi. Commit suitable icons obtained from the existing PWA manifest resources, install them under the user hicolor icon theme as `chrome-web-app-x` and `chrome-web-app-youtube`, and reference those names from the entries. Render each `Exec` field with the absolute `{{ .chezmoi.homeDir }}/.local/bin/chrome-web-app` path followed by its key; do not depend on the GUI session's `PATH`.
+Normal mode uses `--app=<URL>` until the target application's exact manifest resource directory
+exists, then switches to `--app-id=<ID>`. Browser mode opens `chrome://policy` in the same dedicated
+profile for Google Account sign-in, Sync, extension maintenance, and diagnostics.
 
-Do not depend on Chrome-generated desktop entries or icons. The host policy disables shortcut creation, and the chezmoi entries are the only user-facing launchers.
-
-Update the Scroll rules for the fresh profiles:
+Chezmoi owns the visible desktop entries and hicolor icons. Desktop entries call the absolute
+launcher path and do not depend on the graphical session's `PATH`. Scroll matches the resulting
+Wayland app IDs:
 
 ```text
 chrome-lodlkdfmihgonocnmddehnfgiljnadcf-Default
 chrome-agimnkijcaahngcdmfeangaknmldooml-Default
 ```
 
+## Initial setup and verification
+
+Apply only the policy, launcher, desktop entries, icons, Scroll configuration, and any required
+parent directories. Do not run an untargeted `chezmoi apply`.
+
+For both dedicated profiles:
+
+1. Open browser mode, confirm the two policies are valid in `chrome://policy`, and sign in to the
+   same Google Account used by `Default`.
+2. Enable Sync for Extensions. Disable history, tabs, bookmarks, passwords, or other categories
+   that should remain local.
+3. Wait for extensions to appear and approve any requested permissions.
+4. Allow the target site's notification permission and configure extension options that do not
+   sync.
+5. Launch the desktop entry and confirm the target app ID exists under `Manifest Resources`, the
+   window is placed in the intended Scroll workspace, and closing the last window terminates that
+   dedicated Chrome process.
+6. Confirm local cookies, site login sessions, and history do not appear in the other dedicated
+   profile or Zen.
+
+If the same Google Account cannot enable Sync in both dedicated user data directories, stop the
+cutover and retain the old profiles.
+
 ## Fresh cutover
 
-Do not implement state copying, profile aliases, legacy launch paths, or migration code. The new profiles start empty, and Google login and extension-specific options are configured manually.
+Do not copy profile state or add compatibility launchers. After both applications pass verification
+and manual setup is complete, resolve and display every deletion target and obtain explicit
+confirmation before removing only:
 
-After both new applications pass verification and the user confirms that login and extension setup are complete, remove only:
+- `$HOME/.var/app/com.google.Chrome/config/google-chrome/X`;
+- `$HOME/.var/app/com.google.Chrome/config/google-chrome/youtube`;
+- their Chrome-generated desktop entries;
+- icons generated specifically for those old shortcuts.
 
-- the old `$HOME/.var/app/com.google.Chrome/config/google-chrome/X` and `$HOME/.var/app/com.google.Chrome/config/google-chrome/youtube` profile directories;
-- their generated desktop entries;
-- icons generated specifically for those old profile shortcuts.
-
-Do not copy, move, or delete the existing `$HOME/.var/app/com.google.Chrome/config/google-chrome/Default` profile. The global policy will still install the declared PWAs and extensions and apply the notification policy when that profile next runs. Resolve and display every exact deletion target before removal.
-
-## Verification
-
-Before applying:
-
-1. render the Linux templates, parse the generated policy as JSON, and confirm the expected PWA URLs, extension IDs, notification origins, and `create_desktop_shortcut: false`;
-2. run `bash -n` on the launcher and `run_onchange` script;
-3. test rejection of unknown launcher arguments and the missing-system-Flatpak path;
-4. inspect `chezmoi diff` and `chezmoi apply --dry-run --verbose` for the explicit affected targets;
-5. inspect the exact `sudo install` source, destination, mode, and content before approving elevation.
-
-Apply only the new policy target, policy installer, launcher, desktop entries, icons, and Scroll configuration. Do not run an untargeted `chezmoi apply`. Confirm that a second `chezmoi diff` for those targets is empty and that the installed host policy is byte-for-byte equal to the rendered target.
-
-For each PWA, observe that:
-
-- both policy-declared PWA manifests and all six declared extensions appear in its dedicated user data directory, including the target application's exact web app ID under `Default/Web Applications/Manifest Resources`;
-- `chrome://policy` reports the web app, extension, notification, and background policies as valid;
-- `--browser` opens the same dedicated profile and permits access to `chrome://policy`, `chrome://extensions`, and extension option pages;
-- the desktop entry opens an independent application window and Scroll places it in the configured workspace;
-- cookies, login, history, and extension settings do not appear in the other PWA or Zen;
-- closing the last window terminates that dedicated Chrome process.
-
-Google login and extension option configuration are the only manual application setup steps. Perform old-profile deletion only after this verification and explicit confirmation.
-
-Because the change adds a Linux lifecycle script, run `mise run test:e2e:linux` after the targeted local verification.
-
-## Constraints and assumptions
-
-- Zen remains the normal browser; the Chrome host policy intentionally applies to every Chrome profile on the machine.
-- The system Flatpak installation of `com.google.Chrome` is the only supported Chrome distribution; a user Flatpak installation is never selected.
-- `sudo` is required only to install the single host policy file. No package installation or new dependency is introduced.
-- Existing PWA profile data is not migrated or preserved after confirmed cutover.
-- No remote operation is part of implementation.
+Never copy, move, or delete the existing `Default` profile.

@@ -5,6 +5,20 @@ entries = [
   { manifest = "scroll.ini", name = "scroll" },
 ]
 
+[[chrome_web_apps.apps]]
+key = "x"
+name = "X"
+url = "https://x.com/"
+app_id = "lodlkdfmihgonocnmddehnfgiljnadcf"
+notification_origin = "https://x.com"
+
+[[chrome_web_apps.apps]]
+key = "youtube"
+name = "YouTube"
+url = "https://www.youtube.com/"
+app_id = "agimnkijcaahngcdmfeangaknmldooml"
+notification_origin = "https://www.youtube.com"
+
 [flatpak.remotes.flathub]
 descriptor_url = "https://dl.flathub.org/repo/flathub.flatpakrepo"
 

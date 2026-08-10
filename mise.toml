@@ -46,6 +46,7 @@ run = '''
 mise run check
 mise run test:distrobox
 mise run test:flatpak
+mise run test:chrome-web-apps
 mise run test:e2e:linux
 '''
 
@@ -59,6 +60,10 @@ bash tests/distrobox-service-restart.sh
 [tasks."test:flatpak"]
 description = "Test Flatpak lifecycle installation"
 run = "bash tests/flatpak-install.sh"
+
+[tasks."test:chrome-web-apps"]
+description = "Test portable Chrome web app configuration"
+run = "bash tests/chrome-web-apps.sh"
 
 [tasks."test:e2e:linux:fedora"]
 description = "Run the full chezmoi E2E test on Fedora 44"

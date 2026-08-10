@@ -1,0 +1,12 @@
+{{- $webApps := list -}}
+{{- range $app := .chrome_web_apps.apps -}}
+{{-   $webApps = append $webApps (dict
+        "url" $app.url
+        "default_launch_container" "window"
+        "create_desktop_shortcut" false
+      ) -}}
+{{- end -}}
+{{- dict
+      "WebAppInstallForceList" $webApps
+      "BackgroundModeEnabled" false
+    | toPrettyJson }}

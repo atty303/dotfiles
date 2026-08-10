@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+  printf 'Usage: chrome-web-app <x|youtube> [--browser]\n' >&2
+}
+
+if (($# < 1 || $# > 2)); then
+  usage
+  exit 2
+fi
+
+key=$1
+case "$key" in
+{{- range .chrome_web_apps.apps }}
+  {{ .key }})
+    url={{ .url | quote }}
+    app_id={{ .app_id | quote }}
+    ;;
+{{- end }}
+  *)
+    printf 'Unknown Chrome web app: %s\n' "$key" >&2
+    usage
+    exit 2
+    ;;
+esac
+
+browser_mode=false
+if (($# == 2)); then
+  if [[ $2 != --browser ]]; then
+    printf 'Unknown argument: %s\n' "$2" >&2
+    usage
+    exit 2
+  fi
+  browser_mode=true
+fi
+
+if ! command -v flatpak >/dev/null 2>&1; then
+  printf 'chrome-web-app: flatpak is not available\n' >&2
+  exit 1
+fi
+if ! flatpak info --system com.google.Chrome >/dev/null 2>&1; then
+  printf 'chrome-web-app: system Flatpak com.google.Chrome is not installed\n' >&2
+  exit 1
+fi
+
+policy_directory="$HOME/.config/chrome-web-apps"
+policy_file="$policy_directory/web-apps.json"
+if [[ ! -r $policy_file ]]; then
+  printf 'chrome-web-app: policy is not readable: %s\n' "$policy_file" >&2
+  exit 1
+fi
+
+user_data_dir="$HOME/.var/app/com.google.Chrome/config/google-chrome-web-apps/$key"
+manifest_directory="$user_data_dir/Default/Web Applications/Manifest Resources/$app_id"
+
+chrome_args=(
+  "--user-data-dir=$user_data_dir"
+  --no-first-run
+  --no-default-browser-check
+)
+if [[ $browser_mode == true ]]; then
+  chrome_args+=(chrome://policy)
+elif [[ -d $manifest_directory ]]; then
+  chrome_args+=("--app-id=$app_id")
+else
+  chrome_args+=("--app=$url")
+fi
+
+read -r -d '' sandbox_launcher <<'EOF' || true
+set -euo pipefail
+policy_file=$1
+shift
+install -Dm0444 "$policy_file" /etc/opt/chrome/policies/managed/web-apps.json
+exec /app/bin/chrome "$@"
+EOF
+
+exec flatpak run \
+  --system \
+  --filesystem="$policy_directory:ro" \
+  --command=/usr/bin/bash \
+  com.google.Chrome \
+  -c "$sandbox_launcher" \
+  chrome-web-app-sandbox \
+  "$policy_file" \
+  "${chrome_args[@]}"
