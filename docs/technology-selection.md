@@ -84,6 +84,10 @@ Hyprlandとniriは現在休眠している。
 desktop shellはDankMaterialShellとNoctaliaを排他的に比較中である。両方を同時に常用する前提にはせず、hostとの統合、
 必要機能、障害時の切り分け、container imageの保守コストから評価する。未確定の標準を文書上で作らない。
 
+polkit、PAMおよびHowdyによる認証はimmutable hostの責務とする。Noctalia containerへhostのPAM stack、認証情報または
+device設定をmountせず、Scroll sessionからはUWSMのsession targetを介してhostに既存のKDE polkit agentを起動する。
+KDE sessionはPlasma本来の起動経路を維持し、どちらのdesktopでも同じhost PAM stackを利用する。
+
 ### Windows — 役割限定
 
 Windowsはgaming、hardware utility、Windows専用softwareのために維持する。開発体験をWindows独自に作り直すのではなく、

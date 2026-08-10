@@ -1,6 +1,7 @@
 [shell]
 launch_apps_as_systemd_services = false
 launch_apps_custom_command = "host-exec $CMD"
+polkit_agent = false
 
 [lockscreen]
 enabled = false
