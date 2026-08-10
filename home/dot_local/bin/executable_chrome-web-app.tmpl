@@ -16,7 +16,6 @@ case "$key" in
 {{- range .chrome_web_apps.apps }}
   {{ .key }})
     url={{ .url | quote }}
-    app_id={{ .app_id | quote }}
     ;;
 {{- end }}
   *)
@@ -53,7 +52,6 @@ if [[ ! -r $policy_file ]]; then
 fi
 
 user_data_dir="$HOME/.var/app/com.google.Chrome/config/google-chrome-web-apps/$key"
-preferences_file="$user_data_dir/Default/Preferences"
 
 chrome_args=(
   "--user-data-dir=$user_data_dir"
@@ -62,8 +60,6 @@ chrome_args=(
 )
 if [[ $browser_mode == true ]]; then
   chrome_args+=(chrome://policy)
-elif [[ -f $preferences_file ]] && grep -Fq "$app_id" "$preferences_file"; then
-  chrome_args+=("--app-id=$app_id")
 else
   chrome_args+=("--app=$url")
 fi

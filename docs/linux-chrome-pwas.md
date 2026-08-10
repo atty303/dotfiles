@@ -58,19 +58,19 @@ are stored at:
 $HOME/.var/app/com.google.Chrome/config/google-chrome-web-apps/<key>
 ```
 
-Normal mode uses `--app=<URL>` until the target application's exact app ID appears in the profile
-preferences, then switches to `--app-id=<ID>`. Manifest resources alone are not a readiness signal:
-Chrome can download them for a pending policy or Sync installation before the app is locally
-launchable. Browser mode opens `chrome://policy` in the same dedicated profile for Google Account
-sign-in, Sync, extension maintenance, and diagnostics.
+Normal mode always uses `--app=<URL>`. It does not depend on policy or Sync completing a local web
+app installation. Chrome derives a stable Wayland app ID from each fixed URL, while the dedicated
+user data directory keeps each application's browser state separate. Browser mode opens
+`chrome://policy` in the same dedicated profile for Google Account sign-in, Sync, extension
+maintenance, and diagnostics.
 
 Chezmoi owns the visible desktop entries and hicolor icons. Desktop entries call the absolute
 launcher path and do not depend on the graphical session's `PATH`. Scroll matches the resulting
 Wayland app IDs:
 
 ```text
-chrome-lodlkdfmihgonocnmddehnfgiljnadcf-Default
-chrome-agimnkijcaahngcdmfeangaknmldooml-Default
+chrome-x.com__-Default
+chrome-www.youtube.com__-Default
 ```
 
 ## Initial setup and verification

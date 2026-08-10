@@ -157,12 +157,12 @@ workspace 1 output $out_middle
 
 workspace --no-auto-back-and-forth 1
 
-for_window [app_id="chrome-agimnkijcaahngcdmfeangaknmldooml-Default"] {
+for_window [app_id="chrome-www.youtube.com__-Default"] {
     move container to workspace panel
     set_size h 1
     set_size v 0.33333333
 }
-for_window [app_id="chrome-lodlkdfmihgonocnmddehnfgiljnadcf-Default"] {
+for_window [app_id="chrome-x.com__-Default"] {
     move container to workspace strip
     set_size h 1
     set_size v 1
