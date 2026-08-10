@@ -200,6 +200,11 @@ async function runLinuxTarget(
           signal,
         ),
     );
+    await execute(
+      "verify x-open-default handler",
+      $`podman exec ${containerName} /bin/sh -c 'grep -Fqx x-scheme-handler/x-open-default=open-in-default-browser.desktop /home/e2e/.config/mimeapps.list'`
+        .signal(signal),
+    );
     completed = true;
   } finally {
     if (completed) beginSuccessfulCleanup();

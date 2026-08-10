@@ -94,18 +94,17 @@ hard-coding Zen. Chrome may ask for confirmation the first time the external han
 
 The Linux lifecycle script registers `open-in-default-browser.desktop` as the handler for
 `x-scheme-handler/x-open-default`. It requires `xdg-mime` and `update-desktop-database` on a live
-desktop.
+desktop; the bridge itself requires `xdg-open`.
 
 ## Initial setup and verification
 
 Run the normal `chezmoi apply`. The Linux lifecycle script registers the custom scheme during the
-apply. Verify it afterward with:
+apply. Confirm afterward that the `[Default Applications]` section in
+`${XDG_CONFIG_HOME:-$HOME/.config}/mimeapps.list` contains:
 
-```sh
-xdg-mime query default x-scheme-handler/x-open-default
+```ini
+x-scheme-handler/x-open-default=open-in-default-browser.desktop
 ```
-
-The result must be `open-in-default-browser.desktop`.
 
 For both dedicated profiles:
 
