@@ -2,7 +2,9 @@
 
 ## Project Structure & Module Organization
 
-This is a cross-platform chezmoi dotfiles repository. `.chezmoiroot` points to `home/`, so files there map to the user's home directory using chezmoi naming rules: `dot_config/` becomes `~/.config/`, `private_dot_ssh/` receives private permissions, and `executable_*` files are installed as executables. OS-specific lifecycle scripts live in `home/.chezmoiscripts/{linux,darwin,windows}/`. Distrobox manifests are installed from `home/dot_config/distrobox/assemble/`, `root/` contains system-level files, and `install.sh` bootstraps chezmoi. Files ending in `.tmpl` are Go templates; `.age` files are encrypted secrets.
+This is a cross-platform chezmoi dotfiles repository. `.chezmoiroot` points to `home/`, so files there map to the user's home directory using chezmoi naming rules: `dot_config/` becomes `~/.config/`, `private_dot_ssh/` receives private permissions, and `executable_*` files are installed as executables. OS-specific lifecycle scripts live in `home/.chezmoiscripts/{linux,darwin,windows}/`. Distrobox manifests are installed from `home/dot_config/distrobox/assemble/`, `root/` describes desired system-level image contents, and `install.sh` bootstraps chezmoi. Files ending in `.tmpl` are Go templates; `.age` files are encrypted secrets.
+
+`root/` is not part of the chezmoi source state, and no automated path currently synchronizes it to the live host or a custom image. When working on a corresponding system file, inspect the live file as the current operational state. Update `root/` only when the requested goal image should change; do not assume either copy is deployed from the other or introduce a chezmoi/custom-image delivery path without an explicit decision.
 
 ## Build, Test, and Development Commands
 
