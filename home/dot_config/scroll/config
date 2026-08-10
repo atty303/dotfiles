@@ -149,6 +149,7 @@ workspace panel output $out_right
 lua $lua_scripts/workspace_exec.lua panel workspace split v 0.66666666
 lua $lua_scripts/workspace_exec.lua panel rename workspace 2 to strip
 lua $lua_scripts/workspace_exec.lua panel layout_default_width 1
+lua $lua_scripts/x_media.lua
 
 ## Middle
 #lua $lua_scripts/workspace_exec.lua 1 workspace split v 0.333333

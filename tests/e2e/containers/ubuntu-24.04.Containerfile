@@ -5,6 +5,7 @@ RUN apt-get update \
         bash \
         ca-certificates \
         curl \
+        desktop-file-utils \
         findutils \
         fontconfig \
         git \
@@ -12,6 +13,7 @@ RUN apt-get update \
         ncurses-bin \
         tar \
         unzip \
+        xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
 RUN useradd --create-home e2e

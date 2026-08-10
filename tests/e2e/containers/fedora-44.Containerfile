@@ -4,6 +4,7 @@ RUN dnf install -y \
         bash \
         ca-certificates \
         curl \
+        desktop-file-utils \
         findutils \
         fontconfig \
         git \
@@ -12,6 +13,7 @@ RUN dnf install -y \
         shadow-utils \
         tar \
         unzip \
+        xdg-utils \
     && dnf clean all
 
 RUN useradd --create-home e2e

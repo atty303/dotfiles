@@ -73,10 +73,39 @@ chrome-x.com__-Default
 chrome-www.youtube.com__-Default
 ```
 
+## X integration
+
+The X integration uses a repository-managed Manifest V3 extension from
+`~/.config/chrome-web-apps/x-integration`. It is not installed through policy, Chrome Sync, or the
+Chrome Web Store. Google Chrome does not support loading it from a command-line flag, so it must be
+loaded once in the X profile. Chrome retains that installation in the profile. The YouTube and
+regular Chrome profiles do not use the extension.
+
+The extension recognizes X photo and video URLs and prefixes the window title with `⟦X media⟧`.
+Scroll's in-process Lua callback converts that marker into the `x-media` mark. When media opens from
+the normal tiled X window, Lua adds `x-media-auto-float` and enables floating. When media closes, it
+returns to tiling only if Lua originally enabled floating; a window that was already floating stays
+floating.
+
+HTTP(S) links outside `x.com`, `twitter.com`, and their subdomains are encoded into the
+`x-open-default:` URL scheme. The user-level desktop handler validates and decodes the URL, then
+passes it as one argument to `xdg-open`. This follows the current XDG default browser instead of
+hard-coding Zen. Chrome may ask for confirmation the first time the external handler is used.
+
+The Linux lifecycle script registers `open-in-default-browser.desktop` as the handler for
+`x-scheme-handler/x-open-default`. It requires `xdg-mime` and `update-desktop-database` on a live
+desktop.
+
 ## Initial setup and verification
 
-Apply only the policy, launcher, desktop entries, icons, Scroll configuration, and any required
-parent directories. Do not run an untargeted `chezmoi apply`.
+Run the normal `chezmoi apply`. The Linux lifecycle script registers the custom scheme during the
+apply. Verify it afterward with:
+
+```sh
+xdg-mime query default x-scheme-handler/x-open-default
+```
+
+The result must be `open-in-default-browser.desktop`.
 
 For both dedicated profiles:
 
@@ -92,6 +121,18 @@ For both dedicated profiles:
    dedicated Chrome process.
 6. Confirm local cookies, site login sessions, and history do not appear in the other dedicated
    profile or Zen.
+
+For the X profile, also install the repository-managed integration extension:
+
+1. Run `chrome-web-app x --browser`.
+2. Open `chrome://extensions` and enable **Developer mode**.
+3. Select **Load unpacked**, then choose `~/.config/chrome-web-apps/x-integration`.
+4. Confirm **X PWA integration** is enabled and remains present after fully closing and reopening
+   the X profile.
+5. Open an X photo or video and confirm the window floats; close the media viewer and confirm a
+   previously tiled window returns to tiling.
+6. Open an external HTTP(S) link and approve the `x-open-default` handler if Chrome prompts. Confirm
+   the link opens in the current XDG default browser.
 
 If the same Google Account cannot enable Sync in both dedicated user data directories, stop the
 cutover and retain the old profiles.

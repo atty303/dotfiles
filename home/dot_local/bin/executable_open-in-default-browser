@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if (($# != 1)); then
+  printf 'Usage: open-in-default-browser x-open-default:<base64url>\n' >&2
+  exit 2
+fi
+
+case $1 in
+  x-open-default:*) payload=${1#x-open-default:} ;;
+  *)
+    printf 'open-in-default-browser: unsupported URI scheme\n' >&2
+    exit 2
+    ;;
+esac
+
+if [[ -z $payload || ${#payload} -gt 32768 || $payload == *[!A-Za-z0-9_-]* ]]; then
+  printf 'open-in-default-browser: invalid payload\n' >&2
+  exit 2
+fi
+
+encoded=${payload//-/+}
+encoded=${encoded//_/\/}
+case $((${#encoded} % 4)) in
+  0) ;;
+  2) encoded+=\=\= ;;
+  3) encoded+=\= ;;
+  *)
+    printf 'open-in-default-browser: invalid base64url length\n' >&2
+    exit 2
+    ;;
+esac
+
+if ! url=$(printf '%s' "$encoded" | base64 --decode 2>/dev/null); then
+  printf 'open-in-default-browser: invalid base64url payload\n' >&2
+  exit 2
+fi
+if [[ $url != http://* && $url != https://* ]] || [[ $url == *$'\n'* || $url == *$'\r'* ]]; then
+  printf 'open-in-default-browser: decoded URL must be HTTP(S)\n' >&2
+  exit 2
+fi
+
+exec xdg-open "$url"

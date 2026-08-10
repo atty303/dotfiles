@@ -12,7 +12,6 @@ mkdir -p "$test_home/.config/chrome-web-apps" "$fake_bin"
 
 policy="$test_home/.config/chrome-web-apps/web-apps.json"
 chezmoi cat --source "$repository" ~/.config/chrome-web-apps/web-apps.json >"$policy"
-
 deno eval '
 const policy = JSON.parse(await Deno.readTextFile(Deno.args[0]));
 const expectedKeys = ["BackgroundModeEnabled", "WebAppInstallForceList"];
@@ -81,6 +80,10 @@ assert_log_contains "$log" '--command=/usr/bin/bash'
 assert_log_contains "$log" '--user-data-dir=/tmp/'
 assert_log_contains "$log" '--app=https://x.com/'
 assert_log_contains "$log" '/etc/opt/chrome/policies/managed/web-apps.json'
+if grep -Fq -- '--load-extension=' "$log"; then
+  printf 'launcher used an unsupported extension loading flag\n' >&2
+  exit 1
+fi
 
 manifest="$test_home/.var/app/com.google.Chrome/config/google-chrome-web-apps/x/Default/Web Applications/Manifest Resources/lodlkdfmihgonocnmddehnfgiljnadcf"
 mkdir -p "$manifest"
@@ -98,6 +101,10 @@ log="$temporary/youtube-browser.log"
 run_launcher "$log" youtube --browser
 assert_log_contains "$log" 'chrome://policy'
 assert_log_contains "$log" 'google-chrome-web-apps/youtube'
+if grep -Fq -- '--load-extension=' "$log"; then
+  printf 'launcher used an unsupported extension loading flag\n' >&2
+  exit 1
+fi
 
 for arguments in '' 'unknown' 'x --unknown' 'x --browser extra'; do
   read -r -a argument_list <<<"$arguments"
@@ -113,5 +120,72 @@ if HOME="$test_home" PATH="$fake_bin:$PATH" FAKE_LOG="$temporary/missing.log" \
   printf 'launcher accepted a missing system Chrome Flatpak\n' >&2
   exit 1
 fi
+
+# shellcheck disable=SC2016
+deno eval '
+await import(Deno.args[0]);
+const integration = globalThis.xPwaIntegration;
+const cases = [
+  ["https://x.com/user/status/123/photo/1", true],
+  ["https://mobile.x.com/user/status/123/video/2?ref_src=test", true],
+  ["https://x.com/user/status/123", false],
+  ["https://example.com/user/status/123/photo/1", false],
+];
+for (const [url, expected] of cases) {
+  if (integration.isMediaUrl(url) !== expected) throw new Error(`media classification failed: ${url}`);
+}
+for (const url of ["https://x.com/home", "https://help.x.com/", "https://twitter.com/user"]) {
+  if (!integration.isInternalUrl(url)) throw new Error(`internal classification failed: ${url}`);
+}
+for (const url of ["https://t.co/abc", "https://example.com/", "mailto:test@example.com"]) {
+  if (integration.isInternalUrl(url)) throw new Error(`external classification failed: ${url}`);
+}
+const encoded = integration.encodeExternalUrl("https://example.com/path?q=日本語#fragment");
+if (!encoded.startsWith("x-open-default:")) throw new Error("custom scheme is missing");
+' "$repository/home/dot_config/chrome-web-apps/x-integration/logic.js"
+
+for script in content-script.js service-worker.js; do
+  deno eval 'new Function(await Deno.readTextFile(Deno.args[0]));' \
+    "$repository/home/dot_config/chrome-web-apps/x-integration/$script"
+done
+
+bridge="$temporary/open-in-default-browser"
+chezmoi cat --source "$repository" ~/.local/bin/open-in-default-browser >"$bridge"
+chmod +x "$bridge"
+bash -n "$bridge"
+
+cat >"$fake_bin/xdg-open" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+printf '%s\n' "$@" >"$FAKE_XDG_LOG"
+EOF
+chmod +x "$fake_bin/xdg-open"
+
+external_url='https://example.com/path?q=%E6%97%A5%E6%9C%AC%E8%AA%9E#fragment'
+payload=$(printf '%s' "$external_url" | base64 | tr -- '+/' '-_' | tr -d '=\n')
+FAKE_XDG_LOG="$temporary/xdg-open.log" PATH="$fake_bin:$PATH" \
+  "$bridge" "x-open-default:$payload"
+if [[ $(<"$temporary/xdg-open.log") != "$external_url" ]]; then
+  printf 'bridge did not preserve the external URL\n' >&2
+  exit 1
+fi
+
+for rejected in \
+  'https://example.com/' \
+  'x-open-default:' \
+  'x-open-default:***' \
+  'x-open-default:bWFpbHRvOnRlc3RAZXhhbXBsZS5jb20'; do
+  if FAKE_XDG_LOG="$temporary/rejected-xdg.log" PATH="$fake_bin:$PATH" \
+    "$bridge" "$rejected" >/dev/null 2>&1; then
+    printf 'bridge accepted invalid input: %s\n' "$rejected" >&2
+    exit 1
+  fi
+done
+
+desktop="$temporary/open-in-default-browser.desktop"
+chezmoi cat --source "$repository" ~/.local/share/applications/open-in-default-browser.desktop \
+  >"$desktop"
+desktop-file-validate "$desktop"
+grep -Fq 'MimeType=x-scheme-handler/x-open-default;' "$desktop"
 
 printf 'Chrome web app tests passed\n'
