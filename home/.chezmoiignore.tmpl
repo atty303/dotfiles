@@ -19,6 +19,7 @@ AppData/
 .ssh/agent-local
 
 {{ if .e2e }}
+# The E2E archive excludes personal age files and adds an encrypted sentinel instead.
 .wakatime.cfg
 .local/share/atuin/key
 {{ end }}

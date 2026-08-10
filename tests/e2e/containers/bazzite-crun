@@ -1,0 +1,10 @@
+#!/bin/bash
+
+arguments=()
+for argument in "$@"; do
+  arguments+=("$argument")
+  if [[ "$argument" == create ]]; then
+    arguments+=(--no-new-keyring)
+  fi
+done
+exec /usr/bin/crun "${arguments[@]}"

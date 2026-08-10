@@ -1,11 +1,10 @@
-FROM ubuntu:24.04
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04 AS base
 
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         bash \
         ca-certificates \
         curl \
-        desktop-file-utils \
         findutils \
         fontconfig \
         git \
@@ -13,14 +12,23 @@ RUN apt-get update \
         ncurses-bin \
         tar \
         unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV HOME=/home/vscode
+ENV PATH=/home/vscode/.local/bin:/usr/local/bin:/usr/bin:/bin
+WORKDIR /home/vscode
+
+FROM base AS headless
+USER vscode
+CMD ["sleep", "infinity"]
+
+FROM base AS desktop
+USER root
+RUN apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        desktop-file-utils \
         xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
-RUN useradd --create-home e2e
-
-USER e2e
-ENV HOME=/home/e2e
-ENV PATH=/home/e2e/.local/bin:/usr/local/bin:/usr/bin:/bin
-WORKDIR /home/e2e
-
+USER vscode
 CMD ["sleep", "infinity"]

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+unset CONTAINER_HOST
+arguments=()
+skip_user_namespace=false
+replace_runtime=false
+for argument in "$@"; do
+  if [[ "$skip_user_namespace" == true ]]; then
+    skip_user_namespace=false
+    continue
+  fi
+  if [[ "$argument" == --userns ]]; then
+    skip_user_namespace=true
+    continue
+  fi
+  if [[ "$replace_runtime" == true ]]; then
+    argument=/usr/local/bin/crun-e2e
+    replace_runtime=false
+  elif [[ "$argument" == --runtime=* ]]; then
+    argument=--runtime=/usr/local/bin/crun-e2e
+  elif [[ "$argument" == --runtime ]]; then
+    replace_runtime=true
+  fi
+  arguments+=("$argument")
+done
+sudo /usr/bin/podman "${arguments[@]}" 9>&-
+status=$?
+if ((status == 0)) && [[ "${arguments[0]:-}" == cp ]]; then
+  destination="${arguments[-1]}"
+  sudo chown "$(id -u):$(id -g)" "$destination"
+fi
+exit "$status"

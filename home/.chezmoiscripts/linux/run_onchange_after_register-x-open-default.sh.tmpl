@@ -1,16 +1,29 @@
 #!/usr/bin/env bash
 
+# xdg-mime: {{ if lookPath "xdg-mime" }}available{{ else }}unavailable{{ end }}
+# update-desktop-database: {{ if lookPath "update-desktop-database" }}available{{ else }}unavailable{{ end }}
 set -euo pipefail
 
 desktop_file=open-in-default-browser.desktop
 applications_directory="$HOME/.local/share/applications"
 
+available_commands=0
+missing_command=
 for command in update-desktop-database xdg-mime; do
-  if ! command -v "$command" >/dev/null 2>&1; then
-    printf 'Cannot register x-open-default handler: %s is unavailable.\n' "$command" >&2
-    exit 1
+  if command -v "$command" >/dev/null 2>&1; then
+    available_commands=$((available_commands + 1))
+  else
+    missing_command=$command
   fi
 done
+
+if ((available_commands == 0)); then
+  exit 0
+fi
+if ((available_commands != 2)); then
+  printf 'Cannot register x-open-default handler: %s is unavailable.\n' "$missing_command" >&2
+  exit 1
+fi
 
 update-desktop-database "$applications_directory"
 xdg-mime default "$desktop_file" x-scheme-handler/x-open-default

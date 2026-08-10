@@ -6,8 +6,9 @@
 
 対象環境は次の4系統とする。
 
-- Fedora 44コンテナ
-- Ubuntu 24.04コンテナ
+- Bazzite 44 desktopコンテナ
+- Fedora 44互換性コンテナ
+- Ubuntu 24.04 devcontainer（desktop/headless）
 - ローカルKVM上のWindows 11
 - Tart上のmacOS VM
 
@@ -36,6 +37,7 @@ OS再起動後のサービス、ログインセッション、GUI承認状態ま
 
 ```sh
 mise run test:e2e:linux
+mise run test:e2e:linux:ci
 mise run test:e2e:windows
 mise run test:e2e:mac:prepare
 mise run test:e2e:mac:local
@@ -91,19 +93,27 @@ LinuxとmacOSでは、lifecycle script内の `mise install` だけを最大3回�
 
 ### 対象
 
-- Fedora 44
-- Ubuntu 24.04
+- Bazzite 44 desktop（local専用）
+- Fedora 44（local/CI）
+- Ubuntu 24.04 devcontainer desktop（local/CI）
+- Ubuntu 24.04 devcontainer headless（local/CI）
 
-Ubuntuは互換性確認だけでなく、dotfilesを実際に適用するコンテナ環境として正式な対象にする。
+`test:e2e:linux` は4対象すべて、`test:e2e:linux:ci` はBazziteを除く3対象を実行する。
+Ubuntuのdesktop/headlessはGUI sessionの有無ではなく、desktop関連commandの有無で区別する。
+FedoraはFedora系の軽量な互換性対象とし、Bazziteは実際のdesktop hostに近い統合対象とする。
 
 ### 実行方式
 
 - rootless Podmanを使用する。
-- 各ディストリビューション用Containerfileには、証明書、curl、git、archive展開などbootstrapに不可欠なOSパッケージだけを入れる。
+- FedoraとUbuntuのContainerfileには、証明書、curl、git、archive展開などbootstrapに不可欠なOSパッケージだけを入れる。Ubuntu desktop stageだけはXDG handler登録用commandも入れる。
 - chezmoi、mise、mise管理tool、fonts、externalsはimageへ事前導入せず、テスト対象のbootstrap/applyに導入させる。
 - rootではなく専用の一般ユーザーと独立HOMEを作り、通常のdotfiles適用に近い条件にする。
 - source archiveはコンテナへコピーし、target HOMEとchezmoi stateはコンテナ固有volumeに置く。
-- FedoraとUbuntuは同じ共通検証を通す。
+- CI対象の3環境は同じ共通検証を通し、command capabilityに応じてscriptの実行結果またはskip結果を検証する。
+
+Bazziteは汎用desktop imageをdigest固定し、rootless Podmanのprivileged systemd containerでuser sessionを起動する。hostnameを実機と同じ`cristina`にして、system Flatpak全件と選択されたDistrobox全件を実際に作成する。大容量download、cgroup v2およびnested Podmanを必要とするためGitHub Actionsでは実行しない。
+
+`CHEZMOI_E2E=1`は環境種別を表す値ではない。stage時に個人用`.age` fileを除外し、実行ごとに生成したage recipientで暗号化sentinelを配置・復号するfixture modeとして使用する。desktop/headlessの判定や合格条件には使わない。
 
 Podman containerはLinuxカーネルやsystem serviceの構成検証には使わない。今回のLinux scriptsが行うユーザーHOME、mise、fonts、terminfo、externalsのE2Eに限定する。
 
@@ -276,11 +286,12 @@ LinuxとmacOSのE2Eはchezmoi外の各工程の開始時に短い名前を表示
 ## 実装順序
 
 1. 共通archive、age fixture、guest assertion、cleanup処理を作る。
-2. Fedora 44とUbuntu 24.04のPodman E2Eを通す。
-3. Windows golden image builderとKVM driverを追加し、全profilesを通す。
-4. LAN Mac用Tart driverを追加してmacOS E2Eを通す。
-5. AWS EC2 Mac provisioner、SSM transport、自動cleanup scheduleを追加する。
-6. 全backendをmiseタスクへ統合し、READMEへ初期設定、費用、実行方法、復旧方法を記載する。
+2. Fedora 44とUbuntu 24.04 desktop/headlessのPodman E2Eを通す。
+3. Bazzite 44のlocal Podman E2Eを通す。
+4. Windows golden image builderとKVM driverを追加し、全profilesを通す。
+5. LAN Mac用Tart driverを追加してmacOS E2Eを通す。
+6. AWS EC2 Mac provisioner、SSM transport、自動cleanup scheduleを追加する。
+7. 全backendをmiseタスクへ統合し、READMEへ初期設定、費用、実行方法、復旧方法を記載する。
 
 ## 前提と制約
 

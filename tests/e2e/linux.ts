@@ -1,35 +1,89 @@
-import { $, type CommandBuilder } from "@david/dax";
+import { CommandBuilder } from "@david/dax";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { type StagedSource, stageSource } from "./staging.ts";
 
-export type LinuxTarget = "fedora" | "ubuntu";
+export type LinuxTarget = "bazzite" | "fedora" | "ubuntu-desktop" | "ubuntu-headless";
+export type LinuxTargetGroup = LinuxTarget | "ci" | "all";
+
+interface Capabilities {
+  distrobox: boolean;
+  flatpak: boolean;
+  xdgDesktop: boolean;
+}
 
 interface TargetConfig {
+  capabilities: Capabilities;
   containerfile: string;
+  home: string;
   image: string;
   label: string;
+  osId: string;
+  privilegedSystemd: boolean;
+  target?: string;
+  user: string;
+  versionId: string;
 }
 
 const TARGETS: Record<LinuxTarget, TargetConfig> = {
-  fedora: {
-    containerfile: "containers/fedora-44.Containerfile",
-    image: "localhost/chezmoi-e2e-fedora:44",
-    label: "Fedora 44",
+  bazzite: {
+    capabilities: { distrobox: true, flatpak: true, xdgDesktop: true },
+    containerfile: "containers/bazzite-44.Containerfile",
+    home: "/home/e2e",
+    image: "localhost/chezmoi-e2e-bazzite:44",
+    label: "Bazzite 44 desktop",
+    osId: "bazzite",
+    privilegedSystemd: true,
+    user: "e2e",
+    versionId: "44",
   },
-  ubuntu: {
+  fedora: {
+    capabilities: { distrobox: false, flatpak: false, xdgDesktop: true },
+    containerfile: "containers/fedora-44.Containerfile",
+    home: "/home/e2e",
+    image: "localhost/chezmoi-e2e-fedora:44",
+    label: "Fedora 44 compatibility",
+    osId: "fedora",
+    privilegedSystemd: false,
+    user: "e2e",
+    versionId: "44",
+  },
+  "ubuntu-desktop": {
+    capabilities: { distrobox: false, flatpak: false, xdgDesktop: true },
     containerfile: "containers/ubuntu-24.04.Containerfile",
-    image: "localhost/chezmoi-e2e-ubuntu:24.04",
-    label: "Ubuntu 24.04",
+    home: "/home/vscode",
+    image: "localhost/chezmoi-e2e-ubuntu-desktop:24.04",
+    label: "Ubuntu 24.04 devcontainer desktop",
+    osId: "ubuntu",
+    privilegedSystemd: false,
+    target: "desktop",
+    user: "vscode",
+    versionId: "24.04",
+  },
+  "ubuntu-headless": {
+    capabilities: { distrobox: false, flatpak: false, xdgDesktop: false },
+    containerfile: "containers/ubuntu-24.04.Containerfile",
+    home: "/home/vscode",
+    image: "localhost/chezmoi-e2e-ubuntu-headless:24.04",
+    label: "Ubuntu 24.04 devcontainer headless",
+    osId: "ubuntu",
+    privilegedSystemd: false,
+    target: "headless",
+    user: "vscode",
+    versionId: "24.04",
   },
 };
 
+const CI_TARGETS: readonly LinuxTarget[] = ["fedora", "ubuntu-desktop", "ubuntu-headless"];
+const ALL_TARGETS: readonly LinuxTarget[] = ["bazzite", ...CI_TARGETS];
 const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 const repository = join(moduleDirectory, "..", "..");
 const signalShieldedExec = 'trap "" HUP INT TERM; exec "$@"';
+const cleanupTimeoutSeconds = 120;
+const presenceTimeoutSeconds = 15;
 
-export async function runLinuxTargets(target: LinuxTarget | "all"): Promise<void> {
-  const targets: LinuxTarget[] = target === "all" ? ["fedora", "ubuntu"] : [target];
+export async function runLinuxTargets(group: LinuxTargetGroup): Promise<void> {
+  const targets = resolveTargets(group);
   const abort = new AbortController();
   let receivedSignal: Deno.Signal | undefined;
   let successfulCleanupStarted = false;
@@ -86,11 +140,15 @@ export async function runLinuxTargets(target: LinuxTarget | "all"): Promise<void
   if (receivedSignal !== undefined) throw new InterruptedError(receivedSignal);
 
   if (failures.length > 0) {
-    const names = failures.map(({ target: failedTarget }) => TARGETS[failedTarget].label).join(
-      ", ",
-    );
+    const names = failures.map(({ target }) => TARGETS[target].label).join(", ");
     throw new Error(`Linux E2E failed for: ${names}`);
   }
+}
+
+function resolveTargets(group: LinuxTargetGroup): readonly LinuxTarget[] {
+  if (group === "all") return ALL_TARGETS;
+  if (group === "ci") return CI_TARGETS;
+  return [group];
 }
 
 async function runLinuxTarget(
@@ -119,6 +177,8 @@ async function runLinuxTarget(
           sourceSha256: staged.sha256,
           containerName,
           volumeName,
+          capabilities: config.capabilities,
+          privilegedSystemd: config.privilegedSystemd,
         },
         null,
         2,
@@ -143,85 +203,188 @@ async function runLinuxTarget(
 
   let completed = false;
   let archiveCopied = false;
+  let sourcePrepared = false;
   let cleanupFailure: string | undefined;
 
   try {
+    if (config.privilegedSystemd) {
+      await execute(
+        "preflight cgroup v2",
+        command(["sh", "-c", "test $(stat -fc %T /sys/fs/cgroup) = cgroup2fs"]).signal(signal),
+      );
+    }
+
+    const buildArguments = ["build", "--file", containerfile, "--tag", config.image];
+    if (config.target !== undefined) buildArguments.push("--target", config.target);
+    buildArguments.push(repository);
+    await execute("build image", podman(config, buildArguments).signal(signal));
     await execute(
-      "build image",
-      $`podman build --file ${containerfile} --tag ${config.image} ${repository}`.signal(
-        signal,
-      ),
+      "create home volume",
+      podman(config, ["volume", "create", volumeName]).signal(signal),
     );
-    await execute("create home volume", $`podman volume create ${volumeName}`.signal(signal));
-    await execute(
-      "create container",
-      $`podman create --name ${containerName} --volume ${volumeName}:/home/e2e:U --env CHEZMOI_AGE_KEY --env CHEZMOI_E2E=1 --env CHEZMOI_E2E_RECIPIENT=${staged.recipient} ${config.image}`
-        .env({ CHEZMOI_AGE_KEY: staged.identity })
-        .signal(signal),
-    );
+
+    const createArguments = [
+      "create",
+      "--name",
+      containerName,
+      "--volume",
+      `${volumeName}:${config.home}:U`,
+      "--env",
+      "CHEZMOI_E2E=1",
+      "--env",
+      `CHEZMOI_E2E_RECIPIENT=${staged.recipient}`,
+    ];
+    if (config.privilegedSystemd) {
+      createArguments.push(
+        "--hostname",
+        "cristina",
+        "--privileged",
+        "--systemd=always",
+        config.image,
+        "/sbin/init",
+      );
+    } else {
+      createArguments.push("--env", "CHEZMOI_AGE_KEY", config.image);
+    }
+    let createCommand = podman(config, createArguments).signal(signal);
+    if (!config.privilegedSystemd) {
+      createCommand = createCommand.env({ CHEZMOI_AGE_KEY: staged.identity });
+    }
+    await execute("create container", createCommand);
+    if (config.privilegedSystemd) {
+      await execute(
+        "copy age identity",
+        podman(config, [
+          "cp",
+          staged.identityPath,
+          `${containerName}:/usr/local/secrets/CHEZMOI_AGE_KEY`,
+        ]).signal(signal),
+      );
+    }
     await execute(
       "copy source archive",
-      $`podman cp ${staged.archivePath} ${containerName}:/tmp/source.tar`.signal(signal),
+      podman(config, ["cp", staged.archivePath, `${containerName}:/tmp/source.tar`]).signal(signal),
     );
     archiveCopied = true;
-    await execute("start container", $`podman start ${containerName}`.signal(signal));
+    await execute("start container", podman(config, ["start", containerName]).signal(signal));
+
+    if (config.privilegedSystemd) {
+      await execute(
+        "wait for user systemd",
+        podman(config, [
+          "exec",
+          containerName,
+          "/bin/sh",
+          "-c",
+          "for i in $(seq 1 60); do test -S /run/user/1000/bus && exit 0; sleep 1; done; exit 1",
+        ]).signal(signal),
+      );
+      await execute(
+        "prepare desktop runtime directory",
+        podman(config, [
+          "exec",
+          containerName,
+          "install",
+          "-d",
+          "-o",
+          config.user,
+          "-g",
+          config.user,
+          "/run/user/1000/X11-unix",
+        ]).signal(signal),
+      );
+    }
+
     await execute(
-      "create source directory",
-      $`podman exec ${containerName} mkdir -p /tmp/source`.signal(signal),
+      "prepare source directory",
+      podman(config, [
+        "exec",
+        containerName,
+        "/bin/sh",
+        "-c",
+        `mkdir -p /tmp/source && tar -xf /tmp/source.tar -C /tmp/source && chown -R ${config.user}:${config.user} /tmp/source ${config.home}${
+          config.privilegedSystemd ? " /usr/local/secrets/CHEZMOI_AGE_KEY" : ""
+        }`,
+      ]).signal(signal),
     );
+    sourcePrepared = true;
     await execute(
-      "extract source archive",
-      $`podman exec ${containerName} tar -xf /tmp/source.tar -C /tmp/source`.signal(signal),
+      "verify target environment",
+      userExec(config, containerName, [
+        "/bin/sh",
+        "-c",
+        environmentAssertion(config),
+      ]).signal(signal),
     );
     await execute(
       "bootstrap with install.sh",
-      $`podman exec --workdir /tmp/source ${containerName} /bin/sh ./install.sh`.signal(
-        signal,
-      ),
+      userExec(config, containerName, [
+        "/bin/sh",
+        "-c",
+        "cd /tmp/source && exec /bin/sh ./install.sh",
+      ])
+        .signal(signal),
+    );
+    await execute(
+      "verify encrypted sentinel",
+      userExec(config, containerName, [
+        "/bin/sh",
+        "-c",
+        `test \"$(cat ${config.home}/.config/chezmoi-e2e/sentinel.txt)\" = chezmoi-e2e-sentinel`,
+      ]).signal(signal),
     );
     await execute(
       "verify initial target state",
-      $`podman exec ${containerName} /home/e2e/.local/bin/chezmoi --source /tmp/source verify --exclude scripts`
-        .signal(
-          signal,
-        ),
+      userExec(config, containerName, [
+        `${config.home}/.local/bin/chezmoi`,
+        "--source",
+        "/tmp/source",
+        "verify",
+        "--exclude",
+        "scripts",
+      ]).signal(signal),
     );
     await execute(
       "apply a second time",
-      $`podman exec ${containerName} /home/e2e/.local/bin/chezmoi --source /tmp/source apply`
-        .signal(
-          signal,
-        ),
+      userExec(config, containerName, [
+        `${config.home}/.local/bin/chezmoi`,
+        "--source",
+        "/tmp/source",
+        "apply",
+      ]).signal(signal),
     );
     await execute(
       "verify final target state",
-      $`podman exec ${containerName} /home/e2e/.local/bin/chezmoi --source /tmp/source verify --exclude scripts`
-        .signal(
-          signal,
-        ),
+      userExec(config, containerName, [
+        `${config.home}/.local/bin/chezmoi`,
+        "--source",
+        "/tmp/source",
+        "verify",
+        "--exclude",
+        "scripts",
+      ]).signal(signal),
     );
-    await execute(
-      "verify x-open-default handler",
-      $`podman exec ${containerName} /bin/sh -c 'grep -Fqx x-scheme-handler/x-open-default=open-in-default-browser.desktop /home/e2e/.config/mimeapps.list'`
-        .signal(signal),
-    );
+    await verifyOutcomes(config, containerName, execute, signal);
     completed = true;
   } finally {
     if (completed) beginSuccessfulCleanup();
-    let containerPresence = await resourcePresence("container", containerName);
-    let volumePresence = await resourcePresence("volume", volumeName);
+    let containerPresence = await resourcePresence(config, "container", containerName);
+    let volumePresence = await resourcePresence(config, "volume", volumeName);
 
     if (completed) {
       const cleanupErrors: string[] = [];
       let containerRemoved = containerPresence === "absent";
       if (containerPresence !== "absent") {
-        const result =
-          await $`sh -c ${signalShieldedExec} sh setsid --fork --wait podman rm --force ${containerName}`
-            .quiet().noThrow();
+        const result = await shieldedPodman(
+          config,
+          ["rm", "--force", containerName],
+          cleanupTimeoutSeconds,
+        ).quiet()
+          .noThrow();
         if (result.code !== 0) {
           cleanupErrors.push(`container cleanup exited ${result.code}`);
         } else {
-          containerPresence = await resourcePresence("container", containerName);
+          containerPresence = await resourcePresence(config, "container", containerName);
           containerRemoved = containerPresence === "absent";
           if (!containerRemoved) {
             cleanupErrors.push(`container cleanup left resource ${containerPresence}`);
@@ -229,64 +392,159 @@ async function runLinuxTarget(
         }
       }
       if (containerRemoved && volumePresence !== "absent") {
-        const result =
-          await $`sh -c ${signalShieldedExec} sh setsid --fork --wait podman volume rm ${volumeName}`
-            .quiet().noThrow();
+        const result = await shieldedPodman(
+          config,
+          ["volume", "rm", volumeName],
+          cleanupTimeoutSeconds,
+        ).quiet().noThrow();
         if (result.code !== 0) cleanupErrors.push(`volume cleanup exited ${result.code}`);
       }
       if (cleanupErrors.length > 0) {
-        containerPresence = await resourcePresence("container", containerName);
-        volumePresence = await resourcePresence("volume", volumeName);
+        containerPresence = await resourcePresence(config, "container", containerName);
+        volumePresence = await resourcePresence(config, "volume", volumeName);
         reportRetainedResources(
+          config,
           logDirectory,
           containerName,
           volumeName,
           containerPresence,
           volumePresence,
           archiveCopied,
+          sourcePrepared,
         );
         cleanupFailure = cleanupErrors.join(", ");
       }
     } else if (containerPresence !== "absent" || volumePresence !== "absent") {
       reportRetainedResources(
+        config,
         logDirectory,
         containerName,
         volumeName,
         containerPresence,
         volumePresence,
         archiveCopied,
+        sourcePrepared,
       );
     }
   }
-  if (cleanupFailure !== undefined) {
-    throw new Error(`Linux E2E cleanup failed: ${cleanupFailure}`);
+  if (cleanupFailure !== undefined) throw new Error(`Linux E2E cleanup failed: ${cleanupFailure}`);
+}
+
+async function verifyOutcomes(
+  config: TargetConfig,
+  containerName: string,
+  execute: (step: string, builder: CommandBuilder) => Promise<void>,
+  signal: AbortSignal,
+): Promise<void> {
+  const mimeapps = `${config.home}/.config/mimeapps.list`;
+  const handlerAssertion = config.capabilities.xdgDesktop
+    ? `grep -Fqx x-scheme-handler/x-open-default=open-in-default-browser.desktop ${mimeapps}`
+    : `test ! -e ${mimeapps} || ! grep -Fq x-scheme-handler/x-open-default= ${mimeapps}`;
+  await execute(
+    "verify x-open-default outcome",
+    userExec(config, containerName, ["/bin/sh", "-c", handlerAssertion]).signal(signal),
+  );
+
+  if (config.capabilities.flatpak) {
+    await execute(
+      "verify Flatpak applications",
+      userExec(config, containerName, [
+        "/bin/bash",
+        "-c",
+        `set -euo pipefail; installed="$(flatpak list --system --app --columns=application,branch)"; while IFS=$'\\t' read -r id branch; do flatpak info --system "$id" >/dev/null; grep -Fqx "$id\t$branch" <<<"$installed"; done < <(chezmoi execute-template --source /tmp/source '{{ range .flatpak.apps }}{{ .id }}{{ "\\t" }}{{ .branch }}{{ "\\n" }}{{ end }}')`,
+      ]).signal(signal),
+    );
   }
+
+  if (config.capabilities.distrobox) {
+    await execute(
+      "verify Distrobox applications",
+      userExec(config, containerName, [
+        "/bin/bash",
+        "-c",
+        `set -euo pipefail; for name in dms noctalia scroll; do distrobox list --no-color | grep -Eq "(^|[[:space:]|])$name([[:space:]|]|$)"; test -f ${config.home}/.local/state/chezmoi/distrobox/$name.applied; done`,
+      ]).signal(signal),
+    );
+  }
+}
+
+function environmentAssertion(config: TargetConfig): string {
+  const capability = (name: string, expected: boolean) =>
+    expected ? `command -v ${name} >/dev/null` : `! command -v ${name} >/dev/null`;
+  return [
+    "set -eu",
+    `. /etc/os-release`,
+    `test \"$ID\" = ${config.osId}`,
+    `test \"$VERSION_ID\" = ${config.versionId}`,
+    `test \"$(id -un)\" = ${config.user}`,
+    `test \"$HOME\" = ${config.home}`,
+    capability("flatpak", config.capabilities.flatpak),
+    capability("distrobox", config.capabilities.distrobox),
+    capability("xdg-mime", config.capabilities.xdgDesktop),
+    capability("update-desktop-database", config.capabilities.xdgDesktop),
+  ].join("; ");
+}
+
+function userExec(
+  config: TargetConfig,
+  containerName: string,
+  arguments_: string[],
+): CommandBuilder {
+  return podman(config, ["exec", "--user", config.user, containerName, ...arguments_]);
+}
+
+function podman(_config: TargetConfig, arguments_: string[]): CommandBuilder {
+  return command(["podman", ...arguments_]);
+}
+
+function shieldedPodman(
+  _config: TargetConfig,
+  arguments_: string[],
+  timeoutSeconds: number,
+): CommandBuilder {
+  return command([
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=5s",
+    `${timeoutSeconds}s`,
+    "sh",
+    "-c",
+    signalShieldedExec,
+    "sh",
+    "podman",
+    ...arguments_,
+  ]);
+}
+
+function command(arguments_: string[]): CommandBuilder {
+  return new CommandBuilder().command(arguments_);
 }
 
 type ResourcePresence = "present" | "absent" | "unknown";
 
 async function resourcePresence(
+  config: TargetConfig,
   kind: "container" | "volume",
   name: string,
 ): Promise<ResourcePresence> {
-  const result = kind === "container"
-    ? await $`sh -c ${signalShieldedExec} sh setsid --fork --wait podman container exists ${name}`
-      .quiet().noThrow()
-    : await $`sh -c ${signalShieldedExec} sh setsid --fork --wait podman volume exists ${name}`
-      .quiet().noThrow();
+  const result = await shieldedPodman(config, [kind, "exists", name], presenceTimeoutSeconds)
+    .quiet().noThrow();
   if (result.code === 0) return "present";
   if (result.code === 1) return "absent";
   return "unknown";
 }
 
 function reportRetainedResources(
+  config: TargetConfig,
   logDirectory: string,
   containerName: string,
   volumeName: string,
   containerPresence: ResourcePresence,
   volumePresence: ResourcePresence,
   archiveCopied: boolean,
+  sourcePrepared: boolean,
 ): void {
+  const engine = "podman";
   const lines = [
     "",
     "E2E resources retained for investigation:",
@@ -296,23 +554,26 @@ function reportRetainedResources(
   ];
   if (containerPresence !== "absent") {
     lines.push(
-      `  start (if stopped): podman start ${containerName}`,
-      `  shell: podman exec -it ${containerName} /bin/bash`,
+      `  start (if stopped): ${engine} start ${containerName}`,
+      `  shell: ${engine} exec -it ${containerName} /bin/bash`,
     );
-    if (archiveCopied) {
+    if (sourcePrepared) {
       lines.push(
-        `  prepare source: podman exec ${containerName} mkdir -p /tmp/source`,
-        `  extract source: podman exec ${containerName} tar -xf /tmp/source.tar -C /tmp/source`,
-        `  retry install: podman exec --workdir /tmp/source ${containerName} /bin/sh ./install.sh`,
+        `  retry install: ${engine} exec --user ${config.user} ${containerName} /bin/sh -c 'cd /tmp/source && exec /bin/sh ./install.sh'`,
+      );
+    } else if (archiveCopied) {
+      lines.push(
+        `  prepare source: ${engine} exec ${containerName} /bin/sh -c 'mkdir -p /tmp/source && tar -xf /tmp/source.tar -C /tmp/source && chown -R ${config.user}:${config.user} /tmp/source ${config.home}${
+          config.privilegedSystemd ? " /usr/local/secrets/CHEZMOI_AGE_KEY" : ""
+        }'`,
+        `  retry install after preparation: ${engine} exec --user ${config.user} ${containerName} /bin/sh -c 'cd /tmp/source && exec /bin/sh ./install.sh'`,
       );
     } else {
       lines.push("  source archive: not copied; inspect the logs before retrying");
     }
-    lines.push(`  remove container: podman rm --force ${containerName}`);
+    lines.push(`  remove container: ${engine} rm --force ${containerName}`);
   }
-  if (volumePresence !== "absent") {
-    lines.push(`  remove volume: podman volume rm ${volumeName}`);
-  }
+  if (volumePresence !== "absent") lines.push(`  remove volume: ${engine} volume rm ${volumeName}`);
   console.error(lines.join("\n"));
 }
 

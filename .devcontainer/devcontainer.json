@@ -1,10 +1,10 @@
 {
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-    "customizations": {
-      "vscode": {
-        "extensions": [
-          "thenuprojectcontributors.vscode-nushell-lang"
-        ]
-      }
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "thenuprojectcontributors.vscode-nushell-lang"
+      ]
     }
+  }
 }

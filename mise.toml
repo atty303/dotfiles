@@ -47,7 +47,7 @@ mise run check
 mise run test:distrobox
 mise run test:flatpak
 mise run test:chrome-web-apps
-mise run test:e2e:linux
+mise run test:e2e:linux:ci
 '''
 
 [tasks."test:distrobox"]
@@ -69,12 +69,24 @@ run = "bash tests/chrome-web-apps.sh"
 description = "Run the full chezmoi E2E test on Fedora 44"
 run = "deno run -A tests/e2e/main.ts linux fedora"
 
-[tasks."test:e2e:linux:ubuntu"]
-description = "Run the full chezmoi E2E test on Ubuntu 24.04"
-run = "deno run -A tests/e2e/main.ts linux ubuntu"
+[tasks."test:e2e:linux:ubuntu-desktop"]
+description = "Run the full chezmoi E2E test in an Ubuntu 24.04 desktop devcontainer"
+run = "deno run -A tests/e2e/main.ts linux ubuntu-desktop"
+
+[tasks."test:e2e:linux:ubuntu-headless"]
+description = "Run the full chezmoi E2E test in a headless Ubuntu 24.04 devcontainer"
+run = "deno run -A tests/e2e/main.ts linux ubuntu-headless"
+
+[tasks."test:e2e:linux:bazzite"]
+description = "Run the local full chezmoi E2E test on Bazzite 44"
+run = "deno run -A tests/e2e/main.ts linux bazzite"
+
+[tasks."test:e2e:linux:ci"]
+description = "Run the Linux E2E targets supported in CI"
+run = "deno run -A tests/e2e/main.ts linux ci"
 
 [tasks."test:e2e:linux"]
-description = "Run the full chezmoi E2E test on all Linux targets"
+description = "Run all local Linux E2E targets, including privileged Bazzite"
 run = "deno run -A tests/e2e/main.ts linux all"
 
 [tasks."test:e2e:mac:prepare"]

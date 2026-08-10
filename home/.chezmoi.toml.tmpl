@@ -3,6 +3,7 @@
 {{- $work := false -}}{{/* true if this machine is a work machine */}}
 {{- $headless := false -}}{{/* true if this machine does not have a screen and keyboard */}}
 {{- $personal := false -}}{{/* true if this machine should have personal secrets */}}
+{{/* E2E mode replaces personal encrypted targets with a temporary age sentinel. */}}
 {{- $e2e := eq (env "CHEZMOI_E2E") "1" -}}
 {{- "" -}}
 
@@ -18,11 +19,6 @@
 {{-   $ephemeral = true -}}
 {{-   $headless = true -}}
 {{- end -}}
-{{- if $e2e -}}
-{{-   $ephemeral = true -}}
-{{-   $headless = true -}}
-{{- end -}}
-
 {{/* work around unreliable hostname on darwin */}}
 {{- $hostname := .chezmoi.hostname -}}
 {{- if eq .chezmoi.os "darwin" -}}
@@ -54,6 +50,7 @@ encryption = "age"
 [age]
   identity = "~/.config/chezmoi/key.txt"
 {{- if $e2e }}
+  # The E2E harness generates a fresh recipient for its encrypted sentinel.
   recipient = {{ env "CHEZMOI_E2E_RECIPIENT" | quote }}
 {{- else }}
   recipient = "age1hwzfym9sw8wjyckwfgul4qe6mn67h8rrkw9vfprl95nv3dd0qd7susuu8z"

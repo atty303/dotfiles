@@ -1,15 +1,24 @@
 import { Command, EnumType } from "@cliffy/command";
-import { type LinuxTarget, runLinuxTargets } from "./linux.ts";
+import { type LinuxTargetGroup, runLinuxTargets } from "./linux.ts";
 import { runMacHost, runMacLan, runMacLocal } from "./mac.ts";
 import { prepareMacHost } from "./mac_prepare.ts";
 
-const linuxTarget = new EnumType(["fedora", "ubuntu", "all"] as const);
+const linuxTarget = new EnumType(
+  [
+    "bazzite",
+    "fedora",
+    "ubuntu-desktop",
+    "ubuntu-headless",
+    "ci",
+    "all",
+  ] as const,
+);
 
 const linuxCommand = new Command()
   .description("Run a full chezmoi apply in clean Linux containers")
   .type("linux-target", linuxTarget)
   .arguments("<target:linux-target>")
-  .action(async (_options, target: LinuxTarget | "all") => {
+  .action(async (_options, target: LinuxTargetGroup) => {
     await runLinuxTargets(target);
   });
 
