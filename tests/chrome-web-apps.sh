@@ -84,11 +84,17 @@ assert_log_contains "$log" '/etc/opt/chrome/policies/managed/web-apps.json'
 
 manifest="$test_home/.var/app/com.google.Chrome/config/google-chrome-web-apps/x/Default/Web Applications/Manifest Resources/lodlkdfmihgonocnmddehnfgiljnadcf"
 mkdir -p "$manifest"
+log="$temporary/x-pending.log"
+run_launcher "$log" x
+assert_log_contains "$log" '--app=https://x.com/'
+
+preferences="$test_home/.var/app/com.google.Chrome/config/google-chrome-web-apps/x/Default/Preferences"
+printf '{"web_app_install_metrics":{"lodlkdfmihgonocnmddehnfgiljnadcf":{}}}\n' >"$preferences"
 log="$temporary/x-app-id.log"
 run_launcher "$log" x
 assert_log_contains "$log" '--app-id=lodlkdfmihgonocnmddehnfgiljnadcf'
 if grep -Fq -- '--app=https://x.com/' "$log"; then
-  printf 'launcher used the URL after the target manifest became ready\n' >&2
+  printf 'launcher used the URL after the target app was registered\n' >&2
   exit 1
 fi
 

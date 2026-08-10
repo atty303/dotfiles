@@ -53,7 +53,7 @@ if [[ ! -r $policy_file ]]; then
 fi
 
 user_data_dir="$HOME/.var/app/com.google.Chrome/config/google-chrome-web-apps/$key"
-manifest_directory="$user_data_dir/Default/Web Applications/Manifest Resources/$app_id"
+preferences_file="$user_data_dir/Default/Preferences"
 
 chrome_args=(
   "--user-data-dir=$user_data_dir"
@@ -62,7 +62,7 @@ chrome_args=(
 )
 if [[ $browser_mode == true ]]; then
   chrome_args+=(chrome://policy)
-elif [[ -d $manifest_directory ]]; then
+elif [[ -f $preferences_file ]] && grep -Fq "$app_id" "$preferences_file"; then
   chrome_args+=("--app-id=$app_id")
 else
   chrome_args+=("--app=$url")
