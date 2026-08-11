@@ -73,6 +73,32 @@ test -x "$HOME/.local/bin/age"
 test -x "$HOME/.local/bin/bat"
 test -x "$HOME/.local/bin/rg"
 
+echo "verify: fonts"
+font_family_installed() {
+  test "$(/usr/bin/osascript -l JavaScript - "$1" <<'JXA'
+function run(argv) {
+  ObjC.import("AppKit");
+  const families = ObjC.unwrap($.NSFontManager.sharedFontManager.availableFontFamilies);
+  return families.includes(argv[0]);
+}
+JXA
+)" = true
+}
+font_family_installed "UDEV Gothic NF"
+font_family_installed "UDEV Gothic NFLG"
+font_family_installed "Noto Sans Mono CJK JP"
+font_family_installed "Noto Sans CJK JP" || font_family_installed "Noto Sans JP"
+font_family_installed "Noto Serif CJK JP" || font_family_installed "Noto Serif JP"
+
+installer="$($chezmoi --source "$source_directory" execute-template --file "$source_directory/home/.chezmoiscripts/darwin/run_after_install-fonts.sh.tmpl")"
+result="$(printf '%s\n' "$installer" | /bin/sh)"
+for family in "IBM Plex Sans Condensed" "IBM Plex Sans JP"; do
+  printf '%s\n' "$result" | grep -Fqx "Google Font already installed: $family"
+done
+for asset in udev-gothic-nf noto-sans-jp noto-serif-jp noto-sans-mono-cjk-jp; do
+  printf '%s\n' "$result" | grep -Fqx "Font asset already satisfied: $asset"
+done
+
 echo "verify: idempotence"
 test -z "$("$chezmoi" --source "$source_directory" status)"
 "$chezmoi" --source "$source_directory" apply --dry-run --verbose

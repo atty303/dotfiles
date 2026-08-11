@@ -1,0 +1,133 @@
+$ErrorActionPreference = "Stop"
+
+if (-not (Get-InstalledPSResource -Name Fonts -Version 1.1.18 -ErrorAction SilentlyContinue)) {
+    Install-PSResource -Name Fonts -TrustRepository -Version 1.1.18
+}
+Import-Module -Name Fonts -Version 1.0.15
+if (-not (Get-InstalledPSResource -Name GoogleFonts -ErrorAction SilentlyContinue)) {
+    Install-PSResource -Name GoogleFonts -TrustRepository
+}
+Import-Module -Name GoogleFonts
+
+$googleFonts = @(
+{{ range .fonts.google -}}
+    "{{ .family }}"
+{{ end -}}
+)
+
+$fontAssets = @(
+{{ range .fonts.assets.all -}}
+    [PSCustomObject]@{
+        Id = "{{ .id }}"
+        FamilyMode = "{{ .family_mode }}"
+        Families = @(
+{{ range .families -}}
+            "{{ . }}"
+{{ end -}}
+        )
+        Url = "{{ .url }}"
+        Sha256 = "{{ .sha256 }}"
+        Kind = "{{ .kind }}"
+        Files = @(
+{{ range .files -}}
+            "{{ . }}"
+{{ end -}}
+        )
+    }
+{{ end -}}
+)
+
+function Get-InstalledFontFamilies {
+    $collection = [System.Drawing.Text.InstalledFontCollection]::new()
+    try {
+        return @($collection.Families | ForEach-Object Name)
+    }
+    finally {
+        $collection.Dispose()
+    }
+}
+
+function Test-FontFamilies {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateSet("all", "any")]
+        [string]$Mode,
+
+        [Parameter(Mandatory = $true)]
+        [string[]]$Families
+    )
+
+    $installed = Get-InstalledFontFamilies
+    $matches = @($Families | Where-Object { $_ -in $installed }).Count
+    if ($Mode -eq "all") {
+        return $matches -eq $Families.Count
+    }
+    return $matches -gt 0
+}
+
+function Install-FontAsset {
+    param(
+        [Parameter(Mandatory = $true)]
+        [PSCustomObject]$Asset
+    )
+
+    if (Test-FontFamilies -Mode $Asset.FamilyMode -Families $Asset.Families) {
+        Write-Host "Font asset already satisfied: $( $Asset.Id )"
+        return
+    }
+
+    $tempPath = Join-Path ([System.IO.Path]::GetTempPath()) "fonts-$( [guid]::NewGuid() )"
+    $payloadPath = Join-Path $tempPath "payload"
+    try {
+        $null = New-Item -ItemType Directory -Path $tempPath
+        Invoke-WebRequest -Uri $Asset.Url -OutFile $payloadPath
+
+        $actualSha256 = (Get-FileHash -Algorithm SHA256 -Path $payloadPath).Hash.ToLowerInvariant()
+        if ($actualSha256 -ne $Asset.Sha256) {
+            throw "SHA-256 mismatch for $( $Asset.Id )"
+        }
+
+        switch ($Asset.Kind) {
+            "file" {
+                $fontPath = Join-Path $tempPath $Asset.Files[0]
+                Copy-Item -Path $payloadPath -Destination $fontPath
+                Install-Font -Path $fontPath
+            }
+            "zip" {
+                $extractPath = Join-Path $tempPath "extracted"
+                Expand-Archive -Path $payloadPath -DestinationPath $extractPath
+                foreach ($relativePath in $Asset.Files) {
+                    $platformPath = $relativePath.Replace("/", [System.IO.Path]::DirectorySeparatorChar)
+                    $fontPath = Join-Path $extractPath $platformPath
+                    if (-not (Test-Path -LiteralPath $fontPath -PathType Leaf)) {
+                        throw "$relativePath was not found in $( $Asset.Id )"
+                    }
+                    Install-Font -Path $fontPath
+                }
+            }
+            default {
+                throw "Unsupported asset kind '$( $Asset.Kind )' for $( $Asset.Id )"
+            }
+        }
+
+        Write-Host "Installed font asset: $( $Asset.Id )"
+    }
+    finally {
+        if (Test-Path -LiteralPath $tempPath) {
+            Remove-Item -LiteralPath $tempPath -Recurse -Force
+        }
+    }
+}
+
+foreach ($family in $googleFonts) {
+    if (Test-FontFamilies -Mode any -Families @($family)) {
+        Write-Host "Google Font already installed: $family"
+    }
+    else {
+        Install-GoogleFont -Name $family
+    }
+}
+
+foreach ($asset in $fontAssets) {
+    Install-FontAsset -Asset $asset
+}

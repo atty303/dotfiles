@@ -1,0 +1,56 @@
+#!/bin/sh
+
+set -eu
+
+fonts_dir=${XDG_DATA_HOME:-$HOME/.local/share}/fonts
+mkdir -p "$fonts_dir"
+
+font_family_installed() {
+  fc-list : family | tr ',' '\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | grep -Fxq "$1"
+}
+
+font_file_sha256() {
+  sha256sum "$1" | awk '{ print $1 }'
+}
+
+extract_font_archive() {
+  archive=$1
+  destination=$2
+
+  if command -v unzip >/dev/null 2>&1; then
+    unzip -qq "$archive" -d "$destination"
+  elif command -v bsdtar >/dev/null 2>&1; then
+    bsdtar -xf "$archive" -C "$destination"
+  else
+    echo "font installer: unzip or bsdtar is required" >&2
+    return 1
+  fi
+}
+
+install_google_font() {
+  family=$1
+  if font_family_installed "$family"; then
+    echo "Google Font already installed: $family"
+    return
+  fi
+
+  (
+    cd "$fonts_dir"
+    mise exec http:google-font-download[url=https://raw.githubusercontent.com/neverpanic/google-font-download/refs/tags/1.4.3/google-font-download]@1.4.3 -- \
+      google-font-download --format=ttf --languages=all --output=/dev/null "$family"
+  )
+}
+
+{{ template "install-font-assets.sh" . }}
+
+{{ range .fonts.google -}}
+install_google_font {{ .family | quote }}
+{{ end -}}
+{{ range .fonts.assets.all -}}
+install_font_asset {{ .id | quote }} {{ .family_mode | quote }} {{ join "|" .families | quote }} {{ .url | quote }} {{ .sha256 | quote }} {{ .kind | quote }} {{ join "|" .files | quote }}
+{{ end -}}
+{{ range .fonts.assets.linux -}}
+install_font_asset {{ .id | quote }} {{ .family_mode | quote }} {{ join "|" .families | quote }} {{ .url | quote }} {{ .sha256 | quote }} {{ .kind | quote }} {{ join "|" .files | quote }}
+{{ end -}}
+
+fc-cache -f "$fonts_dir" >/dev/null

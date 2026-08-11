@@ -1,11 +1,84 @@
-[fonts]
-google = [
-    "IBM Plex Sans Condensed",
-    "IBM Plex Sans JP",
-    "BIZ UDPGothic:400",
-    "BIZ UDPGothic:700",
+[[fonts.google]]
+family = "IBM Plex Sans Condensed"
+
+[[fonts.google]]
+family = "IBM Plex Sans JP"
+
+[[fonts.assets.all]]
+id = "udev-gothic-nf"
+families = ["UDEV Gothic NF", "UDEV Gothic NFLG"]
+family_mode = "all"
+url = "https://github.com/yuru7/udev-gothic/releases/download/v2.1.0/UDEVGothic_NF_v2.1.0.zip"
+sha256 = "2d3ea89a7dfbf5ad07893fa1a39894f5860a146fd2633311176c61dcca6120e7"
+kind = "zip"
+files = [
+  "UDEVGothic_NF_v2.1.0/UDEVGothicNF-Bold.ttf",
+  "UDEVGothic_NF_v2.1.0/UDEVGothicNF-BoldItalic.ttf",
+  "UDEVGothic_NF_v2.1.0/UDEVGothicNF-Italic.ttf",
+  "UDEVGothic_NF_v2.1.0/UDEVGothicNF-Regular.ttf",
+  "UDEVGothic_NF_v2.1.0/UDEVGothicNFLG-Bold.ttf",
+  "UDEVGothic_NF_v2.1.0/UDEVGothicNFLG-BoldItalic.ttf",
+  "UDEVGothic_NF_v2.1.0/UDEVGothicNFLG-Italic.ttf",
+  "UDEVGothic_NF_v2.1.0/UDEVGothicNFLG-Regular.ttf",
 ]
-zip = [
-    "https://github.com/yuru7/udev-gothic/releases/download/v2.1.0/UDEVGothic_v2.1.0.zip",
-    "https://github.com/yuru7/udev-gothic/releases/download/v2.1.0/UDEVGothic_NF_v2.1.0.zip",
+
+[[fonts.assets.all]]
+id = "noto-sans-jp"
+families = ["Noto Sans CJK JP", "Noto Sans JP"]
+family_mode = "any"
+url = "https://github.com/notofonts/noto-cjk/releases/download/Sans2.004/16_NotoSansJP.zip"
+sha256 = "2bbdd2c20f30670b39ca735c96d75f1fdabdb348103e43b820cf17701fd22b18"
+kind = "zip"
+files = [
+  "NotoSansJP-Regular.otf",
+  "NotoSansJP-Medium.otf",
+  "NotoSansJP-Light.otf",
+  "NotoSansJP-Thin.otf",
+  "NotoSansJP-Bold.otf",
+  "NotoSansJP-DemiLight.otf",
+  "NotoSansJP-Black.otf",
 ]
+
+[[fonts.assets.all]]
+id = "noto-serif-jp"
+families = ["Noto Serif CJK JP", "Noto Serif JP"]
+family_mode = "any"
+url = "https://github.com/notofonts/noto-cjk/releases/download/Serif2.003/12_NotoSerifJP.zip"
+sha256 = "53bdd2a6e4eb63bf24f7890e018dddb94366e3555d0814c72b74fbb128f328f0"
+kind = "zip"
+files = [
+  "SubsetOTF/JP/NotoSerifJP-Bold.otf",
+  "SubsetOTF/JP/NotoSerifJP-Medium.otf",
+  "SubsetOTF/JP/NotoSerifJP-SemiBold.otf",
+  "SubsetOTF/JP/NotoSerifJP-Light.otf",
+  "SubsetOTF/JP/NotoSerifJP-Regular.otf",
+  "SubsetOTF/JP/NotoSerifJP-Black.otf",
+  "SubsetOTF/JP/NotoSerifJP-ExtraLight.otf",
+]
+
+[[fonts.assets.all]]
+id = "noto-sans-mono-cjk-jp"
+families = ["Noto Sans Mono CJK JP"]
+family_mode = "any"
+url = "https://github.com/notofonts/noto-cjk/releases/download/Sans2.004/11_NotoSansMonoCJKjp.zip"
+sha256 = "6c8faf475ce78fa37486dd5d8920e4bb4450b1b0f3c497edf3ba2d25cf52ab78"
+kind = "zip"
+files = ["NotoSansMonoCJKjp-Bold.otf", "NotoSansMonoCJKjp-Regular.otf"]
+
+[[fonts.assets.linux]]
+id = "noto-sans-symbols-2"
+families = ["Noto Sans Symbols 2"]
+family_mode = "any"
+url = "https://github.com/notofonts/symbols/releases/download/NotoSansSymbols2-v2.008/NotoSansSymbols2-v2.008.zip"
+sha256 = "346c930bbe8eb946701a05c54e9c11a2094dee1d93c387bf1771c0a3e335688f"
+kind = "zip"
+files = ["NotoSansSymbols2/full/ttf/NotoSansSymbols2-Regular.ttf"]
+
+[[fonts.assets.linux]]
+id = "noto-color-emoji"
+families = ["Noto Color Emoji"]
+family_mode = "any"
+url = "https://raw.githubusercontent.com/googlefonts/noto-emoji/v2.051/fonts/NotoColorEmoji.ttf"
+sha256 = "72a635cb3d2f3524c51620cdde406b217204e8a6a06c6a096ff8ed4b5fd6e27b"
+kind = "file"
+files = ["NotoColorEmoji.ttf"]
