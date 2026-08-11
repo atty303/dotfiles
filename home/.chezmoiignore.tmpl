@@ -8,6 +8,7 @@ Library/
 {{ end }}
 {{ if ne .chezmoi.os "linux" }}
 .chezmoiscripts/linux/**
+.config/fontconfig/**
 {{ end }}
 {{ if ne .chezmoi.os "windows" }}
 .chezmoiscripts/windows/**
