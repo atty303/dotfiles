@@ -50,13 +50,25 @@ Run commands inside a Distrobox container with `distrobox enter <name> -- <comma
 login and session environment setup. Use read-only `podman` commands only for container-engine
 lifecycle, storage, or metadata inspection.
 
+## Scroll Maintenance
+
+- Expect recurring Scroll maintenance requests and inspect the existing Scroll manifest, update
+  workflow, session integration, and configuration before changing them.
+- Run the host-exported `scrollmsg` command directly; do not enter the Scroll Distrobox merely to
+  invoke it.
+- For Scroll manual content, consult the upstream sources for
+  [`scroll(1)`](https://github.com/dawsers/scroll/blob/master/sway/scroll.1.scd),
+  [`scroll(5)`](https://github.com/dawsers/scroll/blob/master/sway/scroll.5.scd), and
+  [`scrollmsg(1)`](https://github.com/dawsers/scroll/blob/master/swaymsg/scrollmsg.1.scd) rather than
+  relying on a host or container-installed man page.
+
 ## Coding Style & Naming Conventions
 
 Preserve the format native to each tool (TOML, JSON, KDL, Lua, Nushell, POSIX shell, or PowerShell). Use existing indentation in nearby files and keep shell scripts portable when they declare `#!/bin/sh`. Follow chezmoi attributes exactly: `dot_`, `private_`, `executable_`, `symlink_`, `encrypted_`, and `remove_`. Name lifecycle scripts with chezmoi ordering semantics, for example `run_onchange_after_mise.sh.tmpl`.
 
 ## Testing Guidelines
 
-Run `chezmoi diff` and the dry run before committing. Inspect rendered templates for every affected OS and confirm secret material remains encrypted. Use `mise run test` for the host-native full verification: Linux hosts run the standard Linux E2E and macOS hosts run the local Tart E2E; do not require a Linux host to run macOS E2E remotely. Run `mise run test:e2e:linux` after changing files under `home/.chezmoiscripts/linux/` or changing `install.sh`. The Bazzite E2E is exceptionally slow: run `mise run test:e2e:linux:bazzite` only when the change affects Bazzite-specific Flatpak, Distrobox, privileged systemd, or related integration behavior, and obtain explicit user approval immediately before every run. For executable changes, also run the language's parser or formatter when available.
+Run `chezmoi diff` and the dry run before committing. Inspect rendered templates for every affected OS and confirm secret material remains encrypted. Use `mise run test` when host-native full verification is warranted: Linux hosts run the standard Linux E2E and macOS hosts run the local Tart E2E; do not require a Linux host to run macOS E2E remotely. The standard Linux E2E is unnecessary for changes that affect neither `install.sh`, chezmoi lifecycle scripts under `home/.chezmoiscripts/`, nor template branches; executable files merely installed into the target home directory do not count as scripts for this condition. Run `mise run test:e2e:linux` after changing files under `home/.chezmoiscripts/linux/` or changing `install.sh`. The Bazzite E2E is exceptionally slow: run `mise run test:e2e:linux:bazzite` only when the change affects Bazzite-specific Flatpak, Distrobox, privileged systemd, or related integration behavior, and obtain explicit user approval immediately before every run. For executable changes, also run the language's parser or formatter when available.
 
 For Nushell menu or keybinding changes, do not treat isolated function calls as final verification. Use an interactive Nushell session with all autoload files loaded, then verify the actual key input, candidate updates while typing, selection result, and resulting command-line buffer.
 
