@@ -85,7 +85,9 @@ The extension recognizes X photo and video URLs and prefixes the window title wi
 Scroll's in-process Lua callback converts that marker into the `x-media` mark. When media opens from
 the normal tiled X window, Lua adds `x-media-auto-float` and enables floating. When media closes, it
 returns to tiling only if Lua originally enabled floating; a window that was already floating stays
-floating.
+floating. The automatically floated media window fills the target output width and half its height,
+deriving the logical output geometry from Scroll's workspace split so monitor geometry and split
+ratios do not need to be configured separately.
 
 HTTP(S) links outside `x.com`, `twitter.com`, and their subdomains are encoded into the
 `x-open-default:` URL scheme. The user-level desktop handler validates and decodes the URL, then
