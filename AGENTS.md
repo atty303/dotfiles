@@ -31,6 +31,12 @@ There is no compilation step. Validate on the relevant operating system, especia
   from top to bottom together with the file as explicit apply targets. Applying only the file fails
   before chezmoi creates its missing parents.
 
+## KDE KDED Configuration
+
+Plasma 6 KDED still reads `$XDG_CONFIG_HOME/kded5rc`; do not infer a `kded6rc` filename from the
+major version. In this source state, manage that target through `home/dot_config/private_kded5rc`
+and preserve existing module sections when changing its autoload overrides.
+
 ## Immutable Fedora Application Installation
 
 On immutable Fedora systems such as Bazzite, do not treat the availability of a Fedora RPM as making an application a suitable installation candidate. Host package installation does not use `dnf`, and `rpm-ostree` package layering must not be used to install applications. Prefer simple user-space options such as mise-compatible upstream binaries, portable upstream artifacts, Flatpak, or an existing container image.
