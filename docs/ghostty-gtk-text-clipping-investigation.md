@@ -41,8 +41,13 @@ gtk-xft-dpi=122880
 ```
 
 120 DPIにおける10 ptは約16.667 device pixelであり、確認した失敗条件に一致する。この設定は
-chezmoi管理外だった。生成元は未確認であり、DankMaterialShellが生成した可能性はあるが、本調査では
-断定していない。
+chezmoi管理外だった。生成元はKDEの`kde-gtk-config`に含まれるKDED module `gtkconfig`だった。
+
+`~/.config/kdeglobals`にはIBM Plex Sans JPが設定されていた。2026-06-13にDolphinを起動した直後、
+DBus activationで`kded6`が起動し、autoloadが有効な`gtkconfig`がGTK 3/4の`settings.ini`とCSS、
+`xsettingsd.conf`およびGNOME dconfへKDE設定を同期した。各生成ファイルのtimestampも同じ時刻だった。
+DankMaterialShellはIBM Plex Sans JPを自身のUI fontに使用しているが、`gtkThemingEnabled=false`であり、
+本件のGTK設定生成元ではなかった。
 
 ## 観測結果
 
@@ -279,6 +284,25 @@ FONTCONFIG_FILE=/tmp/ibm-plex-sans-jp-v1.3-fonts.conf \
 
 v1.3 hinted/unhintedはともに再現した。v1.3 hintedはfontversion 65733、既存v1.0は65602だった。
 
+## 採用した対応と結果
+
+通常のdesktopはScrollで、Plasma Waylandは回復用であり、その中のGTK applicationをKDE styleへ同期する
+必要はない。このため、chezmoi管理の`~/.config/kded5rc`へ次を設定した。KDED6も歴史的な
+`kded5rc`というfilenameを使用する。
+
+```ini
+[Module-gtkconfig]
+autoload=false
+```
+
+KDEが生成したGTK 3/4設定、CSSおよび`xsettingsd.conf`を削除し、`gtkconfig`が書き込んだGNOME dconf
+keyをresetした。DankMaterialShellが同期する`color-scheme=prefer-dark`は維持した。対応後にGTK 4が
+解決する設定は、fontがAdwaita Sans 11、themeとicon themeがAdwaita、DPIが96になった。
+
+Dolphinを実際に起動した後も、`org.kde.GtkConfig`はDBusへ登録されず、GTK設定、CSS、
+`xsettingsd.conf`および関連dconf keyは再生成されなかった。Ghosttyは実行中にfont変更を反映し、
+タイトル文字の上端欠けが解消した。
+
 ## 回避策
 
 確認済みの回避策は次のいずれかである。
@@ -296,4 +320,3 @@ rendererは維持されるが、GTKのCairo rendererは比較・fallback用で�
 - GTKのglyph atlasまたはrender node captureによる、欠落pixelとatlas boundsの直接比較
 - GTK main branchでの再現有無
 - GTK upstreamへの新規issue報告と既存issueとの重複判定
-- `~/.config/gtk-4.0/settings.ini`の生成元
