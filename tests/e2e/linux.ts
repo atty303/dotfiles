@@ -93,10 +93,8 @@ export async function runLinuxTargets(target?: LinuxTarget): Promise<void> {
   const targets = selectLinuxTargets(target);
   const abort = new AbortController();
   let receivedSignal: Deno.Signal | undefined;
-  let successfulCleanupStarted = false;
   const handleSignal = (signal: Deno.Signal) => {
     receivedSignal ??= signal;
-    if (successfulCleanupStarted) return;
     abort.abort(new Error(`received ${signal}`));
   };
   const onInterrupt = () => handleSignal("SIGINT");
@@ -112,18 +110,17 @@ export async function runLinuxTargets(target?: LinuxTarget): Promise<void> {
   const failures: Array<{ target: LinuxTarget; error: unknown }> = [];
 
   try {
-    staged = await stageSource(abort.signal);
-    console.log(`source archive sha256: ${staged.sha256}`);
+    const stagedSource = await stageSource(abort.signal);
+    staged = stagedSource;
+    console.log(`source archive sha256: ${stagedSource.sha256}`);
 
-    for (const currentTarget of targets) {
-      successfulCleanupStarted = false;
+    await Promise.allSettled(targets.map(async (currentTarget) => {
       try {
         await runLinuxTarget(
           currentTarget,
-          staged,
+          stagedSource,
           runId,
           abort.signal,
-          () => successfulCleanupStarted = true,
         );
         if (receivedSignal !== undefined) throw new InterruptedError(receivedSignal);
       } catch (error) {
@@ -132,10 +129,11 @@ export async function runLinuxTargets(target?: LinuxTarget): Promise<void> {
         }
         failures.push({ target: currentTarget, error });
         console.error(`${TARGETS[currentTarget].label} failed:`, error);
-      } finally {
-        successfulCleanupStarted = false;
+        throw error;
       }
-    }
+    }));
+
+    if (receivedSignal !== undefined) throw new InterruptedError(receivedSignal);
   } finally {
     if (staged !== undefined) {
       await Deno.remove(staged.tempDir, { recursive: true }).catch(() => undefined);
@@ -161,7 +159,6 @@ async function runLinuxTarget(
   staged: StagedSource,
   runId: string,
   signal: AbortSignal,
-  beginSuccessfulCleanup: () => void,
 ): Promise<void> {
   const config = TARGETS[target];
   const containerName = `chezmoi-e2e-${target}-${runId}`;
@@ -403,8 +400,6 @@ async function runLinuxTarget(
     await verifyOutcomes(target, config, containerName, execute, signal);
     completed = true;
   } finally {
-    if (completed) beginSuccessfulCleanup();
-
     if (completed) {
       const cleanup = await cleanupSuccessfulResources({
         presence: (kind) =>
