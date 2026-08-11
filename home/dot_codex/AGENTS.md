@@ -7,6 +7,10 @@
 - SSH remoteへ `jj git push` するときはsandbox外実行を要求し、`["jj", "git", "push"]`
   を再利用可能な承認単位とする。host SSH設定を迂回するために `GIT_SSH_COMMAND` を上書きしない。
 
+## Secret Handling
+
+- 認証、IAM、OAuthまたは外部サービスの設定をAPIやCLIで取得するときは、raw responseをterminalやtool outputへ出さない。取得時点でallowlistにより必要な非機密fieldだけを抽出し、client secret、access/refresh token、API keyおよびprivate keyを除外する。
+
 ## Dotfiles
 
 - ホームディレクトリのdotfilesは原則としてchezmoiで管理されている。
