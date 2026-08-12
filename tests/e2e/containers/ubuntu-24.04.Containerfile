@@ -24,6 +24,8 @@ CMD ["sleep", "infinity"]
 
 FROM base AS desktop
 USER root
+RUN install -d /usr/share/wayland-sessions \
+    && printf '[Desktop Entry]\nName=E2E\nExec=true\nType=Application\n' >/usr/share/wayland-sessions/e2e.desktop
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         desktop-file-utils \

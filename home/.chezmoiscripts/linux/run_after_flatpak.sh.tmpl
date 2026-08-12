@@ -1,16 +1,33 @@
 #!/usr/bin/env -S bash -euo pipefail
 
+{{- $apps := list -}}
+{{- $remotes := dict -}}
+{{- range $app := .flatpak.apps -}}
+{{-   $selected := not (hasKey $app "roles") -}}
+{{-   range $role := ($app.roles | default (list)) -}}
+{{-     if has $role $.roles -}}
+{{-       $selected = true -}}
+{{-     end -}}
+{{-   end -}}
+{{-   if $selected -}}
+{{-     $apps = append $apps $app -}}
+{{-     $_ := set $remotes $app.remote (index $.flatpak.remotes $app.remote) -}}
+{{-   end -}}
+{{- end }}
 if ! command -v flatpak >/dev/null 2>&1; then
+  exit 0
+fi
+if (({{ len $apps }} == 0)); then
   exit 0
 fi
 
 remote_names=(
-{{- range $name, $_ := .flatpak.remotes }}
+{{- range $name, $_ := $remotes }}
   {{ $name | quote }}
 {{- end }}
 )
 remote_descriptors=(
-{{- range $name, $remote := .flatpak.remotes }}
+{{- range $name, $remote := $remotes }}
   {{ $remote.descriptor_url | quote }}
 {{- end }}
 )
@@ -52,17 +69,17 @@ for remote in "${remote_names[@]}"; do
 done
 
 app_ids=(
-{{- range .flatpak.apps }}
+{{- range $apps }}
   {{ .id | quote }}
 {{- end }}
 )
 app_remotes=(
-{{- range .flatpak.apps }}
+{{- range $apps }}
   {{ .remote | quote }}
 {{- end }}
 )
 app_branches=(
-{{- range .flatpak.apps }}
+{{- range $apps }}
   {{ .branch | quote }}
 {{- end }}
 )

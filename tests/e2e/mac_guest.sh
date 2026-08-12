@@ -44,6 +44,8 @@ if ! "$chezmoi" --source "$source_directory" verify; then
   "$chezmoi" --source "$source_directory" status
   exit 1
 fi
+test "$("$chezmoi" --source "$source_directory" execute-template '{{ .roles | toJson }}')" = \
+  '["development","desktop"]'
 
 echo "verify: encrypted sentinel"
 sentinel=$HOME/.config/chezmoi-e2e/sentinel.txt

@@ -1,6 +1,6 @@
 [packages.windows.winget]
 # TOOD: Intel.IntelDriverAndSupportAssistant if platform is Intel based (not AMD)
-essentials = [
+baseline = [
     "AutoHotkey.AutoHotkey",
     "Zen-Team.Zen-Browser",
     "Zoom.Zoom",

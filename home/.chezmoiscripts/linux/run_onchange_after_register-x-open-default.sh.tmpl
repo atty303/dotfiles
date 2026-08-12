@@ -4,6 +4,10 @@
 # update-desktop-database: {{ if lookPath "update-desktop-database" }}available{{ else }}unavailable{{ end }}
 set -euo pipefail
 
+{{ if not (has "desktop" .roles) -}}
+exit 0
+{{ end -}}
+
 desktop_file=open-in-default-browser.desktop
 applications_directory="$HOME/.local/share/applications"
 

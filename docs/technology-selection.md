@@ -36,7 +36,7 @@ Last updated: 2026-08-09
 
 ### chezmoi — 採用
 
-chezmoiをhome directoryのsource of truthにする最大の理由は、一つのsourceからOS、machine role、hostnameの差を
+chezmoiをhome directoryのsource of truthにする最大の理由は、一つのsourceからOSと複数roleの差を
 templateのdataとして表現できることにある。managed fileだけでなく、secret、external resource、lifecycle scriptを
 同じ適用modelへ置けるため、コピーした設定群ではなく、目的の状態へ収束する環境として管理できる。
 

@@ -82,3 +82,11 @@ src/
 
 # Linux
 .local/share/fonts/
+{{ if not (has "desktop" .roles) }}
+.config/chrome-web-apps/
+.local/bin/chrome-web-app
+.local/bin/open-in-default-browser
+.local/share/applications/chrome-web-app-*.desktop
+.local/share/applications/open-in-default-browser.desktop
+.local/share/icons/hicolor/*/apps/chrome-web-app-*.png
+{{ end }}

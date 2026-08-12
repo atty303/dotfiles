@@ -67,6 +67,7 @@ chmod +x "$fake_bin/sudo"
 rendered="$temporary/flatpak.sh"
 chezmoi execute-template \
   --source "$repository" \
+  --override-data '{"roles":["desktop"]}' \
   <"$repository/home/.chezmoiscripts/linux/run_after_flatpak.sh.tmpl" \
   >"$rendered"
 chmod +x "$rendered"
@@ -135,3 +136,24 @@ for query in remotes list; do
 done
 
 printf 'Flatpak installation tests passed\n'
+
+baseline="$temporary/baseline.sh"
+chezmoi execute-template \
+  --source "$repository" \
+  --override-data '{"roles":[]}' \
+  <"$repository/home/.chezmoiscripts/linux/run_after_flatpak.sh.tmpl" \
+  >"$baseline"
+bash -n "$baseline"
+chmod +x "$baseline"
+baseline_remotes="$temporary/baseline-remotes"
+baseline_apps="$temporary/baseline-apps"
+baseline_log="$temporary/baseline.log"
+: >"$baseline_remotes"
+: >"$baseline_apps"
+: >"$baseline_log"
+FAKE_LOG="$baseline_log" FAKE_REMOTES="$baseline_remotes" FAKE_APPS="$baseline_apps" \
+  PATH="$fake_bin:$PATH" "$baseline"
+if grep -Fq 'sudo ' "$baseline_log"; then
+  printf 'baseline render mutated Flatpak state\n' >&2
+  exit 1
+fi

@@ -95,7 +95,10 @@ LinuxとmacOSでは、lifecycle script内の `mise install` だけを最大3回�
 - Ubuntu 24.04 devcontainer headless（local/CI）
 
 `test:e2e:linux` はBazziteを除く標準3対象を実行する。Bazziteはlocal専用の特殊対象として、必要な場合だけ`test:e2e:linux:bazzite`から明示的に実行する。
-Ubuntuのdesktop/headlessはGUI sessionの有無ではなく、desktop関連commandの有無で区別する。
+Ubuntuのdesktop targetにはWayland session定義を置き、headless targetには置かない。Linuxの
+`desktop` role判定は`/usr/share/wayland-sessions/*.desktop`または
+`/usr/share/xsessions/*.desktop`の存在だけで変わり、実行中session、container、systemd、
+Flatpak、XDG commandの状態には依存しない。
 FedoraはFedora系の軽量な互換性対象とし、Bazziteは実際のdesktop hostに近い統合対象とする。
 
 ### 実行方式
@@ -107,7 +110,7 @@ FedoraはFedora系の軽量な互換性対象とし、Bazziteは実際のdesktop
 - source archiveはコンテナへコピーし、target HOMEとchezmoi stateはコンテナ固有volumeに置く。
 - CI対象の3環境は同じ共通検証を通し、command capabilityに応じてscriptの実行結果またはskip結果を検証する。
 
-Bazziteは汎用desktop imageをdigest固定し、rootless Podmanのprivileged systemd containerでuser sessionを起動する。hostnameを実機と同じ`cristina`にして、system Flatpak全件と選択されたDistrobox全件を実際に作成する。大容量download、cgroup v2およびnested Podmanを必要とするためGitHub Actionsでは実行しない。
+Bazziteは汎用desktop imageをdigest固定し、rootless Podmanのprivileged systemd containerでuser sessionを起動する。`desktop` roleでsystem Flatpak全件とDistrobox全件を実際に作成する。大容量download、cgroup v2およびnested Podmanを必要とするためGitHub Actionsでは実行しない。
 
 `CHEZMOI_E2E=1`は環境種別を表す値ではない。stage時に個人用`.age` fileを除外し、実行ごとに生成したage recipientで暗号化sentinelを配置・復号するfixture modeとして使用する。desktop/headlessの判定や合格条件には使わない。
 
@@ -121,7 +124,7 @@ Podman containerはLinuxカーネルやsystem serviceの構成検証には使わ
 
 - Windows 11 24H2以降
 - x86_64
-- profiles: `essentials`、`gaming`、`development`をすべて有効化
+- roles: `development`、`desktop`、`gaming`を有効化（`work`はpolicy検証時だけ選択）
 
 GitHub等のWindows Server runnerは使用しない。Sudo for WindowsとクライアントOS固有設定を検証するため、実際のWindows 11 VMを使用する。
 
@@ -153,14 +156,14 @@ golden imageにはテストtransportとOS prerequisiteだけを含める。
 - virtio driver
 - テスト用ローカル管理者
 
-chezmoi、mise、DSC、winget profile packages、dotfilesはgolden imageへ含めない。Windows ISO、product key、license情報、administrator passwordはリポジトリへ保存しない。
+chezmoi、mise、DSC、winget role packages、dotfilesはgolden imageへ含めない。Windows ISO、product key、license情報、administrator passwordはリポジトリへ保存しない。
 
 ### テスト実行
 
 - golden imageからテストごとにcopy-on-write qcow2 overlayを作る。
-- disk上限は全profiles、Visual Studio Build Tools、Docker Desktopを収容できるよう200GBとする。
+- disk上限は全roles、Visual Studio Build Tools、Docker Desktopを収容できるよう200GBとする。
 - READMEに記載されたSudo for Windows、ExecutionPolicy、symlink prerequisiteをテストsetupとして適用する。
-- PowerShellからchezmoiをbootstrapし、ローカルsource archiveを指定して全profilesでapplyする。
+- `install.ps1 --prompt-roles`からchezmoiをbootstrapし、ローカルsource archiveを指定して対象rolesでapplyする。
 - `winget list` でdata fileに列挙された全packageを検証する。
 - `dsc config test` でWindows DSC構成を検証する。
 - 共通のverifyと2回目applyを実行する。

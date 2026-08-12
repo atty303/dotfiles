@@ -11,7 +11,8 @@ fake_bin="$temporary/bin"
 mkdir -p "$test_home/.config/chrome-web-apps" "$fake_bin"
 
 policy="$test_home/.config/chrome-web-apps/web-apps.json"
-chezmoi cat --source "$repository" ~/.config/chrome-web-apps/web-apps.json >"$policy"
+chezmoi cat --source "$repository" --override-data '{"roles":["desktop"]}' \
+  ~/.config/chrome-web-apps/web-apps.json >"$policy"
 deno eval '
 const policy = JSON.parse(await Deno.readTextFile(Deno.args[0]));
 const expectedKeys = ["BackgroundModeEnabled", "WebAppInstallForceList"];
@@ -41,6 +42,7 @@ for (const forbidden of ["ExtensionSettings", "NotificationsAllowedForUrls", "Br
 
 launcher="$temporary/chrome-web-app"
 chezmoi execute-template --source "$repository" \
+  --override-data '{"roles":["desktop"]}' \
   <"$repository/home/dot_local/bin/executable_chrome-web-app.tmpl" \
   >"$launcher"
 chmod +x "$launcher"
@@ -77,7 +79,7 @@ run_launcher "$log" x
 assert_log_contains "$log" 'run --system'
 assert_log_contains "$log" '--filesystem='
 assert_log_contains "$log" '--command=/usr/bin/bash'
-assert_log_contains "$log" '--user-data-dir=/tmp/'
+assert_log_contains "$log" "--user-data-dir=$test_home/.var/app/com.google.Chrome/config/google-chrome-web-apps/x"
 assert_log_contains "$log" '--app=https://x.com/'
 assert_log_contains "$log" '/etc/opt/chrome/policies/managed/web-apps.json'
 if grep -Fq -- '--load-extension=' "$log"; then
@@ -107,9 +109,14 @@ if grep -Fq -- '--load-extension=' "$log"; then
 fi
 
 for arguments in '' 'unknown' 'x --unknown' 'x --browser extra'; do
-  read -r -a argument_list <<<"$arguments"
+  if [[ -n $arguments ]]; then
+    read -r -a argument_list <<<"$arguments"
+    command=("$launcher" "${argument_list[@]}")
+  else
+    command=("$launcher")
+  fi
   if HOME="$test_home" PATH="$fake_bin:$PATH" FAKE_LOG="$temporary/rejected.log" \
-    "$launcher" "${argument_list[@]}" >/dev/null 2>&1; then
+    "${command[@]}" >/dev/null 2>&1; then
     printf 'launcher accepted invalid arguments: %s\n' "$arguments" >&2
     exit 1
   fi
@@ -150,7 +157,8 @@ for script in content-script.js service-worker.js; do
 done
 
 bridge="$temporary/open-in-default-browser"
-chezmoi cat --source "$repository" ~/.local/bin/open-in-default-browser >"$bridge"
+chezmoi cat --source "$repository" --override-data '{"roles":["desktop"]}' \
+  ~/.local/bin/open-in-default-browser >"$bridge"
 chmod +x "$bridge"
 bash -n "$bridge"
 
@@ -183,9 +191,12 @@ for rejected in \
 done
 
 desktop="$temporary/open-in-default-browser.desktop"
-chezmoi cat --source "$repository" ~/.local/share/applications/open-in-default-browser.desktop \
+chezmoi cat --source "$repository" --override-data '{"roles":["desktop"]}' \
+  ~/.local/share/applications/open-in-default-browser.desktop \
   >"$desktop"
-desktop-file-validate "$desktop"
+if command -v desktop-file-validate >/dev/null 2>&1; then
+  desktop-file-validate "$desktop"
+fi
 grep -Fq 'MimeType=x-scheme-handler/x-open-default;' "$desktop"
 
 printf 'Chrome web app tests passed\n'

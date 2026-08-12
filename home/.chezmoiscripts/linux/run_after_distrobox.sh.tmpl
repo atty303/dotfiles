@@ -3,10 +3,12 @@
 {{- $entries := list -}}
 {{- if hasKey . "distrobox" -}}
 {{-   $distrobox := index . "distrobox" -}}
-{{-   if hasKey $distrobox "hosts" -}}
-{{-     $hosts := index $distrobox "hosts" -}}
-{{-     if hasKey $hosts .hostname -}}
-{{-       $entries = (index $hosts .hostname).entries -}}
+{{-   if hasKey $distrobox "roles" -}}
+{{-     $roleEntries := index $distrobox "roles" -}}
+{{-     range $role := .roles -}}
+{{-       if hasKey $roleEntries $role -}}
+{{-         $entries = concat $entries (index $roleEntries $role).entries -}}
+{{-       end -}}
 {{-     end -}}
 {{-   end -}}
 {{- end -}}

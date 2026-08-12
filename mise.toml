@@ -47,6 +47,7 @@ mise run check
 mise run test:distrobox
 mise run test:flatpak
 mise run test:chrome-web-apps
+mise run test:roles
 mise run test:e2e:harness
 mise run test:e2e
 '''
@@ -65,6 +66,10 @@ run = "bash tests/flatpak-install.sh"
 [tasks."test:chrome-web-apps"]
 description = "Test portable Chrome web app configuration"
 run = "bash tests/chrome-web-apps.sh"
+
+[tasks."test:roles"]
+description = "Test role initialization and bootstrap wrappers"
+run = "bash tests/roles.sh"
 
 [tasks."test:e2e:linux:fedora"]
 description = "Run the full chezmoi E2E test on Fedora 44"

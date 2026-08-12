@@ -1,4 +1,4 @@
-{{ if has "gaming" .profiles }}
+{{ if has "gaming" .roles }}
 $packages = @(
 {{ range $index, $element := .packages.windows.winget.gaming }}
     "{{ $element }}"

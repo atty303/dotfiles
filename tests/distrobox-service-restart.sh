@@ -34,7 +34,7 @@ chmod +x "$fake_bin/systemctl" "$fake_bin/distrobox" "$fake_bin/scroll-helper"
 
 rendered="$temporary/distrobox.sh"
 chezmoi execute-template \
-  --override-data '{"hostname":"testhost","distrobox":{"hosts":{"testhost":{"entries":[{"manifest":"dms.ini","name":"shell","service":"test-shell.service"}]}}}}' \
+  --override-data '{"roles":["desktop"],"distrobox":{"roles":{"desktop":{"entries":[{"manifest":"dms.ini","name":"shell","service":"test-shell.service"}]}}}}' \
   <"$repository/home/.chezmoiscripts/linux/run_after_distrobox.sh.tmpl" \
   >"$rendered"
 chmod +x "$rendered"

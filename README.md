@@ -33,9 +33,9 @@ The repository follows these principles:
   RPMs onto systems such as Bazzite. Portable upstream artifacts, Flatpak, and existing
   container images are preferred; Distrobox is used when an application needs a mutable
   userspace.
-- **Machine differences are data, not copied configurations.** Templates select OS,
-  machine role, and hostname-specific behavior while shared configuration remains
-  common.
+- **Shared configuration is the baseline.** Optional differences are selected through
+  the `development`, `desktop`, `gaming`, and `work` roles; OS, WSL, and E2E remain
+  separate environment facts.
 - **Secrets are encrypted at rest.** Secret files are committed only in age-encrypted
   form. The age identity is provisioned separately and stored with private permissions.
 - **Applying twice should be safe.** Change-triggered scripts derive their inputs from
@@ -79,25 +79,27 @@ level is:
 Windows has package and configuration automation, but its clean-environment E2E remains a
 future design rather than part of the current validation guarantee.
 
-Individual physical machines can have additional hostname-selected desktop components
-that are intentionally outside the generic E2E environments.
+Roles are fixed during `chezmoi init` and stored in the chezmoi config. A normal apply
+does not inspect the current session or infer roles again.
 
 ## Owner bootstrap
 
 Bootstrapping requires access to the repository's age identity or the passphrase used
 to decrypt the committed identity. These commands are for the repository owner.
 
-On Linux or macOS, install chezmoi and apply the GitHub source state:
-
-```sh
-sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply atty303
-```
-
-When bootstrapping from an existing checkout on Linux or macOS, use the repository
-entrypoint instead:
+On Linux or macOS, use a checkout of this repository:
 
 ```sh
 ./install.sh
+```
+
+The default is fully non-interactive. `development` is always selected; macOS also
+selects `desktop`, while Linux selects it only when a `.desktop` session definition
+exists under `/usr/share/wayland-sessions` or `/usr/share/xsessions`. Select a different
+combination interactively with:
+
+```sh
+./install.sh --prompt-roles
 ```
 
 On Windows 11 24H2 or later:
@@ -110,12 +112,17 @@ On Windows 11 24H2 or later:
 New-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Sudo" `
   -Name "Enabled" -Value 3 -PropertyType DWord -Force
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-iex "&{$(irm 'https://get.chezmoi.io/ps1')} -b ~/.local/bin -- init --apply atty303"
+./install.ps1
 ```
 
-Windows prompts for the enabled package profiles during initialization. Account-backed
-applications such as Atuin and 1Password still require their normal login and sync
-steps after bootstrap.
+Use `./install.ps1 --prompt-roles` to replace the Windows defaults (`development` and
+`desktop`). Enter `-` at the role prompt for a valid baseline-only configuration. Both
+wrappers pass any other arguments through to `chezmoi init`. `work` is reserved for
+future policy exclusions on managed work devices; it currently adds no settings. Account-backed
+applications such as Atuin and 1Password still require their normal login and sync.
+
+After this roles redesign, existing installations must run the wrapper once again (with
+`--prompt-roles` when the defaults are not appropriate) to regenerate the chezmoi config.
 
 ## Maintenance
 

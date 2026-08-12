@@ -338,6 +338,17 @@ async function runLinuxTarget(
         `sentinel=${config.home}/.config/chezmoi-e2e/sentinel.txt; test \"$(cat \"$sentinel\")\" = chezmoi-e2e-sentinel; test \"$(stat -c %a \"$sentinel\")\" = 600`,
       ]).signal(signal),
     );
+    const expectedRoles = target === "bazzite" || target === "ubuntu-desktop"
+      ? '["development","desktop"]'
+      : '["development"]';
+    await execute(
+      "verify initialized roles",
+      userExec(config, containerName, [
+        "/bin/sh",
+        "-c",
+        `test "$(${config.home}/.local/bin/chezmoi --source /tmp/source execute-template '{{ .roles | toJson }}')" = '${expectedRoles}'`,
+      ]).signal(signal),
+    );
     await execute(
       "verify initial target state",
       userExec(config, containerName, [
@@ -393,7 +404,7 @@ async function runLinuxTarget(
         "scripts",
       ]).signal(signal),
     );
-    await verifyOutcomes(config, containerName, execute, signal);
+    await verifyOutcomes(target, config, containerName, execute, signal);
     completed = true;
   } finally {
     if (completed) beginSuccessfulCleanup();
@@ -448,13 +459,14 @@ async function runLinuxTarget(
 }
 
 async function verifyOutcomes(
+  target: LinuxTarget,
   config: TargetConfig,
   containerName: string,
   execute: (step: string, builder: CommandBuilder) => Promise<void>,
   signal: AbortSignal,
 ): Promise<void> {
   const mimeapps = `${config.home}/.config/mimeapps.list`;
-  const handlerAssertion = config.capabilities.xdgDesktop
+  const handlerAssertion = target === "bazzite" || target === "ubuntu-desktop"
     ? `grep -Fqx x-scheme-handler/x-open-default=open-in-default-browser.desktop ${mimeapps}`
     : `test ! -e ${mimeapps} || ! grep -Fq x-scheme-handler/x-open-default= ${mimeapps}`;
   await execute(
