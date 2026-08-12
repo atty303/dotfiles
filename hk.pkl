@@ -1,7 +1,7 @@
 amends "package://github.com/jdx/hk/releases/download/v1.54.1/hk@1.54.1#/Config.pkl"
 import "package://github.com/jdx/hk/releases/download/v1.54.1/hk@1.54.1#/Builtins.pkl"
 
-min_hk_version = "1.54.1"
+min_hk_version = "1.48.0"
 
 local linters = new Mapping<String, Step> {
   ["actionlint"] = Builtins.actionlint
