@@ -1,36 +1,36 @@
 #!/usr/bin/env -S mise tool-stub
 
 tool = "usage"
-version = "5.0.0"
+version = "5.1.0"
 
 [lock]
 
 [lock.platforms]
 
 [lock.platforms.linux-arm64]
-url = "https://github.com/jdx/usage/releases/download/v5.0.0/usage-aarch64-unknown-linux-musl.tar.gz"
-checksum = "sha256:fb2dfc21532129ce230314818e05a8a75ee1c8929936f8b3a5bbd078736706d7"
+url = "https://github.com/jdx/usage/releases/download/v5.1.0/usage-aarch64-unknown-linux-musl.tar.gz"
+checksum = "sha256:e2056b06c8d13f109389d53e758b4e79208f01360dec996751bc48ce658eb200"
 
 [lock.platforms.linux-arm64-musl]
-url = "https://github.com/jdx/usage/releases/download/v5.0.0/usage-aarch64-unknown-linux-musl.tar.gz"
-checksum = "sha256:fb2dfc21532129ce230314818e05a8a75ee1c8929936f8b3a5bbd078736706d7"
+url = "https://github.com/jdx/usage/releases/download/v5.1.0/usage-aarch64-unknown-linux-musl.tar.gz"
+checksum = "sha256:e2056b06c8d13f109389d53e758b4e79208f01360dec996751bc48ce658eb200"
 
 [lock.platforms.linux-x64]
-url = "https://github.com/jdx/usage/releases/download/v5.0.0/usage-x86_64-unknown-linux-musl.tar.gz"
-checksum = "sha256:16e87ac9110face925d39a9aae5c90767738df2cc390af1be1f00e625b599280"
+url = "https://github.com/jdx/usage/releases/download/v5.1.0/usage-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:a702c639f8e25d1e10f42ab37e09b8f73634c09b23c7abe2ebd6ab6f9665e99c"
 
 [lock.platforms.linux-x64-musl]
-url = "https://github.com/jdx/usage/releases/download/v5.0.0/usage-x86_64-unknown-linux-musl.tar.gz"
-checksum = "sha256:16e87ac9110face925d39a9aae5c90767738df2cc390af1be1f00e625b599280"
+url = "https://github.com/jdx/usage/releases/download/v5.1.0/usage-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:a702c639f8e25d1e10f42ab37e09b8f73634c09b23c7abe2ebd6ab6f9665e99c"
 
 [lock.platforms.macos-arm64]
-url = "https://github.com/jdx/usage/releases/download/v5.0.0/usage-universal-apple-darwin.tar.gz"
-checksum = "sha256:35f1703ed922486387d499265c9d6c0dbc84b8347e565fb31d54ad23fdff712d"
+url = "https://github.com/jdx/usage/releases/download/v5.1.0/usage-universal-apple-darwin.tar.gz"
+checksum = "sha256:ca35e60afd2895ec0b5be9162dbef155a76384ce43573b1ab8a04fbb46e70cd9"
 
 [lock.platforms.macos-x64]
-url = "https://github.com/jdx/usage/releases/download/v5.0.0/usage-universal-apple-darwin.tar.gz"
-checksum = "sha256:35f1703ed922486387d499265c9d6c0dbc84b8347e565fb31d54ad23fdff712d"
+url = "https://github.com/jdx/usage/releases/download/v5.1.0/usage-universal-apple-darwin.tar.gz"
+checksum = "sha256:ca35e60afd2895ec0b5be9162dbef155a76384ce43573b1ab8a04fbb46e70cd9"
 
 [lock.platforms.windows-x64]
-url = "https://github.com/jdx/usage/releases/download/v5.0.0/usage-x86_64-pc-windows-msvc.zip"
-checksum = "sha256:0ca7cbc821d6fe274ef42162058935261bf0f7ad8029a197275ff83cc36d996e"
+url = "https://github.com/jdx/usage/releases/download/v5.1.0/usage-x86_64-pc-windows-msvc.zip"
+checksum = "sha256:c0ef8c1c04917b4f2727134a10a3ab1afed9f251f677ab621c25b9cc85cad66b"
