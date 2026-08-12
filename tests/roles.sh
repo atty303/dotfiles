@@ -80,16 +80,32 @@ printf '%s\n' - | FAKE_UNAME=Linux FAKE_LOG="$log" PATH="$fake_bin:/usr/bin:/bin
   /bin/sh "$repository/install.sh" --prompt-roles
 grep -Fxq 'Roles=' "$log"
 
-desktop_data='{"roles":["desktop"]}'
-baseline_data='{"roles":[]}'
+desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"bazzite","idLike":"fedora"}}}'
+fedora_desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"fedora","idLike":""}}}'
+ubuntu_desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"ubuntu","idLike":"debian"}}}'
+baseline_data='{"roles":[],"chezmoi":{"osRelease":{"id":"bazzite","idLike":"fedora"}}}'
 secrets_data='{"roles":["secrets"]}'
 desktop_managed="$(chezmoi managed --source "$repository" --override-data "$desktop_data")"
 baseline_managed="$(chezmoi managed --source "$repository" --override-data "$baseline_data")"
 grep -Fxq '.config/chrome-web-apps/web-apps.json' <<<"$desktop_managed"
 grep -Fxq '.local/bin/open-in-default-browser' <<<"$desktop_managed"
 grep -Fxq '.local/share/applications/open-in-default-browser.desktop' <<<"$desktop_managed"
+grep -Fxq '.local/bin/chatgpt' <<<"$desktop_managed"
+grep -Fxq '.local/libexec/chatgpt-update' <<<"$desktop_managed"
+grep -Fxq '.local/share/applications/chatgpt.desktop' <<<"$desktop_managed"
+fedora_desktop_managed="$(chezmoi managed --source "$repository" --override-data "$fedora_desktop_data")"
+grep -Fxq '.local/bin/chatgpt' <<<"$fedora_desktop_managed"
+ubuntu_desktop_managed="$(chezmoi managed --source "$repository" --override-data "$ubuntu_desktop_data")"
+if grep -Eq '^\.local/(bin/chatgpt|libexec/chatgpt-update|share/applications/chatgpt\.desktop|share/chatgpt/)' <<<"$ubuntu_desktop_managed"; then
+  printf 'Ubuntu desktop render managed Fedora ChatGPT integration\n' >&2
+  exit 1
+fi
 if grep -Eq '^\.config/chrome-web-apps/|^\.local/bin/(chrome-web-app|open-in-default-browser)$|^\.local/share/applications/(chrome-web-app-.*|open-in-default-browser)\.desktop$' <<<"$baseline_managed"; then
   printf 'baseline render managed Chrome web apps\n' >&2
+  exit 1
+fi
+if grep -Eq '^\.local/(bin/chatgpt|libexec/chatgpt-update|share/applications/chatgpt\.desktop|share/chatgpt/)' <<<"$baseline_managed"; then
+  printf 'baseline render managed ChatGPT desktop integration\n' >&2
   exit 1
 fi
 baseline_registration="$temporary/register-baseline.sh"
@@ -97,6 +113,10 @@ chezmoi execute-template --source "$repository" --override-data "$baseline_data"
   <"$repository/home/.chezmoiscripts/linux/run_onchange_after_register-x-open-default.sh.tmpl" \
   >"$baseline_registration"
 grep -Fxq 'exit 0' "$baseline_registration"
+ubuntu_chatgpt="$temporary/chatgpt-ubuntu.sh"
+chezmoi execute-template --source "$repository" --override-data "$ubuntu_desktop_data" \
+  <"$repository/home/.chezmoiscripts/linux/run_onchange_after_chatgpt.sh.tmpl" >"$ubuntu_chatgpt"
+grep -Fxq 'exit 0' "$ubuntu_chatgpt"
 desktop_distrobox="$temporary/distrobox-desktop.sh"
 baseline_distrobox="$temporary/distrobox-baseline.sh"
 chezmoi execute-template --source "$repository" --override-data "$desktop_data" \

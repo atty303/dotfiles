@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+export LC_ALL=C
+
+repo_base=https://persistent.oaistatic.com/codex-app-prod/linux/rpm/x86_64
+key="$HOME/.local/share/chatgpt/codex-linux-repository.asc"
+expected_fingerprint=3BFA0E4AE8B8CC16A2D9BA684A3B4A566C4660E4
+app_root="$HOME/.local/opt/chatgpt"
+state_root="${XDG_STATE_HOME:-$HOME/.local/state}/chatgpt"
+check_interval=86400
+failure_interval=3600
+force=false
+
+if [[ ${1:-} == --force ]]; then
+  force=true
+  shift
+fi
+(($# == 0)) || { printf 'Usage: chatgpt-update [--force]\n' >&2; exit 2; }
+[[ $(uname -s) == Linux && $(uname -m) == x86_64 ]] || {
+  printf 'chatgpt-update: only Linux x86_64 is supported\n' >&2
+  exit 1
+}
+
+for command in cpio curl flock gpg gzip rpm2cpio rpmkeys sha256sum; do
+  command -v "$command" >/dev/null 2>&1 || {
+    printf 'chatgpt-update: required command is unavailable: %s\n' "$command" >&2
+    exit 1
+  }
+done
+[[ -r $key ]] || { printf 'chatgpt-update: repository key is unavailable: %s\n' "$key" >&2; exit 1; }
+
+mkdir -p "$app_root/versions" "$state_root"
+exec 9>"$state_root/update.lock"
+if ! flock -n 9; then
+  [[ -x "$app_root/current/usr/lib/chatgpt/ChatGPT" ]] && exit 0
+  printf 'chatgpt-update: another update or app instance is running\n' >&2
+  exit 1
+fi
+
+now=$(date +%s)
+stamp="$state_root/last-check"
+if [[ $force == false && -x "$app_root/current/usr/lib/chatgpt/ChatGPT" && -f $stamp ]]; then
+  read -r checked_at result <"$stamp" || true
+  interval=$check_interval
+  [[ ${result:-failure} == success ]] || interval=$failure_interval
+  if [[ ${checked_at:-0} =~ ^[0-9]+$ ]] && ((now - checked_at < interval)); then
+    exit 0
+  fi
+fi
+
+work=$(mktemp -d "$state_root/update.XXXXXX")
+cleanup() { rm -rf "$work"; }
+trap cleanup EXIT
+record_failure() { printf '%s failure\n' "$now" >"$stamp"; }
+trap record_failure ERR
+
+curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
+  --output "$work/repomd.xml" "$repo_base/repodata/repomd.xml"
+curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
+  --output "$work/repomd.xml.asc" "$repo_base/repodata/repomd.xml.asc"
+
+gpg_home="$work/gnupg"
+mkdir -m 0700 "$gpg_home"
+gpg --homedir "$gpg_home" --batch --quiet --import "$key"
+fingerprint=$(gpg --homedir "$gpg_home" --batch --with-colons --fingerprint |
+  awk -F: '$1 == "fpr" { print $10; exit }')
+[[ $fingerprint == "$expected_fingerprint" ]] || {
+  printf 'chatgpt-update: unexpected repository key fingerprint\n' >&2
+  exit 1
+}
+gpg --homedir "$gpg_home" --batch --verify "$work/repomd.xml.asc" "$work/repomd.xml"
+
+primary_href=$(sed -n 's/.*location href="\([^"]*primary\.xml\.gz\)".*/\1/p' "$work/repomd.xml")
+primary_sha=$(awk '
+  /<data type="primary">/ { primary = 1 }
+  primary && /<checksum type="sha256">/ {
+    sub(/.*<checksum type="sha256">/, ""); sub(/<.*/, ""); print; exit
+  }
+' "$work/repomd.xml")
+[[ -n $primary_href && $primary_href != /* && -n $primary_sha ]] || {
+  printf 'chatgpt-update: invalid repository metadata\n' >&2
+  exit 1
+}
+curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
+  --output "$work/primary.xml.gz" "$repo_base/$primary_href"
+printf '%s  %s\n' "$primary_sha" "$work/primary.xml.gz" | sha256sum --check --status
+gzip -dc "$work/primary.xml.gz" >"$work/primary.xml"
+
+package=$(awk 'BEGIN { RS = "</package>" } /<name>chatgpt<\/name>/ && /<arch>x86_64<\/arch>/ { print; exit }' \
+  "$work/primary.xml" | tr '\n' ' ')
+repo_version=$(sed -n 's/.*<version epoch="0" ver="\([^"]*\)" rel="[^"]*"\/>.*/\1/p' <<<"$package")
+version=$(sed -n 's/.*<version epoch="0" ver="\([^"]*\)" rel="\([^"]*\)"\/>.*/\1-\2/p' <<<"$package")
+rpm_href=$(sed -n 's/.*<location href="\([^"]*\.rpm\)"\/>.*/\1/p' <<<"$package")
+rpm_sha=$(sed -n 's/.*<checksum type="sha256" pkgid="YES">\([^<]*\)<.*/\1/p' <<<"$package")
+[[ -n $repo_version && -n $version && -n $rpm_href && $rpm_href != /* && -n $rpm_sha ]] || {
+  printf 'chatgpt-update: invalid package metadata\n' >&2
+  exit 1
+}
+[[ $version =~ ^[A-Za-z0-9][A-Za-z0-9._+~-]*-[A-Za-z0-9][A-Za-z0-9._+~-]*$ ]] || {
+  printf 'chatgpt-update: unsafe package version\n' >&2
+  exit 1
+}
+
+installed=$(basename "$(readlink "$app_root/current" 2>/dev/null || true)")
+if [[ $installed == "$version" ]]; then
+  printf '%s success\n' "$now" >"$stamp"
+  trap - ERR
+  exit 0
+fi
+
+curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
+  --output "$work/chatgpt.rpm" "$repo_base/$rpm_href"
+printf '%s  %s\n' "$rpm_sha" "$work/chatgpt.rpm" | sha256sum --check --status
+rpm_db="$work/rpmdb"
+mkdir "$rpm_db"
+rpmkeys --dbpath "$rpm_db" --import "$key"
+rpmkeys --dbpath "$rpm_db" --checksig "$work/chatgpt.rpm" | grep -Fq 'digests signatures OK'
+
+candidate="$app_root/versions/.${version}.new"
+rm -rf "$candidate"
+mkdir "$candidate"
+(cd "$candidate" && rpm2cpio "$work/chatgpt.rpm" | cpio -idm --quiet)
+[[ -x "$candidate/usr/lib/chatgpt/ChatGPT" ]] || {
+  printf 'chatgpt-update: package does not contain the application executable\n' >&2
+  exit 1
+}
+candidate_version=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' \
+  "$candidate/usr/lib/chatgpt/resources/linux-package-metadata.json")
+[[ $candidate_version == "$repo_version" ]] || {
+  printf 'chatgpt-update: extracted version does not match repository metadata\n' >&2
+  exit 1
+}
+
+final="$app_root/versions/$version"
+rm -rf "$final"
+mv "$candidate" "$final"
+rm -f "$app_root/.current.new"
+ln -s "versions/$version" "$app_root/.current.new"
+mv -Tf "$app_root/.current.new" "$app_root/current"
+find "$app_root/versions" -mindepth 1 -maxdepth 1 ! -path "$final" -exec rm -rf -- {} +
+printf '%s success\n' "$now" >"$stamp"
+trap - ERR
+printf 'chatgpt-update: installed %s\n' "$version" >&2

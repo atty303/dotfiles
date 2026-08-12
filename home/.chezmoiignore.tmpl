@@ -91,3 +91,9 @@ src/
 .local/share/applications/open-in-default-browser.desktop
 .local/share/icons/hicolor/*/apps/chrome-web-app-*.png
 {{ end }}
+{{ if or (ne .chezmoi.os "linux") (ne .chezmoi.arch "amd64") (not (has "desktop" .roles)) (not (or (eq .chezmoi.osRelease.id "fedora") (contains "fedora" .chezmoi.osRelease.idLike))) }}
+.local/bin/chatgpt
+.local/libexec/chatgpt-update
+.local/share/applications/chatgpt.desktop
+.local/share/chatgpt/
+{{ end }}

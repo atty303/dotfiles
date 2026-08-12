@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+updater="$HOME/.local/libexec/chatgpt-update"
+app_root="$HOME/.local/opt/chatgpt"
+state_root="${XDG_STATE_HOME:-$HOME/.local/state}/chatgpt"
+
+if [[ ${1:-} == --update ]]; then
+  shift
+  (($# == 0)) || { printf 'Usage: chatgpt [--update]\n' >&2; exit 2; }
+  exec "$updater" --force
+fi
+
+if ! "$updater"; then
+  if [[ ! -x "$app_root/current/usr/lib/chatgpt/ChatGPT" ]]; then
+    printf 'chatgpt: update failed and no installed version is available\n' >&2
+    exit 1
+  fi
+  printf 'chatgpt: update failed; starting the installed version\n' >&2
+fi
+
+mkdir -p "$state_root"
+exec 9>"$state_root/update.lock"
+flock -s 9
+
+export CODEX_SPARKLE_ENABLED=false
+exec "$app_root/current/usr/lib/chatgpt/ChatGPT" "$@"

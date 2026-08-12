@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# chatgpt: {{ if (stat (joinPath .chezmoi.homeDir ".local/bin/chatgpt")) }}available{{ else }}unavailable{{ end }}
+# xdg-mime: {{ if lookPath "xdg-mime" }}available{{ else }}unavailable{{ end }}
+# update-desktop-database: {{ if lookPath "update-desktop-database" }}available{{ else }}unavailable{{ end }}
+set -euo pipefail
+
+{{ if or (not (has "desktop" .roles)) (ne .chezmoi.arch "amd64") (not (or (eq .chezmoi.osRelease.id "fedora") (contains "fedora" .chezmoi.osRelease.idLike))) -}}
+exit 0
+{{ end -}}
+
+for command in update-desktop-database xdg-mime; do
+  command -v "$command" >/dev/null 2>&1 || {
+    printf 'Cannot register ChatGPT desktop integration: %s is unavailable.\n' "$command" >&2
+    exit 1
+  }
+done
+
+"$HOME/.local/bin/chatgpt" --update
+applications_directory="$HOME/.local/share/applications"
+update-desktop-database "$applications_directory"
+xdg-mime default chatgpt.desktop x-scheme-handler/codex
+
+if [[ $(xdg-mime query default x-scheme-handler/codex) != chatgpt.desktop ]]; then
+  printf 'Could not register the codex URL handler.\n' >&2
+  exit 1
+fi
