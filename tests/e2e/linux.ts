@@ -505,7 +505,20 @@ done`,
       userExec(config, containerName, [
         "/bin/bash",
         "-c",
-        `set -euo pipefail; containers="$(distrobox list --no-color)"; for name in dms noctalia scroll; do grep -Eq "(^|[[:space:]|])$name([[:space:]|]|$)" <<<"$containers"; test -f ${config.home}/.local/state/chezmoi/distrobox/$name.applied; done`,
+        `set -euo pipefail
+containers="$(distrobox list --no-color)"
+state_dir=${config.home}/.local/state/chezmoi/distrobox
+for name in dms noctalia scroll; do
+  grep -Eq "(^|[[:space:]|])$name([[:space:]|]|$)" <<<"$containers"
+done
+for name in dms noctalia; do
+  test -s "$state_dir/$name.applied"
+done
+test ! -e "$state_dir/scroll.applied"
+pending="$(<"$state_dir/scroll.pending")"
+test -n "$pending"
+[[ "$pending" != *$'\n'* ]]
+cmp -s "$state_dir/scroll.transaction" <(printf '%s\n%s\n%s\n' prepared "$pending" no)`,
       ]).signal(signal),
     );
   }
