@@ -26,18 +26,18 @@ fi
 
 # POSIX way to get script's dir: https://stackoverflow.com/a/29834779/12156188
 script_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0")")" && pwd -P)"
-roles=development
+roles=development,secrets
 case "$(uname -s)" in
-  Darwin) roles=development,desktop ;;
+  Darwin) roles=development,desktop,secrets ;;
   Linux)
     if find /usr/share/wayland-sessions /usr/share/xsessions -maxdepth 1 -type f -name '*.desktop' -print -quit 2>/dev/null | grep -q .; then
-      roles=development,desktop
+      roles=development,desktop,secrets
     fi
     ;;
 esac
 
 if [ "$prompt_roles" = true ]; then
-  printf 'Roles (development,desktop,gaming,work) [%s]: ' "$roles" >&2
+  printf 'Roles (development,desktop,gaming,secrets,work) [%s]: ' "$roles" >&2
   IFS= read -r selected_roles
   if [ "$selected_roles" = "-" ]; then
     roles=

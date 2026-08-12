@@ -22,9 +22,9 @@ if (-not $chezmoi) {
     $chezmoiPath = $chezmoi.Source
 }
 
-$roles = 'development,desktop'
+$roles = 'development,desktop,secrets'
 if ($promptRoles) {
-    $selection = Read-Host "Roles (development,desktop,gaming,work) [$roles]"
+    $selection = Read-Host "Roles (development,desktop,gaming,secrets,work) [$roles]"
     if ($selection -eq '-') {
         $roles = ''
     } elseif ($selection) {

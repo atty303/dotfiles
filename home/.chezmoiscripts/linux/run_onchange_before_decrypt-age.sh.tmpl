@@ -1,18 +1,22 @@
 #!/usr/bin/env -S bash -euo pipefail
+{{ if has "secrets" .roles }}
 
-if [ ! -f "${HOME}/.config/chezmoi/key.txt" ]; then
+identity="${HOME}/.config/chezmoi/age/identity.txt"
+if [ ! -s "$identity" ]; then
   umask 077
-  mkdir -p "${HOME}/.config/chezmoi"
+  mkdir -p "$(dirname "$identity")"
 
   # passphrase=$(mise exec ubi:open-source-cooperative/keyring-rs -- keyring-rs -s chezmoi -t age-passphrase password)
 
-  if [ -f "/usr/local/secrets/CHEZMOI_AGE_KEY" ]; then
-    cp /usr/local/secrets/CHEZMOI_AGE_KEY "${HOME}/.config/chezmoi/key.txt"
-  elif [ -n "${CHEZMOI_AGE_KEY+x}" ]; then
-    printf '%s\n' "$CHEZMOI_AGE_KEY" > "${HOME}/.config/chezmoi/key.txt"
+  if [ -s "/usr/local/secrets/CHEZMOI_AGE_KEY" ]; then
+    cp /usr/local/secrets/CHEZMOI_AGE_KEY "$identity"
+  elif [ -n "${CHEZMOI_AGE_KEY:-}" ]; then
+    printf '%s\n' "$CHEZMOI_AGE_KEY" > "$identity"
   else
-    chezmoi age decrypt --output "${HOME}/.config/chezmoi/key.txt" --passphrase "{{ .chezmoi.config.sourceDir }}/key.txt.age"
+    chezmoi age decrypt --output "$identity" --passphrase "{{ .chezmoi.config.sourceDir }}/key.txt.age"
   fi
-
-  chmod 600 "${HOME}/.config/chezmoi/key.txt"
 fi
+chmod 600 "$identity"
+{{ else }}
+exit 0
+{{ end }}

@@ -63,11 +63,10 @@ mise run test:e2e:mac:local
 
 - 各テスト実行時に新しいage identityとrecipientを生成する。
 - 固定のsentinel平文を生成したrecipientで暗号化し、一時source stateへchezmoiのencrypted entryとして追加する。
-- private identityは環境変数 `CHEZMOI_AGE_KEY` でゲストへ渡し、ファイルへ永続保存しない。
+- private identityは環境変数 `CHEZMOI_AGE_KEY` または `/usr/local/secrets/CHEZMOI_AGE_KEY` でゲストへ渡し、通常のidentity準備scriptで使い捨てHOMEへ保存する。
 - stdout、stderr、verbose logへidentityを出力しない。
-- `.chezmoi.toml.tmpl` に明示的なE2E data flagを追加し、E2E時だけテストrecipientを使用する。
-- `.chezmoiignore.tmpl` はE2E時に個人用encrypted targetを除外する。
-- Linux、macOS、Windowsのdecrypt前スクリプトを揃え、`CHEZMOI_AGE_KEY` がある場合はそれをidentity fileへ安全なpermissionで書き込む。
+- chezmoi source stateにはE2E専用flagやrecipient分岐を追加しない。復号にはrecipient設定を使わず、fixtureに対応するidentityだけを供給する。
+- Linux、macOS、Windowsのdecrypt前スクリプトを揃え、供給されたidentityをprivate permissionで永続化する。
 - リポジトリへテスト用private key、plaintext credential、復号済み個人データをコミットしない。
 
 ### 共通検証
@@ -112,7 +111,7 @@ FedoraはFedora系の軽量な互換性対象とし、Bazziteは実際のdesktop
 
 Bazziteは汎用desktop imageをdigest固定し、rootless Podmanのprivileged systemd containerでuser sessionを起動する。`desktop` roleでsystem Flatpak全件とDistrobox全件を実際に作成する。大容量download、cgroup v2およびnested Podmanを必要とするためGitHub Actionsでは実行しない。
 
-`CHEZMOI_E2E=1`は環境種別を表す値ではない。stage時に個人用`.age` fileを除外し、実行ごとに生成したage recipientで暗号化sentinelを配置・復号するfixture modeとして使用する。desktop/headlessの判定や合格条件には使わない。
+stage時に実際の`.age` fileを除外し、実行ごとに生成したage identityとrecipientで暗号化sentinelを一時source stateへ追加する。chezmoi側へE2E専用dataやrecipient分岐は持たせず、通常の`secrets` roleとidentity供給経路で配置・復号する。
 
 Podman containerはLinuxカーネルやsystem serviceの構成検証には使わない。今回のLinux scriptsが行うユーザーHOME、mise、fonts、terminfo、externalsのE2Eに限定する。
 
@@ -124,7 +123,7 @@ Podman containerはLinuxカーネルやsystem serviceの構成検証には使わ
 
 - Windows 11 24H2以降
 - x86_64
-- roles: `development`、`desktop`、`gaming`を有効化（`work`はpolicy検証時だけ選択）
+- roles: `development`、`desktop`、`gaming`、`secrets`を有効化（`work`はpolicy検証時だけ選択）
 
 GitHub等のWindows Server runnerは使用しない。Sudo for WindowsとクライアントOS固有設定を検証するため、実際のWindows 11 VMを使用する。
 

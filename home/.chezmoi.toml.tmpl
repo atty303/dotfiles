@@ -1,7 +1,3 @@
-{{/* E2E mode replaces personal encrypted targets with a temporary age sentinel. */}}
-{{- $e2e := eq (env "CHEZMOI_E2E") "1" -}}
-{{- "" -}}
-
 {{- $osID := .chezmoi.os -}}
 {{- if (and (eq .chezmoi.os "linux") (hasKey .chezmoi.osRelease "id")) -}}
 {{-   $osID = printf "%s-%s" .chezmoi.os .chezmoi.osRelease.id -}}
@@ -9,7 +5,7 @@
 
 {{- $wsl := (and (eq .chezmoi.os "linux") (.chezmoi.kernel.osrelease | lower | contains "microsoft")) -}}
 
-{{- $knownRoles := list "development" "desktop" "gaming" "work" -}}
+{{- $knownRoles := list "development" "desktop" "gaming" "secrets" "work" -}}
 {{- $rolesInput := promptString "Roles" -}}
 {{- $roles := list -}}
 {{- if $rolesInput -}}
@@ -35,20 +31,14 @@ sourceDir = "/workspaces/.codespaces/.persistedshare/dotfiles/home"
 encryption = "age"
 
 [age]
-  identity = "~/.config/chezmoi/key.txt"
-{{- if $e2e }}
-  # The E2E harness generates a fresh recipient for its encrypted sentinel.
-  recipient = {{ env "CHEZMOI_E2E_RECIPIENT" | quote }}
-{{- else }}
+  identity = "~/.config/chezmoi/age/identity.txt"
   recipient = "age1hwzfym9sw8wjyckwfgul4qe6mn67h8rrkw9vfprl95nv3dd0qd7susuu8z"
-{{- end }}
 
 [onepassword]
   prompt = false
 
 [data]
     github_username = "atty303"
-    e2e = {{ $e2e }}
     osid = {{ $osID | quote }}
     roles = {{ $roles | toToml }}
     wsl = {{ $wsl }}

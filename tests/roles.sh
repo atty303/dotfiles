@@ -12,7 +12,7 @@ render_config() {
     --promptString "Roles=$roles" <"$repository/home/.chezmoi.toml.tmpl"
 }
 
-grep -Fq 'roles = ["development", "desktop"]' < <(render_config development,desktop)
+grep -Fq 'roles = ["development", "desktop", "secrets"]' < <(render_config development,desktop,secrets)
 grep -Fq 'roles = []' < <(render_config '')
 for roles in unknown development,development desktop,work,work; do
   if render_config "$roles" >"$temporary/rejected" 2>&1; then
@@ -58,17 +58,17 @@ run_install() {
 log="$temporary/linux-headless.log"
 FAKE_UNAME=Linux CODESPACES=true REMOTE_CONTAINERS_IPC=test \
   XDG_CURRENT_DESKTOP=Test WAYLAND_DISPLAY=wayland-0 run_install "$log" --depth 1
-grep -Fxq 'Roles=development' "$log"
+grep -Fxq 'Roles=development,secrets' "$log"
 grep -Fxq -- '--depth' "$log"
 grep -Fxq '1' "$log"
 
 log="$temporary/linux-desktop.log"
 FAKE_UNAME=Linux FAKE_DESKTOP_SESSION_DEFINITION=true run_install "$log"
-grep -Fxq 'Roles=development,desktop' "$log"
+grep -Fxq 'Roles=development,desktop,secrets' "$log"
 
 log="$temporary/macos.log"
 FAKE_UNAME=Darwin run_install "$log"
-grep -Fxq 'Roles=development,desktop' "$log"
+grep -Fxq 'Roles=development,desktop,secrets' "$log"
 
 log="$temporary/prompt.log"
 printf 'gaming,work\n' | FAKE_UNAME=Linux FAKE_LOG="$log" PATH="$fake_bin:/usr/bin:/bin" \
@@ -82,6 +82,7 @@ grep -Fxq 'Roles=' "$log"
 
 desktop_data='{"roles":["desktop"]}'
 baseline_data='{"roles":[]}'
+secrets_data='{"roles":["secrets"]}'
 desktop_managed="$(chezmoi managed --source "$repository" --override-data "$desktop_data")"
 baseline_managed="$(chezmoi managed --source "$repository" --override-data "$baseline_data")"
 grep -Fxq '.config/chrome-web-apps/web-apps.json' <<<"$desktop_managed"
@@ -133,8 +134,14 @@ grep -Fq 'Valve.Steam' "$gaming_winget"
 for data in "$baseline_data" "$desktop_data"; do
   managed="$(chezmoi managed --source "$repository" --override-data "$data")"
   grep -Fxq '.config/atuin/config.toml' <<<"$managed"
-  grep -Fxq '.wakatime.cfg' <<<"$managed"
+  if grep -Eq '^(\.wakatime\.cfg|\.local/share/atuin/key)$' <<<"$managed"; then
+    printf 'non-secrets role rendered encrypted bootstrap artifacts\n' >&2
+    exit 1
+  fi
 done
+secrets_managed="$(chezmoi managed --source "$repository" --override-data "$secrets_data")"
+grep -Fxq '.wakatime.cfg' <<<"$secrets_managed"
+grep -Fxq '.local/share/atuin/key' <<<"$secrets_managed"
 
 set +e
 FAKE_CHEZMOI_STATUS=42 run_install "$temporary/failure.log"
@@ -156,7 +163,7 @@ result=$?
 set -e
 [[ $result -eq 37 ]]
 
-expected_ps_roles="\$roles = 'development,desktop'"
+expected_ps_roles="\$roles = 'development,desktop,secrets'"
 expected_ps_prompt='--promptString "Roles='"\$roles"'"'
 grep -Fq "$expected_ps_roles" "$repository/install.ps1"
 grep -Fq -- "$expected_ps_prompt" "$repository/install.ps1"

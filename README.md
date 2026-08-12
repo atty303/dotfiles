@@ -34,10 +34,12 @@ The repository follows these principles:
   container images are preferred; Distrobox is used when an application needs a mutable
   userspace.
 - **Shared configuration is the baseline.** Optional differences are selected through
-  the `development`, `desktop`, `gaming`, and `work` roles; OS, WSL, and E2E remain
+  the `development`, `desktop`, `gaming`, `secrets`, and `work` roles; OS and WSL remain
   separate environment facts.
-- **Secrets are encrypted at rest.** Secret files are committed only in age-encrypted
-  form. The age identity is provisioned separately and stored with private permissions.
+- **Bootstrap secrets are encrypted at rest.** Optional copies used to shorten initial
+  setup are committed only in age-encrypted form. They do not replace the external
+  systems that own the underlying credentials. The age identity is provisioned
+  separately and stored with private permissions.
 - **Applying twice should be safe.** Change-triggered scripts derive their inputs from
   the managed source, and important desktop-container updates preserve enough state to
   recover from a failed transition.
@@ -84,8 +86,10 @@ does not inspect the current session or infer roles again.
 
 ## Owner bootstrap
 
-Bootstrapping requires access to the repository's age identity or the passphrase used
-to decrypt the committed identity. These commands are for the repository owner.
+The default `secrets` role requires access to the repository's age identity or the
+passphrase used to decrypt the committed identity. The first apply stores that identity
+at `~/.config/chezmoi/age/identity.txt`, so later applies do not require it again.
+These commands are for the repository owner.
 
 On Linux or macOS, use a checkout of this repository:
 
@@ -93,10 +97,10 @@ On Linux or macOS, use a checkout of this repository:
 ./install.sh
 ```
 
-The default is fully non-interactive. `development` is always selected; macOS also
-selects `desktop`, while Linux selects it only when a `.desktop` session definition
-exists under `/usr/share/wayland-sessions` or `/usr/share/xsessions`. Select a different
-combination interactively with:
+The default is fully non-interactive. `development` and `secrets` are always selected;
+macOS also selects `desktop`, while Linux selects it only when a `.desktop` session
+definition exists under `/usr/share/wayland-sessions` or `/usr/share/xsessions`.
+Select a different combination interactively with:
 
 ```sh
 ./install.sh --prompt-roles
@@ -115,11 +119,12 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ./install.ps1
 ```
 
-Use `./install.ps1 --prompt-roles` to replace the Windows defaults (`development` and
-`desktop`). Enter `-` at the role prompt for a valid baseline-only configuration. Both
+Use `./install.ps1 --prompt-roles` to replace the Windows defaults (`development`,
+`desktop`, and `secrets`). Enter `-` at the role prompt for a valid baseline-only configuration. Both
 wrappers pass any other arguments through to `chezmoi init`. `work` is reserved for
 future policy exclusions on managed work devices; it currently adds no settings. Account-backed
 applications such as Atuin and 1Password still require their normal login and sync.
+Disable `secrets` when their encrypted bootstrap artifacts should not be managed.
 
 After this roles redesign, existing installations must run the wrapper once again (with
 `--prompt-roles` when the defaults are not appropriate) to regenerate the chezmoi config.

@@ -18,8 +18,8 @@ AppData/
 .ssh/SSH_AUTH_SOCK
 .ssh/agent-local
 
-{{ if .e2e }}
-# The E2E archive excludes personal age files and adds an encrypted sentinel instead.
+{{ if not (has "secrets" .roles) }}
+# Optional encrypted bootstrap artifacts.
 .wakatime.cfg
 .local/share/atuin/key
 {{ end }}

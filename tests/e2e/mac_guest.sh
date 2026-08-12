@@ -4,8 +4,7 @@ set -euo pipefail
 
 source_directory=$(cd -P -- "$1" && pwd -P)
 identity_file=$2
-recipient=$3
-log_directory=$4
+log_directory=$3
 chezmoi=$HOME/.local/bin/chezmoi
 
 exec > >(/usr/bin/tee -a "$log_directory/stdout.log")
@@ -13,8 +12,6 @@ exec 2> >(/usr/bin/tee -a "$log_directory/stderr.log" >&2)
 
 export CHEZMOI_AGE_KEY
 CHEZMOI_AGE_KEY=$(<"$identity_file")
-export CHEZMOI_E2E=1
-export CHEZMOI_E2E_RECIPIENT=$recipient
 export HEADLESS=1
 export PATH="$HOME/.local/bin:$PATH"
 
@@ -45,12 +42,13 @@ if ! "$chezmoi" --source "$source_directory" verify; then
   exit 1
 fi
 test "$("$chezmoi" --source "$source_directory" execute-template '{{ .roles | toJson }}')" = \
-  '["development","desktop"]'
+  '["development","desktop","secrets"]'
 
 echo "verify: encrypted sentinel"
 sentinel=$HOME/.config/chezmoi-e2e/sentinel.txt
 test "$(<"$sentinel")" = "chezmoi-e2e-sentinel"
 test "$(/usr/bin/stat -f '%Lp' "$sentinel")" = "600"
+test "$(/usr/bin/stat -f '%Lp' "$HOME/.config/chezmoi/age/identity.txt")" = "600"
 
 echo "verify: platform symlinks"
 code_settings=$HOME/Library/Application\ Support/Code/User/settings.json

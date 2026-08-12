@@ -234,10 +234,6 @@ async function runLinuxTarget(
       containerName,
       "--volume",
       `${volumeName}:${config.home}:U`,
-      "--env",
-      "CHEZMOI_E2E=1",
-      "--env",
-      `CHEZMOI_E2E_RECIPIENT=${staged.recipient}`,
     ];
     if (config.privilegedSystemd) {
       createArguments.push(
@@ -335,12 +331,12 @@ async function runLinuxTarget(
       userExec(config, containerName, [
         "/bin/sh",
         "-c",
-        `sentinel=${config.home}/.config/chezmoi-e2e/sentinel.txt; test \"$(cat \"$sentinel\")\" = chezmoi-e2e-sentinel; test \"$(stat -c %a \"$sentinel\")\" = 600`,
+        `sentinel=${config.home}/.config/chezmoi-e2e/sentinel.txt; test \"$(cat \"$sentinel\")\" = chezmoi-e2e-sentinel; test \"$(stat -c %a \"$sentinel\")\" = 600; test \"$(stat -c %a ${config.home}/.config/chezmoi/age/identity.txt)\" = 600`,
       ]).signal(signal),
     );
     const expectedRoles = target === "bazzite" || target === "ubuntu-desktop"
-      ? '["development","desktop"]'
-      : '["development"]';
+      ? '["development","desktop","secrets"]'
+      : '["development","secrets"]';
     await execute(
       "verify initialized roles",
       userExec(config, containerName, [

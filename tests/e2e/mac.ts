@@ -62,7 +62,6 @@ async function runStagedMac(staged: StagedSource): Promise<void> {
       `${sourceDirectory}/tests/e2e/mac_guest.sh`,
       sourceDirectory,
       `${GUEST_MOUNT}/identity.txt`,
-      staged.recipient,
       GUEST_LOG_MOUNT,
     ], GUEST_TIMEOUT_MS);
   });

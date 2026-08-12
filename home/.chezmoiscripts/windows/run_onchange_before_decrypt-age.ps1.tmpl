@@ -1,10 +1,19 @@
-$KeyPath = "$HOME\.config\chezmoi\key.txt"
+{{ if has "secrets" .roles -}}
+$KeyPath = "$HOME\.config\chezmoi\age\identity.txt"
 $KeyDir = [System.IO.Path]::GetDirectoryName($KeyPath)
 $AgeFile = "{{ .chezmoi.config.sourceDir }}/key.txt.age"
 
-if (-not (Test-Path $KeyPath)) {
+$HasIdentity = (Test-Path $KeyPath -PathType Leaf) -and ((Get-Item $KeyPath).Length -gt 0)
+if (-not $HasIdentity) {
     if (-not (Test-Path $KeyDir)) {
         New-Item -ItemType Directory -Path $KeyDir | Out-Null
     }
-    chezmoi age decrypt --output $KeyPath --passphrase $AgeFile
+    if ($env:CHEZMOI_AGE_KEY) {
+        [System.IO.File]::WriteAllText($KeyPath, $env:CHEZMOI_AGE_KEY + [Environment]::NewLine)
+    } else {
+        chezmoi age decrypt --output $KeyPath --passphrase $AgeFile
+    }
 }
+{{ else -}}
+exit 0
+{{ end -}}

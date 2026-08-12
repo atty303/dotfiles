@@ -6,7 +6,6 @@ export interface StagedSource {
   archivePath: string;
   identity: string;
   identityPath: string;
-  recipient: string;
   sha256: string;
   tempDir: string;
 }
@@ -62,7 +61,7 @@ export async function stageRepository(
     const sha256 = Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0"))
       .join("");
 
-    return { archivePath, identity, identityPath, recipient, sha256, tempDir };
+    return { archivePath, identity, identityPath, sha256, tempDir };
   } catch (error) {
     await Deno.remove(tempDir, { recursive: true }).catch(() => undefined);
     throw error;
