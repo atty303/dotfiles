@@ -18,11 +18,11 @@ if command -v jj >/dev/null 2>&1 && jj root >/dev/null 2>&1; then
     case $1 in
         --change)
             [ "$#" -eq 2 ] || usage
-            jj git push --remote "$remote" --change "$2"
+            jj --config snapshot.auto-update-stale=false git push --remote "$remote" --change "$2"
             ;;
         *)
             [ "$#" -eq 1 ] || usage
-            jj git push --remote "$remote" --bookmark "$1"
+            jj --config snapshot.auto-update-stale=false git push --remote "$remote" --bookmark "$1"
             ;;
     esac
 elif command -v git >/dev/null 2>&1 && git rev-parse --show-toplevel >/dev/null 2>&1; then
