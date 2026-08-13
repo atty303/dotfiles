@@ -11,6 +11,11 @@
 
 - 認証、IAM、OAuthまたは外部サービスの設定をAPIやCLIで取得するときは、raw responseをterminalやtool outputへ出さない。取得時点でallowlistにより必要な非機密fieldだけを抽出し、client secret、access/refresh token、API keyおよびprivate keyを除外する。
 
+## Human-Facing Commands
+
+- 人間が端末で実行するコマンドを提示するときは、表示上の都合だけでバックスラッシュによる行継続を使わず、1回でコピー＆ペーストできる単一行のコードブロックにする。
+- 複数の独立した操作は、それぞれを単一行のコマンドとして分ける。構造の説明や読みやすい表記が必要な場合も、実行用コマンドとは分離する。
+
 ## Dotfiles
 
 - ホームディレクトリのdotfilesは原則としてchezmoiで管理されている。
