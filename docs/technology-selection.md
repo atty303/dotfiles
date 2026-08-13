@@ -76,6 +76,8 @@ host RPMとしてlayeringしない。portable upstream artifact、Flatpak、既�
 
 これは「すべてcontainerへ入れる」方針ではない。desktop sessionとの統合はUWSMとsystemd user service、host上で自然に
 動くapplicationはFlatpak、共通CLIはmiseというように、変更主体ごとに境界を分ける。
+GUI applicationをDistroboxへ置く場合の責務境界、host統合、およびScrollで追加している設定の意図は
+[`DistroboxによるGUI applicationのコンテナ化`](distrobox-gui-containers.md)を参照する。
 
 Scrollはscrollable tilingを理由に採用している。固定されたtileやworkspaceへwindowを押し込むより、横方向へ連続する
 window列を移動してfocusするmodelが作業方法に合う。Sway系の設定とIPCを利用できることも利点だが、選定の主目的ではない。
