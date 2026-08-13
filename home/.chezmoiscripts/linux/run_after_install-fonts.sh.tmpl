@@ -27,25 +27,8 @@ extract_font_archive() {
   fi
 }
 
-install_google_font() {
-  family=$1
-  if font_family_installed "$family"; then
-    echo "Google Font already installed: $family"
-    return
-  fi
-
-  (
-    cd "$fonts_dir"
-    mise exec http:google-font-download[url=https://raw.githubusercontent.com/neverpanic/google-font-download/refs/tags/1.4.3/google-font-download]@1.4.3 -- \
-      google-font-download --format=ttf --languages=all --output=/dev/null "$family"
-  )
-}
-
 {{ template "install-font-assets.sh" . }}
 
-{{ range .fonts.google -}}
-install_google_font {{ .family | quote }}
-{{ end -}}
 {{ range .fonts.assets.all -}}
 install_font_asset {{ .id | quote }} {{ .family_mode | quote }} {{ join "|" .families | quote }} {{ .url | quote }} {{ .sha256 | quote }} {{ .kind | quote }} {{ join "|" .files | quote }}
 {{ end -}}

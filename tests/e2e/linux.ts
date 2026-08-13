@@ -465,15 +465,12 @@ async function verifyOutcomes(
 case "$(fc-match -f '%{family[0]}\\n' sans-serif)" in 'Noto Sans CJK JP'|'Noto Sans JP') ;; *) exit 1 ;; esac
 case "$(fc-match -f '%{family[0]}\\n' serif)" in 'Noto Serif CJK JP'|'Noto Serif JP') ;; *) exit 1 ;; esac
 test "$(fc-match -f '%{family[0]}\\n' monospace)" = 'UDEV Gothic NFLG'
-for family in 'UDEV Gothic NF' 'UDEV Gothic NFLG' 'Noto Sans Mono CJK JP' 'Noto Sans Symbols 2' 'Noto Color Emoji'; do
+for family in 'IBM Plex Sans Condensed' 'IBM Plex Sans JP' 'UDEV Gothic NF' 'UDEV Gothic NFLG' 'Noto Sans Mono CJK JP' 'Noto Sans Symbols 2' 'Noto Color Emoji'; do
   fc-list : family | tr ',' '\\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | grep -Fxq "$family"
 done
 installer="$(${config.home}/.local/bin/chezmoi --source /tmp/source execute-template --file /tmp/source/home/.chezmoiscripts/linux/run_after_install-fonts.sh.tmpl)"
 result="$(printf '%s\\n' "$installer" | /bin/sh)"
-for family in 'IBM Plex Sans Condensed' 'IBM Plex Sans JP'; do
-  printf '%s\\n' "$result" | grep -Fqx "Google Font already installed: $family"
-done
-for asset in udev-gothic-nf noto-sans-jp noto-serif-jp noto-sans-mono-cjk-jp noto-sans-symbols-2 noto-color-emoji; do
+for asset in ibm-plex-sans-condensed ibm-plex-sans-jp udev-gothic-nf noto-sans-jp noto-serif-jp noto-sans-mono-cjk-jp noto-sans-symbols-2 noto-color-emoji; do
   printf '%s\\n' "$result" | grep -Fqx "Font asset already satisfied: $asset"
 done`,
     ]).signal(signal),

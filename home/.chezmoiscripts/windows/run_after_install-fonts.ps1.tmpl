@@ -4,16 +4,6 @@ if (-not (Get-InstalledPSResource -Name Fonts -Version 1.1.18 -ErrorAction Silen
     Install-PSResource -Name Fonts -TrustRepository -Version 1.1.18
 }
 Import-Module -Name Fonts -Version 1.0.15
-if (-not (Get-InstalledPSResource -Name GoogleFonts -ErrorAction SilentlyContinue)) {
-    Install-PSResource -Name GoogleFonts -TrustRepository
-}
-Import-Module -Name GoogleFonts
-
-$googleFonts = @(
-{{ range .fonts.google -}}
-    "{{ .family }}"
-{{ end -}}
-)
 
 $fontAssets = @(
 {{ range .fonts.assets.all -}}
@@ -116,15 +106,6 @@ function Install-FontAsset {
         if (Test-Path -LiteralPath $tempPath) {
             Remove-Item -LiteralPath $tempPath -Recurse -Force
         }
-    }
-}
-
-foreach ($family in $googleFonts) {
-    if (Test-FontFamilies -Mode any -Families @($family)) {
-        Write-Host "Google Font already installed: $family"
-    }
-    else {
-        Install-GoogleFont -Name $family
     }
 }
 

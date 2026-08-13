@@ -1,8 +1,46 @@
-[[fonts.google]]
-family = "IBM Plex Sans Condensed"
+[[fonts.assets.all]]
+id = "ibm-plex-sans-condensed"
+families = ["IBM Plex Sans Condensed"]
+family_mode = "any"
+url = "https://github.com/IBM/plex/releases/download/%40ibm/plex-sans-condensed%402.0.0/ibm-plex-sans-condensed.zip"
+sha256 = "f86ba73abbeed7cf7690ead863192a87211dfc2b0cef0ac6bf4700533ec5ab9e"
+kind = "zip"
+files = [
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-Thin.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-ThinItalic.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-ExtraLight.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-ExtraLightItalic.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-Light.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-LightItalic.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-Regular.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-Italic.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-Text.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-TextItalic.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-Medium.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-MediumItalic.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-SemiBold.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-SemiBoldItalic.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-Bold.ttf",
+  "ibm-plex-sans-condensed/fonts/complete/ttf/IBMPlexSansCondensed-BoldItalic.ttf",
+]
 
-[[fonts.google]]
-family = "IBM Plex Sans JP"
+[[fonts.assets.all]]
+id = "ibm-plex-sans-jp"
+families = ["IBM Plex Sans JP"]
+family_mode = "any"
+url = "https://github.com/IBM/plex/releases/download/%40ibm/plex-sans-jp%403.0.0/ibm-plex-sans-jp.zip"
+sha256 = "4c14c41552934b0bc92fc216a76b36bdc78f745dfbeed1115f9b8bc405ee314f"
+kind = "zip"
+files = [
+  "ibm-plex-sans-jp/fonts/complete/ttf/hinted/IBMPlexSansJP-Thin.ttf",
+  "ibm-plex-sans-jp/fonts/complete/ttf/hinted/IBMPlexSansJP-ExtraLight.ttf",
+  "ibm-plex-sans-jp/fonts/complete/ttf/hinted/IBMPlexSansJP-Light.ttf",
+  "ibm-plex-sans-jp/fonts/complete/ttf/hinted/IBMPlexSansJP-Regular.ttf",
+  "ibm-plex-sans-jp/fonts/complete/ttf/hinted/IBMPlexSansJP-Text.ttf",
+  "ibm-plex-sans-jp/fonts/complete/ttf/hinted/IBMPlexSansJP-Medium.ttf",
+  "ibm-plex-sans-jp/fonts/complete/ttf/hinted/IBMPlexSansJP-SemiBold.ttf",
+  "ibm-plex-sans-jp/fonts/complete/ttf/hinted/IBMPlexSansJP-Bold.ttf",
+]
 
 [[fonts.assets.all]]
 id = "udev-gothic-nf"
