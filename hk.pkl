@@ -7,13 +7,26 @@ local linters = new Mapping<String, Step> {
   ["actionlint"] = Builtins.actionlint
   ["case-conflict"] = Builtins.check_case_conflict
   ["deno-check"] = (Builtins.deno_check) {
-    glob = "tests/e2e/**/*.ts"
+    glob = List(
+      "home/dot_agents/skills/maintain-agent-guidance/scripts/*.ts",
+      "tests/agent-guidance-session-evidence_test.ts",
+      "tests/e2e/**/*.ts"
+    )
   }
   ["deno-fmt"] = (Builtins.deno) {
-    glob = List("deno.json", "tests/e2e/**/*.ts")
+    glob = List(
+      "deno.json",
+      "home/dot_agents/skills/maintain-agent-guidance/scripts/*.ts",
+      "tests/agent-guidance-session-evidence_test.ts",
+      "tests/e2e/**/*.ts"
+    )
   }
   ["deno-lint"] {
-    glob = "tests/e2e/**/*.ts"
+    glob = List(
+      "home/dot_agents/skills/maintain-agent-guidance/scripts/*.ts",
+      "tests/agent-guidance-session-evidence_test.ts",
+      "tests/e2e/**/*.ts"
+    )
     check = "deno lint {{files}}"
   }
   ["merge-conflict"] = Builtins.check_merge_conflict

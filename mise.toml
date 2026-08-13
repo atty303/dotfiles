@@ -49,6 +49,7 @@ mise run test:flatpak
 mise run test:chrome-web-apps
 mise run test:chatgpt
 mise run test:roles
+mise run test:agent-guidance
 mise run test:vcs
 mise run test:e2e:harness
 mise run test:e2e
@@ -76,6 +77,10 @@ run = "bash tests/chatgpt.sh"
 [tasks."test:roles"]
 description = "Test role initialization and bootstrap wrappers"
 run = "bash tests/roles.sh"
+
+[tasks."test:agent-guidance"]
+description = "Test agent-guidance session evidence collection"
+run = "deno test -A tests/agent-guidance-session-evidence_test.ts"
 
 [tasks."test:vcs"]
 description = "Test develop-repository VCS wrappers"

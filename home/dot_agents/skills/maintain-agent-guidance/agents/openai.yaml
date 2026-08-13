@@ -1,4 +1,4 @@
 interface:
   display_name: "Agent Guidanceのメンテナンス"
-  short_description: "永続的なagent guidanceの配置と内容を監査・改善する"
-  default_prompt: "$maintain-agent-guidance を使って、このguidance改善案を評価してください。"
+  short_description: "sessionとmemoryの仮説を検証し、永続化候補を評価する"
+  default_prompt: "$maintain-agent-guidance を使って、candidate learningを検証し、永続化の可否を評価してください。"
