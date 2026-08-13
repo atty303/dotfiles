@@ -11,6 +11,14 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 - `origin` がない、またはGitHub ownerを判定できない場合は、配置、作成目的および依頼の文脈から
   `atty303` またはOtherを推定する。適用規則に影響する不明点が残る場合だけ確認を求める。
 
+### Repository State
+
+- 開発タスクの開始時は、変更前に使用中のVCS、working stateおよび関連remoteを特定し、remoteがある場合はそのVCSのfetch操作でremote refsを最新化してから、現在の作業線、追跡先およびdefault branchを確認する。fetchできない場合は、参照情報が古い可能性を明示して作業可否を判断する。
+- Git repoでは現在のbranch、upstreamおよびHEADを確認する。`jj` repoではworking-copy commit、bookmarkおよびtracked remote bookmarkを確認し、colocated Gitのbranchやdetached HEADを作業状態の判定根拠にしない。
+- ユーザーが指定した作業線、依頼に対応する既存branch、bookmarkまたは未完了changeがある場合は、その継続を優先する。新しい独立した変更では、repoの運用規約、未統合変更、依頼との関連性およびPR作成要否から、default branch上で直接作業するか、最新のremote default branchを起点にbranch、bookmarkまたはchangeを作るかを判断する。現在の作業線に無関係な変更がある場合は、そこから新しい変更を派生させない。
+- 意図しない作業開始点、古いdefault branch、依頼と無関係なbranchまたはbookmarkなどを検出した場合は、ユーザー変更と公開済み履歴を保持したまま作業開始点を適正化する。履歴のrewrite、既存branchまたはbookmarkの移動、未確定変更を伴う切替が必要なら、影響を示して事前確認を求める。
+- commitまたはchangeの確定前にVCS stateを再確認し、working copyまたはcurrent changeの親、branchまたはbookmarkの位置、diffの範囲および既存のユーザー変更との分離が、開始時に選択した作業線と一致することを確認する。長時間の作業やremote default branchの更新が統合判断に影響する場合は再度fetchする。default branchが進んだことだけを理由に自動でmerge、rebase、rewriteまたはbookmark移動を行わない。
+
 ### Change Cost
 
 - コード、設定、テスト、文書、コメント、互換処理およびcommitを、すべて継続的な保守コストとして扱う。変更前に、現在の要求をrepo変更なしの操作、既存成果物の削除・簡略化、または既存機構の利用では達成できないことを確認する。
