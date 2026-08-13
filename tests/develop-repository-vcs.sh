@@ -5,6 +5,7 @@ repo_root=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd)
 vcs_script=$repo_root/home/dot_agents/skills/develop-repository/scripts/executable_vcs.sh
 push_script=$repo_root/home/dot_agents/skills/develop-repository/scripts/executable_vcs-push.sh
 rules_template=$repo_root/home/dot_codex/rules/vcs.rules.tmpl
+github_rules=$repo_root/home/dot_codex/rules/github-read.rules
 test_root=$(mktemp -d "${TMPDIR:-/tmp}/develop-repository-vcs.XXXXXX")
 
 cleanup() {
@@ -40,9 +41,17 @@ if command -v chezmoi >/dev/null 2>&1 && command -v codex >/dev/null 2>&1; then
     codex execpolicy check --rules "$rendered_rules" --pretty "$wrapper_path" snapshot >"$test_root/vcs-policy.txt" 2>&1
     codex execpolicy check --rules "$rendered_rules" --pretty "$push_wrapper_path" ssh feature/example >"$test_root/push-policy.txt" 2>&1
     codex execpolicy check --rules "$rendered_rules" --pretty "$push_wrapper_path" origin --change @ >"$test_root/push-change-policy.txt" 2>&1
+    codex execpolicy check --rules "$github_rules" --pretty gh pr list --repo openai/codex >"$test_root/gh-pr-list-policy.txt" 2>&1
+    codex execpolicy check --rules "$github_rules" --pretty gh pr view 123 >"$test_root/gh-pr-view-policy.txt" 2>&1
+    codex execpolicy check --rules "$github_rules" --pretty gh pr create >"$test_root/gh-pr-create-policy.txt" 2>&1
+    codex execpolicy check --rules "$github_rules" --pretty gh pr merge 123 >"$test_root/gh-pr-merge-policy.txt" 2>&1
     assert_contains "$test_root/vcs-policy.txt" '"decision": "allow"'
     assert_contains "$test_root/push-policy.txt" '"matchedRules": []'
     assert_contains "$test_root/push-change-policy.txt" '"matchedRules": []'
+    assert_contains "$test_root/gh-pr-list-policy.txt" '"decision": "allow"'
+    assert_contains "$test_root/gh-pr-view-policy.txt" '"decision": "allow"'
+    assert_contains "$test_root/gh-pr-create-policy.txt" '"matchedRules": []'
+    assert_contains "$test_root/gh-pr-merge-policy.txt" '"matchedRules": []'
 else
     echo 'SKIP: chezmoi or codex is unavailable; VCS policy tests skipped'
 fi

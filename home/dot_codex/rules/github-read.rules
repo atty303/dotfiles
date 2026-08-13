@@ -1,0 +1,27 @@
+prefix_rule(
+    pattern = ["gh", "pr", "list"],
+    decision = "allow",
+    justification = "Listing GitHub pull requests is read-only.",
+    match = [
+        "gh pr list",
+        "gh pr list --repo openai/codex --json number,title",
+    ],
+    not_match = [
+        "gh pr create",
+        "gh pr merge 123",
+    ],
+)
+
+prefix_rule(
+    pattern = ["gh", "pr", "view"],
+    decision = "allow",
+    justification = "Viewing GitHub pull requests is read-only.",
+    match = [
+        "gh pr view 123",
+        "gh pr view 123 --repo openai/codex --json title,state",
+    ],
+    not_match = [
+        "gh pr create",
+        "gh pr merge 123",
+    ],
+)
