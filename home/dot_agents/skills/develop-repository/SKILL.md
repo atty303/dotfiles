@@ -20,7 +20,7 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 - 意図しない作業開始点、古いdefault branch、依頼と無関係なbranchまたはbookmarkなどを検出した場合は、ユーザー変更と公開済み履歴を保持したまま作業開始点を適正化する。scriptはbranch作成、rebase、workspace更新またはbookmark移動を行わない。履歴のrewrite、既存branchまたはbookmarkの移動、未確定変更を伴う切替が必要なら、影響を示して事前確認を求める。
 - commitまたはchangeの確定前に同scriptの `snapshot` を再実行し、working copyまたはcurrent changeの親、branchまたはbookmarkの位置、diffの範囲および既存のユーザー変更との分離が、開始時に選択した作業線と一致することを確認する。長時間の作業やremote default lineの更新が統合判断に影響する場合は `snapshot --fetch [REMOTE]` を使う。default lineが進んだことだけを理由に自動でmerge、rebase、rewriteまたはbookmark移動を行わない。
 - 確定対象を確認後、同scriptの `commit -m MESSAGE -- PATH...` で自分の変更だけを確定する。current change全体が対象であると確認済みの場合だけ `--all` を使う。scriptがGitのstageとcommitまたは`jj commit`を選択し、Codexのco-author trailerを付ける。
-- 明示的にpushを依頼された場合だけ、通常権限で `vcs.sh snapshot --fetch REMOTE` を実行して結果を確認した後、`<develop-repository-dir>/scripts/vcs-push.sh REMOTE BRANCH_OR_BOOKMARK` をsandbox外で実行し、push script pathだけを再利用可能な承認prefixとする。`jj`でchange bookmarkを生成する場合は第2引数以降を `--change REVISION` とする。
+- 明示的にpushを依頼された場合だけ、通常権限で `vcs.sh snapshot --fetch REMOTE` を実行して結果を確認した後、`<develop-repository-dir>/scripts/vcs-push.sh REMOTE BRANCH_OR_BOOKMARK` をsandbox外で実行し、その実行ごとに承認を求める。push scriptの再利用可能な承認prefixは要求しない。`jj`でchange bookmarkを生成する場合は第2引数以降を `--change REVISION` とする。
 
 ### Change Cost
 

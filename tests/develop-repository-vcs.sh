@@ -4,6 +4,7 @@ set -eu
 repo_root=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd)
 vcs_script=$repo_root/home/dot_agents/skills/develop-repository/scripts/executable_vcs.sh
 push_script=$repo_root/home/dot_agents/skills/develop-repository/scripts/executable_vcs-push.sh
+rules_template=$repo_root/home/dot_codex/rules/vcs.rules.tmpl
 test_root=$(mktemp -d "${TMPDIR:-/tmp}/develop-repository-vcs.XXXXXX")
 
 cleanup() {
@@ -30,6 +31,21 @@ assert_not_contains() {
         fail "$file unexpectedly contains: $text"
     fi
 }
+
+if command -v chezmoi >/dev/null 2>&1 && command -v codex >/dev/null 2>&1; then
+    rendered_rules=$test_root/vcs.rules
+    chezmoi execute-template <"$rules_template" >"$rendered_rules"
+    wrapper_path=$HOME/.agents/skills/develop-repository/scripts/vcs.sh
+    push_wrapper_path=$HOME/.agents/skills/develop-repository/scripts/vcs-push.sh
+    codex execpolicy check --rules "$rendered_rules" --pretty "$wrapper_path" snapshot >"$test_root/vcs-policy.txt" 2>&1
+    codex execpolicy check --rules "$rendered_rules" --pretty "$push_wrapper_path" ssh feature/example >"$test_root/push-policy.txt" 2>&1
+    codex execpolicy check --rules "$rendered_rules" --pretty "$push_wrapper_path" origin --change @ >"$test_root/push-change-policy.txt" 2>&1
+    assert_contains "$test_root/vcs-policy.txt" '"decision": "allow"'
+    assert_contains "$test_root/push-policy.txt" '"matchedRules": []'
+    assert_contains "$test_root/push-change-policy.txt" '"matchedRules": []'
+else
+    echo 'SKIP: chezmoi or codex is unavailable; VCS policy tests skipped'
+fi
 
 init_git_repo() {
     path=$1

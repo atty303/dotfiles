@@ -1,0 +1,15 @@
+prefix_rule(
+    pattern = ["{{ .chezmoi.homeDir }}/.agents/skills/develop-repository/scripts/vcs.sh"],
+    decision = "allow",
+    justification = "The develop-repository VCS wrapper performs local state inspection and scoped commits; pushing uses a separate approval-gated wrapper.",
+    match = [
+        "{{ .chezmoi.homeDir }}/.agents/skills/develop-repository/scripts/vcs.sh snapshot",
+        "{{ .chezmoi.homeDir }}/.agents/skills/develop-repository/scripts/vcs.sh snapshot --fetch origin",
+        "{{ .chezmoi.homeDir }}/.agents/skills/develop-repository/scripts/vcs.sh commit -m test --all",
+    ],
+    not_match = [
+        "{{ .chezmoi.homeDir }}/.agents/skills/develop-repository/scripts/vcs-push.sh origin main",
+        "{{ .chezmoi.homeDir }}/.agents/skills/develop-repository/scripts/vcs-push.sh ssh feature/example",
+        "{{ .chezmoi.homeDir }}/.agents/skills/develop-repository/scripts/vcs-push.sh origin --change @",
+    ],
+)
