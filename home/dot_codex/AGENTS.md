@@ -4,8 +4,6 @@
 
 - 承認が必要なコマンドは、必要最小限かつ再利用可能な単位で永続承認できるように実行する。
 - 長くなりそうなタスクでは、必要な承認を開始時に見積もり、予見できるものを可能な限り早い段階でまとめて求める。
-- SSH remoteへ `jj git push` するときはsandbox外実行を要求し、`["jj", "git", "push"]`
-  を再利用可能な承認単位とする。host SSH設定を迂回するために `GIT_SSH_COMMAND` を上書きしない。
 
 ## Secret Handling
 
@@ -28,14 +26,10 @@
 
 ## Version Control
 
-- 既存の `jj` リポジトリでは、書き込み操作に `jj` を使い、`git` は読み取り操作に限る。
-- `jj` リポジトリでない場合は `git` を使う。
-- ユーザーが未確定のまま残すよう指定しない限り、完了した自分の変更だけを論理単位でローカルに確定し、既存のユーザー変更は含めない。`jj`
-  では `jj commit` を使うか、説明を設定済みなら `jj new` で空の次changeへ進む。`git` ではcommitする。
+- 開発タスクのVCS判定、fetch、state確認、commitおよびpushには `$develop-repository` が指定するscriptを使い、個別の `jj` または `git` コマンドで代替しない。
+- ユーザーが未確定のまま残すよう指定しない限り、完了した自分の変更だけを論理単位でローカルに確定し、既存のユーザー変更は含めない。
 - 変更説明やコミットメッセージはリポジトリの慣習に従い、判定できない場合は英語のConventional
   Commits形式を使う。
-- Codexが生成した変更をcommitするときは、commit messageの末尾へ空行で区切って
-  `Co-authored-by: Codex <codex@openai.com>` trailerを付ける。
 - push、リモートbookmarkの更新、PR作成などのリモート操作は、明示的に依頼された場合にのみ行う。
 
 ## Durable Guidance
