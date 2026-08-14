@@ -40,9 +40,9 @@ reviewerには、日本語でactionableな指摘だけを返させる。各指�
 - コードまたは検証結果に基づく根拠
 - 最小限の修正方針
 
-型または静的検査で既に排除される問題、根拠のない推測、単なるスタイル上の好みは除外させる。重要な指摘がない場合は、その旨と未確認の残存リスクを明示させる。
+型または静的検査で既に排除される問題、根拠のない推測、単なるスタイル上の好みは除外させる。候補は、明示的なcontract、invariant、security policyまたは適用されるcompatibility requirementへの違反、あるいは到達可能な現在のcorrectness、security、reliabilityまたはdata integrity上の欠陥に限定する。重要な指摘がない場合は、その旨と未確認の残存リスクを明示させる。
 
-外部processまたは一時resourceのlifecycleを変更する場合は、正常系だけでなくfailure、timeoutおよびsignalの各終了経路を追跡させる。resource取得前にcleanupが有効になること、完了状態がatomicに公開されること、cleanup失敗を成功扱いしないこと、および終了後に残留状態がないことを確認させる。
+外部process、一時resource、streamまたはintegration boundaryを変更する場合は、callerとhelper、clientとserverなど境界の両側について、dataとcontrol flow、stdoutとstderr、exit statusまたはexception、failure、timeout、signal、cleanup ownershipおよび残留状態を追跡させる。同じversion、process、classloader、environmentまたはlifecycleを共有すると仮定しない。resource取得前にcleanupが有効になること、完了状態がatomicに公開されること、およびcleanup失敗を成功扱いしないことも確認させる。
 
 ## 指摘を検証して裁定する
 
@@ -53,7 +53,7 @@ reviewerには、日本語でactionableな指摘だけを返させる。各指�
     integrity上の欠陥、および検証失敗のうち、元の依頼範囲内で局所的に修正でき、新しい依存、権限またはmigrationを必要としないもの。
   - 棄却: 誤検出、重複、到達不能、型または既存validationで排除済み、根拠のない将来懸念、単なるstyle選好、および現在の要求外のgeneralization。
   - ユーザー判断: 現在の要求、acceptance criteriaおよび既存方針だけでは公開挙動、API、設計、scopeまたは継続的な保守コストが一意に決まらないもの、新しい依存、権限またはmigrationを伴うもの、および元の依頼から権限を拡大するもの。
-- 到達可能な現在の欠陥がなく、要求外の任意改善にすぎない指摘は棄却する。欠陥があり、要求または既存方針から結果が一意に決まる場合は、公開挙動または内部設計に触れても自動対応とする。複数の妥当な選択肢または新しい権限が残る場合だけユーザー判断とする。
+- 到達可能な現在の欠陥がなく、採用済みのarchitecture、policyまたはtradeoffに対する別案、あるいは要求外の任意改善にすぎない指摘は棄却する。欠陥があり、要求または既存方針から結果が一意に決まる場合は、公開挙動または内部設計に触れても自動対応とする。複数の妥当な選択肢または新しい権限が残る場合だけユーザー判断とする。
 - 自動対応に分類した指摘と、ユーザーが採用して対応対象へ移した指摘だけを一括修正する。重大度の高さだけを理由に、ユーザー判断に分類される設計またはscopeを自動決定しない。
 - ユーザー判断が必要な指摘は、すべての結果を収集した後に一度だけ、根拠、利用者への影響、変更規模および推奨する採否をまとめて提示する。該当指摘がなければ確認turnを挟まない。
 - ユーザーの回答後、採用された案を回答で指定された範囲に限って対応対象へ移し、採用されなかった案を棄却として確定する。

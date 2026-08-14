@@ -5,9 +5,15 @@
 - 承認が必要なコマンドは、必要最小限かつ再利用可能な単位で永続承認できるように実行する。
 - 長くなりそうなタスクでは、必要な承認を開始時に見積もり、予見できるものを可能な限り早い段階でまとめて求める。
 
+## External State Changes
+
+- deploy、release、data migrationの実行およびcloud resourceの変更は、ユーザーから明示的に依頼または承認された場合だけ行う。
+
 ## Secret Handling
 
 - 認証、IAM、OAuthまたは外部サービスの設定をAPIやCLIで取得するときは、raw responseをterminalやtool outputへ出さない。取得時点でallowlistにより必要な非機密fieldだけを抽出し、client secret、access/refresh token、API keyおよびprivate keyを除外する。
+- 外部サービスの新しい認証経路では、既存のagent専用actorまたはidentity boundaryと短期・最小権限credentialを優先し、固定key、長期credentialまたは人間用credentialへ到達する迂回経路を追加・拡張しない。
+- 外部サービスへの操作が権限不足で失敗した場合、IAM管理自体が依頼または承認済みでない限り、IAM policy、role、permission boundary、profile、credentialまたはidentityを変更せず、より広いidentityやscopeへ切り替えない。失敗したactionとresourceを示して停止する。この規則をsandboxのcommandやnetworkの承認、および設定済みconnectorを既存権限内で利用する操作には適用しない。
 
 ## Human-Facing Commands
 
