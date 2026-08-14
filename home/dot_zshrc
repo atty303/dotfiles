@@ -1,4 +1,12 @@
-if [ -e "/opt/homebrew/bin/brew" ]; then
+if [ -e "/opt/homebrew/bin/brew" ] && {
+  [ "${HOMEBREW_PREFIX:-}" != "/opt/homebrew" ] ||
+    [ "${HOMEBREW_CELLAR:-}" != "/opt/homebrew/Cellar" ] ||
+    [ "${HOMEBREW_REPOSITORY:-}" != "/opt/homebrew" ] ||
+    [[ ":${PATH:-}:" != *":/opt/homebrew/bin:"* ]] ||
+    [[ ":${PATH:-}:" != *":/opt/homebrew/sbin:"* ]] ||
+    [[ ":${FPATH:-}:" != *":/opt/homebrew/share/zsh/site-functions:"* ]] ||
+    [[ ":${INFOPATH:-}:" != *":/opt/homebrew/share/info:"* ]]
+}; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
