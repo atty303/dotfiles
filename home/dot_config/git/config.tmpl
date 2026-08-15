@@ -9,6 +9,8 @@
   sshCommand = "C:/Windows/System32/OpenSSH/ssh.exe"
 {{ else if (.wsl) }}
   sshCommand = "//mnt/c/Windows/System32/OpenSSH/ssh.exe"
+{{ else if eq .chezmoi.os "linux" }}
+  sshCommand = "ssh -F ~/.ssh/config"
 {{- end }}
 
 [includeIf "gitdir:~/src/github.com/CyberAgent/"]
