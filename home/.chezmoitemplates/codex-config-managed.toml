@@ -21,6 +21,7 @@ extends = ":workspace"
 "~/.local/state/mise" = "write"
 "~/.local/state/mise/github-oauth-tokens.toml" = "read"
 "~/.npm" = "write"
+"/private/tmp" = "write"
 
 [permissions.personal-development.filesystem.":workspace_roots"]
 ".git" = "write"
