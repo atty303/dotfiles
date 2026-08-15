@@ -6,7 +6,11 @@
 
 {{- $managed := includeTemplate "codex-config-managed.toml" . | fromToml -}}
 {{- $ownedKeys := index $managed "_chezmoi_owned_top_level_keys" -}}
+{{- $ownedFeatureKeys := index $managed "_chezmoi_owned_feature_keys" -}}
+{{- $managedFeatures := index $managed "features" -}}
 {{- $managed = deleteValueAtPath "_chezmoi_owned_top_level_keys" $managed -}}
+{{- $managed = deleteValueAtPath "_chezmoi_owned_feature_keys" $managed -}}
+{{- $managed = deleteValueAtPath "features" $managed -}}
 
 {{- range $ownedKeys -}}
 {{-   $current = deleteValueAtPath . $current -}}
@@ -14,5 +18,10 @@
 {{- range $key, $value := $managed -}}
 {{-   $current = setValueAtPath $key $value $current -}}
 {{- end -}}
+{{- $features := dig "features" (dict) $current -}}
+{{- range $ownedFeatureKeys -}}
+{{-   $features = setValueAtPath . (index $managedFeatures .) $features -}}
+{{- end -}}
+{{- $current = setValueAtPath "features" $features $current -}}
 
 {{- $current | toToml -}}
