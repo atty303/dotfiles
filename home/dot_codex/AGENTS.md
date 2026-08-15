@@ -38,6 +38,7 @@
 - 変更説明やコミットメッセージはリポジトリの慣習に従い、判定できない場合は英語のConventional
   Commits形式を使う。
 - push、リモートbookmarkの更新、PR作成などのリモート操作は、明示的に依頼された場合にのみ行う。
+- PRを作成するときは、draftの指定がない限りready for reviewとして作成する。
 
 ## Durable Guidance
 
