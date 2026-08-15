@@ -77,3 +77,15 @@ For Nushell menu or keybinding changes, do not treat isolated function calls as 
 History favors short imperative Conventional Commit subjects such as `feat: add fzf configuration` and `fix: update background-opacity`. Use a focused subject and keep unrelated platform changes separate. Pull requests should describe affected OSes, summarize rendered-file impact, list validation commands, and include screenshots only for visible desktop or terminal changes. Never commit plaintext credentials, tokens, host keys, or decrypted `.age` content.
 
 The `origin` remote uses HTTPS and is reserved for fetch and pull. Push this repository through the SSH-only `ssh` remote with `git push ssh <branch>`; do not use `git push origin`.
+
+This repository is synchronized across multiple machines. Codex is authorized to sync commits on
+`main` without a separate push confirmation: after creating its own commit, fetch and pull/rebase
+from `origin/main`, then push the resulting `main` to `ssh`. Use `vcs.sh snapshot --fetch origin`
+for the fetch/state check, `git pull --rebase origin main` only when the workspace is clean, and
+`vcs-push.sh ssh main` for the push. At the start of a modifying task, fetch `origin` and pull/rebase
+when the clean workspace is behind `origin/main`.
+
+The clean-workspace requirement applies only to automatic pull/rebase/push, not ordinary editing,
+validation, or a commit limited to Codex's own paths. If the workspace is dirty, the current line is
+not `main`, fetch or pull fails, or a rebase conflicts, skip the automatic sync and report the state;
+do not force push, discard changes, or resolve conflicts without direction.
