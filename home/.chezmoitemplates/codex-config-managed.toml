@@ -32,14 +32,11 @@ extends = ":workspace"
 [permissions.personal-development.network]
 enabled = true
 
-[permissions.personal-development.network.domains]
-"**.crates.io" = "allow"
-
 [permissions.personal-development.network.unix_sockets]
 "/var/home/atty/.1password/agent.sock" = "allow"
 
 [features]
-network_proxy = true
+network_proxy = false
 
 # Use author-skills instead; the bundled skill-creator validator requires undeclared PyYAML.
 [[skills.config]]
