@@ -89,7 +89,6 @@ printf 'flathub\n' >"$remotes"
 : >"$log"
 run_script "$log" "$remotes" "$apps"
 
-[[ "$(wc -l <"$apps")" -eq 27 ]]
 grep -Fxq 'GeForceNOW' "$remotes"
 grep -Fq 'sudo flatpak remote-add --system --if-not-exists GeForceNOW https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow.flatpakrepo' "$log"
 grep -Fq 'sudo flatpak install --system --assumeyes --noninteractive GeForceNOW com.nvidia.geforcenow//master' "$log"

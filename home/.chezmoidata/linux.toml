@@ -169,12 +169,6 @@ branch = "stable"
 
 [[flatpak.apps]]
 roles = ["desktop"]
-id = "org.flameshot.Flameshot"
-remote = "flathub"
-branch = "stable"
-
-[[flatpak.apps]]
-roles = ["desktop"]
 id = "org.kicad.KiCad"
 remote = "flathub"
 branch = "stable"
