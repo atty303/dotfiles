@@ -1,7 +1,7 @@
 # 技術選定
 
 Status: Living
-Last updated: 2026-08-09
+Last updated: 2026-08-16
 
 ## 目的
 
@@ -78,6 +78,12 @@ host RPMとしてlayeringしない。portable upstream artifact、Flatpak、既�
 動くapplicationはFlatpak、共通CLIはmiseというように、変更主体ごとに境界を分ける。
 GUI applicationをDistroboxへ置く場合の責務境界、host統合、およびScrollで追加している設定の意図は
 [`DistroboxによるGUI applicationのコンテナ化`](distrobox-gui-containers.md)を参照する。
+
+AppImageしか単純なuser-space配布がないapplicationは、Gear Leverを標準の管理境界にする。Gear Leverが
+`~/AppImages`への配置、application menuへの統合、icon、およびupstreamの更新元を所有し、chezmoiは
+Gear Lever自体をFlatpakとして導入する。個々のAppImageのversionやchecksumはsource stateへ複製せず、
+更新と旧版の併存はGear Lever上で明示的に操作する。AppImageはsandboxではないため、配布元を信頼できる
+applicationに限定し、Flatpakが適する場合の第一候補にはしない。
 
 Scrollはscrollable tilingを理由に採用している。固定されたtileやworkspaceへwindowを押し込むより、横方向へ連続する
 window列を移動してfocusするmodelが作業方法に合う。Sway系の設定とIPCを利用できることも利点だが、選定の主目的ではない。

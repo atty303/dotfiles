@@ -89,10 +89,11 @@ printf 'flathub\n' >"$remotes"
 : >"$log"
 run_script "$log" "$remotes" "$apps"
 
-[[ "$(wc -l <"$apps")" -eq 26 ]]
+[[ "$(wc -l <"$apps")" -eq 27 ]]
 grep -Fxq 'GeForceNOW' "$remotes"
 grep -Fq 'sudo flatpak remote-add --system --if-not-exists GeForceNOW https://international.download.nvidia.com/GFNLinux/flatpak/geforcenow.flatpakrepo' "$log"
 grep -Fq 'sudo flatpak install --system --assumeyes --noninteractive GeForceNOW com.nvidia.geforcenow//master' "$log"
+grep -Fq 'sudo flatpak install --system --assumeyes --noninteractive flathub it.mijorus.gearlever//stable' "$log"
 grep -Fq 'sudo flatpak install --system --assumeyes --noninteractive flathub org.winehq.Wine//stable-25.08' "$log"
 if grep -Eq -- '--user|uninstall|remote-delete' "$log"; then
   printf 'lifecycle script attempted a user or removal operation\n' >&2
