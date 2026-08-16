@@ -184,6 +184,10 @@ for_window [app_id="obsidian"] {
     move container to workspace secondary
 }
 
+for_window [app_id="Chatgpt"] {
+    move container to workspace secondary
+}
+
 for_window [app_id="gamescope"] {
     move container to workspace 1
     set_size v 1
