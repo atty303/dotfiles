@@ -210,13 +210,6 @@ for_window [title="Endfield"] {
 #    fullscreen enable
 }
 
-for_window [app_id="flameshot"] {
-    border pixel 0
-    floating enable
-    fullscreen enable global
-    move absolute position 0 0
-}
-
 include /home/atty/.config/scroll/config.d/*
 
 include ~/.config/scroll/noctalia
