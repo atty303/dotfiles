@@ -1,0 +1,24 @@
+#!/usr/bin/env -S mise tool-stub
+
+tool = "github:Satty-org/Satty"
+version = "0.22.0"
+
+[lock]
+
+[lock.platforms]
+
+[lock.platforms.linux-arm64]
+url = "https://github.com/Satty-org/Satty/releases/download/v0.22.0/satty-aarch64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:814073f70e7e18390d826f8b60dc429fc904b3abd05f6cae2b00fb8c2b9ea44b"
+
+[lock.platforms.linux-arm64-musl]
+url = "https://github.com/Satty-org/Satty/releases/download/v0.22.0/satty-aarch64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:814073f70e7e18390d826f8b60dc429fc904b3abd05f6cae2b00fb8c2b9ea44b"
+
+[lock.platforms.linux-x64]
+url = "https://github.com/Satty-org/Satty/releases/download/v0.22.0/satty-x86_64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:eb7a028c4a5ce331c2f355add8e2b807a7d697fe4495f7e1965786a4f6bcd5b8"
+
+[lock.platforms.linux-x64-musl]
+url = "https://github.com/Satty-org/Satty/releases/download/v0.22.0/satty-x86_64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:eb7a028c4a5ce331c2f355add8e2b807a7d697fe4495f7e1965786a4f6bcd5b8"
