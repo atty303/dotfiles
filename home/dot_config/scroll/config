@@ -182,10 +182,14 @@ for_window [app_id="app.zen_browser.zen"] {
 
 for_window [app_id="obsidian"] {
     move container to workspace secondary
+    set_size h 1
+    set_size v 0.5
 }
 
 for_window [app_id="Chatgpt"] {
     move container to workspace secondary
+    set_size h 1
+    set_size v 0.5
 }
 
 for_window [app_id="gamescope"] {
