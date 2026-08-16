@@ -218,3 +218,5 @@ for_window [app_id="flameshot"] {
 }
 
 include /home/atty/.config/scroll/config.d/*
+
+include ~/.config/scroll/noctalia
