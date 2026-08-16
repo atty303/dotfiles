@@ -92,7 +92,7 @@ font_family_installed "Noto Sans Mono CJK JP"
 font_family_installed "Noto Sans CJK JP" || font_family_installed "Noto Sans JP"
 font_family_installed "Noto Serif CJK JP" || font_family_installed "Noto Serif JP"
 
-installer="$($chezmoi --source "$source_directory" execute-template --file "$source_directory/home/.chezmoiscripts/darwin/run_after_install-fonts.sh.tmpl")"
+installer="$($chezmoi --source "$source_directory" execute-template --file "$source_directory/home/.chezmoiscripts/darwin/run_onchange_after_install-fonts.sh.tmpl")"
 result="$(printf '%s\n' "$installer" | /bin/sh)"
 for asset in ibm-plex-sans-condensed ibm-plex-sans-jp udev-gothic-nf noto-sans-jp noto-serif-jp noto-sans-mono-cjk-jp; do
   printf '%s\n' "$result" | grep -Fqx "Font asset already satisfied: $asset"

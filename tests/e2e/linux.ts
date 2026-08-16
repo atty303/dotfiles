@@ -374,7 +374,7 @@ async function runLinuxTarget(
       userExec(config, containerName, [
         "/bin/bash",
         "-c",
-        `set -euo pipefail; expected=$(printf '%s\\n' ' R .chezmoiscripts/linux/distrobox.sh' ' R .chezmoiscripts/linux/flatpak.sh' ' R .chezmoiscripts/linux/install-fonts.sh'); actual=$(${config.home}/.local/bin/chezmoi --source /tmp/source status); test \"$actual\" = \"$expected\"; ${config.home}/.local/bin/chezmoi --source /tmp/source apply --dry-run --verbose`,
+        `set -euo pipefail; expected=$(printf '%s\\n' ' R .chezmoiscripts/linux/distrobox.sh' ' R .chezmoiscripts/linux/flatpak.sh'); actual=$(${config.home}/.local/bin/chezmoi --source /tmp/source status); test \"$actual\" = \"$expected\"; ${config.home}/.local/bin/chezmoi --source /tmp/source apply --dry-run --verbose`,
       ]).signal(signal),
     );
     await execute(
@@ -468,7 +468,7 @@ test "$(fc-match -f '%{family[0]}\\n' monospace)" = 'UDEV Gothic NFLG'
 for family in 'IBM Plex Sans Condensed' 'IBM Plex Sans JP' 'UDEV Gothic NF' 'UDEV Gothic NFLG' 'Noto Sans Mono CJK JP' 'Noto Sans Symbols 2' 'Noto Color Emoji'; do
   fc-list : family | tr ',' '\\n' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' | grep -Fxq "$family"
 done
-installer="$(${config.home}/.local/bin/chezmoi --source /tmp/source execute-template --file /tmp/source/home/.chezmoiscripts/linux/run_after_install-fonts.sh.tmpl)"
+installer="$(${config.home}/.local/bin/chezmoi --source /tmp/source execute-template --file /tmp/source/home/.chezmoiscripts/linux/run_onchange_after_install-fonts.sh.tmpl)"
 result="$(printf '%s\\n' "$installer" | /bin/sh)"
 for asset in ibm-plex-sans-condensed ibm-plex-sans-jp udev-gothic-nf noto-sans-jp noto-serif-jp noto-sans-mono-cjk-jp noto-sans-symbols-2 noto-color-emoji; do
   printf '%s\\n' "$result" | grep -Fqx "Font asset already satisfied: $asset"
