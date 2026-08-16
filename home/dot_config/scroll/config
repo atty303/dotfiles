@@ -186,7 +186,7 @@ for_window [app_id="obsidian"] {
     set_size v 0.5
 }
 
-for_window [app_id="Chatgpt"] {
+for_window [class="^Chatgpt$"] {
     move container to workspace secondary
     set_size h 1
     set_size v 0.5
