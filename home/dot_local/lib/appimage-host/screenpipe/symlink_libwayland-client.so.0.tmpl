@@ -1,0 +1,19 @@
+{{- if eq (includeTemplate "screenpipe-appimage-enabled" .) "true" -}}
+{{- $ldconfig := lookPath "ldconfig" -}}
+{{- if not $ldconfig -}}
+{{-   range $candidate := list "/sbin/ldconfig" "/usr/sbin/ldconfig" -}}
+{{-     if stat $candidate -}}
+{{-       $ldconfig = $candidate -}}
+{{-     end -}}
+{{-   end -}}
+{{- end -}}
+{{- if not $ldconfig -}}
+{{-   fail "screenpipe host preload requires ldconfig" -}}
+{{- end -}}
+{{- $entry := regexFind `(?m)^\s*libwayland-client\.so\.0 \(libc6,x86-64\) => \S+$` (output $ldconfig "-p") -}}
+{{- $library := regexReplaceAll `^.*=>\s*` $entry "" -}}
+{{- if or (not $library) (not (stat $library)) -}}
+{{-   fail "screenpipe host preload requires an x86-64 libwayland-client.so.0" -}}
+{{- end -}}
+{{- $library -}}
+{{- end -}}

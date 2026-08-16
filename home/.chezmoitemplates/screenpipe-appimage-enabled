@@ -1,0 +1,23 @@
+{{- $enabled := false -}}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   range $app := .appimages.apps -}}
+{{-     if and (eq $app.id "screenpipe") (eq $app.state "present") -}}
+{{-       $roleSelected := not (hasKey $app "roles") -}}
+{{-       range $role := ($app.roles | default (list)) -}}
+{{-         if has $role $.roles -}}
+{{-           $roleSelected = true -}}
+{{-         end -}}
+{{-       end -}}
+{{-       $archSelected := not (hasKey $app "arches") -}}
+{{-       range $arch := ($app.arches | default (list)) -}}
+{{-         if eq $arch $.chezmoi.arch -}}
+{{-           $archSelected = true -}}
+{{-         end -}}
+{{-       end -}}
+{{-       if and $roleSelected $archSelected -}}
+{{-         $enabled = true -}}
+{{-       end -}}
+{{-     end -}}
+{{-   end -}}
+{{- end -}}
+{{- if $enabled }}true{{ end -}}

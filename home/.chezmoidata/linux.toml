@@ -14,6 +14,7 @@ desktop_id = "screenpipe.desktop"
 download_url = "https://screenpipe.com/api/download?platform=linux"
 update_manager = "StaticFileUpdater"
 update_options = { url = "https://screenpipe.com/api/download?platform=linux" }
+host_preload_libraries = ["libwayland-client.so.0"]
 
 [[chrome_web_apps.apps]]
 key = "x"

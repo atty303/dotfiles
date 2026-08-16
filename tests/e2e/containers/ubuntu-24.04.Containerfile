@@ -29,6 +29,7 @@ RUN install -d /usr/share/wayland-sessions \
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         desktop-file-utils \
+        libwayland-client0 \
         xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 

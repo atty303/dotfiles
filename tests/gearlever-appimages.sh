@@ -12,12 +12,18 @@ fake_state="$temporary/gearlever-state"
 fake_log="$temporary/commands.log"
 curl_log="$temporary/curl.log"
 fixture="$temporary/screenpipe.AppImage"
+host_library="$temporary/host-libraries/libwayland-client.so.0"
 tmpdir="$temporary/tmp"
-mkdir -p "$test_home" "$fake_bin" "$tmpdir"
+bash_env="$temporary/bash-env"
+preload_link="$test_home/.local/lib/appimage-host/screenpipe/libwayland-client.so.0"
+mkdir -p "$test_home" "$fake_bin" "$tmpdir" "$(dirname "$host_library")" \
+  "$(dirname "$preload_link")"
 : >"$fake_state"
 : >"$fake_log"
 : >"$curl_log"
 printf 'AppImage fixture\n' >"$fixture"
+printf 'host wayland client fixture\n' >"$host_library"
+ln -s "$host_library" "$preload_link"
 
 cat >"$fake_bin/flatpak" <<'EOF'
 #!/usr/bin/env bash
@@ -60,7 +66,7 @@ case "${1:-}" in
         [[ ${FAKE_INTEGRATE_PARTIAL_FAIL:-false} != true ]] || exit 75
         mkdir -p "$(dirname "$icon")"
         printf 'icon fixture\n' >"$icon"
-        printf '[Desktop Entry]\nType=Application\nName=screenpipe\nTryExec=%s\nExec=%s\nIcon=%s\n' \
+        printf '[Desktop Entry]\nType=Application\nName=screenpipe\nTryExec=%s\nExec=env DESKTOPINTEGRATION=1 EXISTING_ENV="keep value" %s --existing-argument "argument value"\nIcon=%s\n' \
           "$destination" "$destination" "$icon" >"$desktop"
         printf '%s\t%s\t\n' "$desktop_id" "$destination" >"$FAKE_STATE"
         ;;
@@ -126,6 +132,46 @@ printf '\n' >>"$FAKE_LOG"
 rm -f -- "$2"
 EOF
 
+cat >"$fake_bin/mv" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+printf 'mv' >>"$FAKE_LOG"
+printf ' %q' "$@" >>"$FAKE_LOG"
+printf '\n' >>"$FAKE_LOG"
+exec /usr/bin/mv "$@"
+EOF
+
+cat >"$fake_bin/mktemp" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+for argument in "$@"; do
+  if [[ ${FAKE_MKTEMP_SIGNAL:-false} == true && \
+    "$argument" == */.screenpipe.desktop.*XXXXXX ]]; then
+    temporary_file="$(/usr/bin/mktemp "$@")"
+    printf '%s\n' "$temporary_file"
+    kill -TERM "$PPID"
+    exit 143
+  fi
+done
+exec /usr/bin/mktemp "$@"
+EOF
+
+cat >"$fake_bin/chmod" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+for argument in "$@"; do
+  if [[ ${FAKE_CHMOD_SIGNAL:-false} == true && \
+    "$argument" == */.screenpipe.desktop.* ]]; then
+    kill -TERM "$PPID"
+    exit 143
+  fi
+done
+exec /usr/bin/chmod "$@"
+EOF
+
 cat >"$fake_bin/cp" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -173,7 +219,19 @@ printf '%s\n' "$url" >>"$FAKE_CURL_LOG"
 [[ ${FAKE_CURL_FAIL:-false} != true ]] || exit 22
 cp "$FAKE_FIXTURE" "$output"
 EOF
-chmod +x "$fake_bin/flatpak" "$fake_bin/gio" "$fake_bin/cp" "$fake_bin/curl"
+cat >"$bash_env" <<'EOF'
+printf() {
+  local last_argument=""
+  for last_argument in "$@"; do :; done
+  if [[ ${FAKE_PRINTF_FAIL_ON_TAIL:-false} == true && "$last_argument" == TailSentinel ]]; then
+    return 77
+  fi
+  builtin printf "$@"
+}
+EOF
+
+chmod +x "$fake_bin/flatpak" "$fake_bin/gio" "$fake_bin/mv" "$fake_bin/mktemp" \
+  "$fake_bin/chmod" "$fake_bin/cp" "$fake_bin/curl"
 
 render() {
   local data="${1:?override data is required}"
@@ -194,6 +252,7 @@ run_script() {
     FAKE_CURL_LOG="$curl_log" \
     FAKE_FIXTURE="$fixture" \
     FAKE_OPTIONS="$temporary/update-options" \
+    BASH_ENV="$bash_env" \
     PATH="$fake_bin:/usr/bin:/bin" \
     bash -euo pipefail "$1"
 }
@@ -225,6 +284,8 @@ appimage="$test_home/AppImages/screenpipe.appimage"
 desktop="$test_home/.local/share/applications/screenpipe.desktop"
 [[ -x "$appimage" ]]
 grep -Fxq "TryExec=$appimage" "$desktop"
+grep -Fxq "Exec=env LD_PRELOAD=$preload_link DESKTOPINTEGRATION=1 EXISTING_ENV=\"keep value\" $appimage --existing-argument \"argument value\"" "$desktop"
+grep -Fq "mv -- $test_home/.local/share/applications/.screenpipe.desktop." "$fake_log"
 grep -Fq 'flatpak run it.mijorus.gearlever --integrate' "$fake_log"
 grep -Fq 'flatpak run it.mijorus.gearlever --set-update-source' "$fake_log"
 grep -Fxq 'https://screenpipe.com/api/download?platform=linux' "$curl_log"
@@ -241,6 +302,34 @@ if grep -Eq -- '--integrate|^curl ' "$fake_log"; then
 fi
 grep -Fq 'flatpak run it.mijorus.gearlever --set-update-source' "$fake_log"
 [[ ! -s "$curl_log" ]]
+[[ "$(grep -o 'LD_PRELOAD=' "$desktop" | wc -l)" -eq 1 ]]
+
+printf 'TailSentinel\n' >>"$desktop"
+cp "$desktop" "$temporary/desktop-before-write-failure"
+FAKE_PRINTF_FAIL_ON_TAIL=true expect_failure 1 run_script "$present_script"
+cmp "$temporary/desktop-before-write-failure" "$desktop"
+[[ -z "$(find "$(dirname "$desktop")" -maxdepth 1 -name '.screenpipe.desktop.*' -print -quit)" ]]
+
+set +e
+FAKE_CHMOD_SIGNAL=true run_script "$present_script"
+signal_status=$?
+set -e
+[[ "$signal_status" -ne 0 ]]
+cmp "$temporary/desktop-before-write-failure" "$desktop"
+[[ -z "$(find "$(dirname "$desktop")" -maxdepth 1 -name '.screenpipe.desktop.*' -print -quit)" ]]
+
+set +e
+FAKE_MKTEMP_SIGNAL=true run_script "$present_script"
+acquisition_signal_status=$?
+set -e
+[[ "$acquisition_signal_status" -ne 0 ]]
+cmp "$temporary/desktop-before-write-failure" "$desktop"
+[[ -z "$(find "$(dirname "$desktop")" -maxdepth 1 -name '.screenpipe.desktop.*' -print -quit)" ]]
+
+sed -i "s#LD_PRELOAD=$preload_link#LD_PRELOAD=/wrong/libwayland-client.so.0#" "$desktop"
+run_script "$present_script"
+grep -Fxq "Exec=env LD_PRELOAD=$preload_link DESKTOPINTEGRATION=1 EXISTING_ENV=\"keep value\" $appimage --existing-argument \"argument value\"" "$desktop"
+[[ "$(grep -o 'LD_PRELOAD=' "$desktop" | wc -l)" -eq 1 ]]
 
 reset_entry
 run_script "$present_script"
@@ -251,6 +340,13 @@ rm -f "$appimage" "$desktop"
 run_script "$present_script"
 [[ -x "$appimage" && -f "$desktop" ]]
 grep -Fq 'flatpak run it.mijorus.gearlever --integrate' "$fake_log"
+
+reset_entry
+rm "$preload_link"
+expect_failure 1 run_script "$present_script"
+[[ ! -e "$appimage" && ! -e "$desktop" && ! -s "$fake_state" ]]
+ln -s "$host_library" "$preload_link"
+run_script "$present_script"
 
 absent_data='{"roles":["desktop"],"appimages":{"apps":[{"id":"screenpipe","roles":["desktop"],"arches":["amd64"],"state":"absent","desktop_id":"screenpipe.desktop","download_url":"https://screenpipe.com/api/download?platform=linux","update_manager":"StaticFileUpdater","update_options":{"url":"https://screenpipe.com/api/download?platform=linux"}}]}}'
 absent_script="$temporary/absent.sh"
@@ -398,5 +494,51 @@ if grep -Eq -- '--integrate|--set-update-source' "$fake_log"; then
   printf 'Invalid update URL changed Gear Lever state\n' >&2
   exit 1
 fi
+
+isolated_config="$temporary/nonexistent-chezmoi-config.toml"
+source_test_home="$temporary/source-home"
+managed_autostart="$source_test_home/.config/autostart/screenpipe-chezmoi.desktop"
+legacy_autostart="$source_test_home/.config/autostart/screenpipe.desktop"
+managed_preload="$source_test_home/.local/lib/appimage-host/screenpipe/libwayland-client.so.0"
+mkdir -p "$(dirname "$managed_autostart")" "$(dirname "$managed_preload")"
+rendered_autostart="$(
+  HOME="$source_test_home" chezmoi --config "$isolated_config" --source "$repository" \
+    --destination "$source_test_home" cat --override-data "$desktop_data" "$managed_autostart"
+)"
+grep -Fqx \
+  "Exec=env LD_PRELOAD=$managed_preload $source_test_home/AppImages/screenpipe.appimage --autostart" \
+  <<<"$rendered_autostart"
+resolved_preload="$(
+  HOME="$source_test_home" chezmoi --config "$isolated_config" --source "$repository" \
+    --destination "$source_test_home" cat --override-data "$desktop_data" "$managed_preload"
+)"
+[[ -f "$resolved_preload" ]]
+
+apply_conditional_sources() {
+  local data="${1:?override data is required}"
+
+  HOME="$source_test_home" chezmoi --config "$isolated_config" --source "$repository" \
+    --destination "$source_test_home" apply --override-data "$data" \
+    "$(dirname "$managed_autostart")" "$(dirname "$managed_preload")"
+}
+
+printf 'legacy screenpipe autostart\n' >"$legacy_autostart"
+apply_conditional_sources "$desktop_data"
+[[ -f "$managed_autostart" && -L "$managed_preload" && ! -e "$legacy_autostart" ]]
+
+for disabled_data in \
+  '{"roles":[]}' \
+  '{"roles":["desktop"],"appimages":{"apps":[{"id":"screenpipe","roles":["desktop"],"arches":["amd64"],"state":"absent"}]}}' \
+  '{"roles":["desktop"],"appimages":{"apps":[{"id":"screenpipe","roles":["desktop"],"arches":["arm64"],"state":"present"}]}}'
+do
+  apply_conditional_sources "$desktop_data"
+  [[ -f "$managed_autostart" && -L "$managed_preload" ]]
+  apply_conditional_sources "$disabled_data"
+  if [[ -e "$managed_autostart" || -L "$managed_preload" ]]; then
+    printf 'Conditional screenpipe sources survived an inapplicable transition: %s\n' \
+      "$disabled_data" >&2
+    exit 1
+  fi
+done
 
 printf 'Gear Lever AppImage lifecycle tests passed\n'

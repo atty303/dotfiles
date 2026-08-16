@@ -33,6 +33,8 @@ gearlever=(flatpak run it.mijorus.gearlever)
 applications_dir="$HOME/.local/share/applications"
 installed_apps=""
 work_dir=""
+active_staging_file=""
+active_staging_prefix=""
 declare -A integration_preexisting_paths=()
 declare -A integration_preexisting_desktops=()
 declare -A integration_desktop_backups=()
@@ -40,7 +42,21 @@ declare -A integration_icon_backups=()
 integration_expected_desktop_preexisting=false
 integration_expected_desktop_backup=""
 
+cleanup_staging() {
+  local staging_file
+
+  if [[ -n "$active_staging_prefix" ]]; then
+    for staging_file in "$active_staging_prefix"*; do
+      [[ -e "$staging_file" || -L "$staging_file" ]] || continue
+      rm -f -- "$staging_file"
+    done
+  fi
+  active_staging_file=""
+  active_staging_prefix=""
+}
+
 cleanup() {
+  cleanup_staging
   [[ -z "$work_dir" ]] || rm -rf -- "$work_dir"
 }
 trap cleanup EXIT
@@ -84,6 +100,207 @@ validate_update_options() {
       return 1
     fi
   fi
+}
+
+host_preload_value() {
+  local id="${1:?AppImage ID is required}"
+  local library link resolved value=""
+  shift
+
+  for library in "$@"; do
+    [[ "$library" =~ ^[A-Za-z0-9][A-Za-z0-9._+-]*$ ]] || {
+      printf 'Invalid host preload library for %s: %s\n' "$id" "$library" >&2
+      return 1
+    }
+    link="$HOME/.local/lib/appimage-host/$id/$library"
+    [[ -L "$link" && -f "$link" ]] || {
+      printf 'Host preload library link is missing or broken for %s: %s\n' "$id" "$link" >&2
+      return 1
+    }
+    resolved="$(readlink -f -- "$link")"
+    [[ -n "$resolved" && -f "$resolved" ]] || {
+      printf 'Cannot resolve host preload library for %s: %s\n' "$id" "$link" >&2
+      return 1
+    }
+    if [[ -n "$value" ]]; then
+      value+=:
+    fi
+    value+="$link"
+  done
+
+  printf '%s\n' "$value"
+}
+
+split_desktop_exec() {
+  local input="${1:?desktop Exec value is required}"
+  local character raw="" decoded="" quoted=false escaped=false started=false
+  local index
+
+  exec_raw_tokens=()
+  exec_decoded_tokens=()
+  for ((index = 0; index < ${#input}; index++)); do
+    character="${input:index:1}"
+    if [[ "$escaped" == true ]]; then
+      raw+="$character"
+      decoded+="$character"
+      escaped=false
+      started=true
+      continue
+    fi
+    case "$character" in
+      \\)
+        raw+="$character"
+        escaped=true
+        started=true
+        ;;
+      \")
+        raw+="$character"
+        if [[ "$quoted" == true ]]; then
+          quoted=false
+        else
+          quoted=true
+        fi
+        started=true
+        ;;
+      ' ' | $'\t')
+        if [[ "$quoted" == true ]]; then
+          raw+="$character"
+          decoded+="$character"
+        elif [[ "$started" == true ]]; then
+          exec_raw_tokens+=("$raw")
+          exec_decoded_tokens+=("$decoded")
+          raw=""
+          decoded=""
+          started=false
+        fi
+        ;;
+      *)
+        raw+="$character"
+        decoded+="$character"
+        started=true
+        ;;
+    esac
+  done
+  [[ "$quoted" == false && "$escaped" == false ]] || return 1
+  if [[ "$started" == true ]]; then
+    exec_raw_tokens+=("$raw")
+    exec_decoded_tokens+=("$decoded")
+  fi
+  ((${#exec_raw_tokens[@]}))
+}
+
+reconcile_host_preload() {
+  local id="${1:?AppImage ID is required}"
+  local desktop_id="${2:?desktop ID is required}"
+  local preload_value="${3:?host preload value is required}"
+  local desktop_file="$applications_dir/$desktop_id"
+  local try_exec current_exec token executable="" replacement variable
+  local temporary_file backup_file line exec_count=0
+  local token_index=0
+  local -a exec_raw_tokens=() exec_decoded_tokens=() preserved=()
+
+  [[ -f "$desktop_file" ]] || {
+    printf 'Cannot set host preload because desktop entry is missing for %s: %s\n' \
+      "$id" "$desktop_file" >&2
+    return 1
+  }
+  try_exec="$(desktop_try_exec "$desktop_id")" || {
+    printf 'Cannot set host preload because TryExec is invalid for %s.\n' "$id" >&2
+    return 1
+  }
+  current_exec="$(sed -n 's/^Exec=//p' "$desktop_file" | head -n 1)"
+  [[ -n "$current_exec" ]] || {
+    printf 'Cannot set host preload because Exec is missing for %s.\n' "$id" >&2
+    return 1
+  }
+
+  split_desktop_exec "$current_exec" || {
+    printf 'Cannot parse desktop Exec for %s: %s\n' "$id" "$current_exec" >&2
+    return 1
+  }
+  if [[ "${exec_decoded_tokens[0]}" == env ]]; then
+    token_index=1
+  fi
+  for ((; token_index < ${#exec_raw_tokens[@]}; token_index++)); do
+    token="${exec_decoded_tokens[token_index]}"
+    if [[ -z "$executable" ]]; then
+      if [[ "$token" =~ ^([A-Za-z_][A-Za-z0-9_]*)= ]]; then
+        variable="${BASH_REMATCH[1]}"
+        [[ "$variable" == LD_PRELOAD ]] || preserved+=("${exec_raw_tokens[token_index]}")
+        continue
+      fi
+      executable="$token"
+    fi
+    preserved+=("${exec_raw_tokens[token_index]}")
+  done
+  [[ "$executable" == "$try_exec" ]] || {
+    printf 'Desktop Exec does not launch TryExec for %s: %s\n' "$id" "$current_exec" >&2
+    return 1
+  }
+
+  replacement="env LD_PRELOAD=$preload_value"
+  for token in "${preserved[@]}"; do
+    replacement+=" $token"
+  done
+  if [[ -z "$work_dir" ]] && ! work_dir="$(mktemp -d)"; then
+    printf 'Cannot create AppImage reconciliation work directory for %s.\n' "$id" >&2
+    return 1
+  fi
+  active_staging_prefix="$applications_dir/.${desktop_id}.${BASHPID}.${RANDOM}.${RANDOM}."
+  if ! temporary_file="$(mktemp "${active_staging_prefix}XXXXXX")"; then
+    cleanup_staging
+    printf 'Cannot create desktop staging file for %s.\n' "$id" >&2
+    return 1
+  fi
+  active_staging_file="$temporary_file"
+  backup_file="$work_dir/$id.desktop.before-preload"
+  if ! cp -p -- "$desktop_file" "$backup_file"; then
+    cleanup_staging
+    printf 'Cannot back up desktop entry before preload update for %s.\n' "$id" >&2
+    return 1
+  fi
+  exec_count="$(grep -c '^Exec=' "$desktop_file" || true)"
+  if ((exec_count != 1)); then
+    cleanup_staging
+    printf 'Expected exactly one Exec key for %s, found %d.\n' "$id" "$exec_count" >&2
+    return 1
+  fi
+  if ! (
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      if [[ "$line" == Exec=* ]]; then
+        printf 'Exec=%s\n' "$replacement" || exit
+      else
+        printf '%s\n' "$line" || exit
+      fi
+    done
+  ) <"$desktop_file" >"$temporary_file"; then
+    cleanup_staging
+    printf 'Could not write complete desktop staging file for %s.\n' "$id" >&2
+    return 1
+  fi
+  if ! chmod --reference="$desktop_file" "$temporary_file" || \
+    ! mv -- "$temporary_file" "$desktop_file"; then
+    cleanup_staging
+    printf 'Could not atomically update desktop entry for %s.\n' "$id" >&2
+    return 1
+  fi
+  active_staging_file=""
+
+  current_exec="$(sed -n 's/^Exec=//p' "$desktop_file" | head -n 1)"
+  if [[ "$current_exec" != "$replacement" ]] || \
+    [[ "$(grep -o 'LD_PRELOAD=' <<<"$current_exec" | wc -l)" -ne 1 ]]; then
+    active_staging_file="$temporary_file"
+    if ! cp -p -- "$backup_file" "$temporary_file" || \
+      ! mv -- "$temporary_file" "$desktop_file"; then
+      rm -f -- "$temporary_file"
+      printf 'Could not restore desktop entry after preload verification failure: %s.\n' \
+        "$id" >&2
+    fi
+    cleanup_staging
+    printf 'Could not verify host preload environment for %s.\n' "$id" >&2
+    return 1
+  fi
+  cleanup_staging
 }
 
 desktop_try_exec() {
@@ -355,8 +572,20 @@ reconcile_present() {
   local desktop_id="${2:?desktop ID is required}"
   local download_url="${3:?download URL is required}"
   local update_manager="${4:?update manager is required}"
-  local appimage path="" status fresh=false
-  shift 4
+  local preload_count="${5:?host preload library count is required}"
+  local appimage path="" status fresh=false preload_value=""
+  local -a host_preload_libraries=()
+  shift 5
+
+  if ((preload_count)); then
+    host_preload_libraries=("${@:1:preload_count}")
+    shift "$preload_count"
+  fi
+  [[ ${1:-} == -- ]] || {
+    printf 'Missing update-option separator for %s.\n' "$id" >&2
+    return 1
+  }
+  shift
 
   validate_identity "$id" "$desktop_id"
   [[ "$download_url" == https://* ]] || {
@@ -368,6 +597,9 @@ reconcile_present() {
     return 1
   }
   validate_update_options "$id" "$update_manager" "$@"
+  if ((${#host_preload_libraries[@]})); then
+    preload_value="$(host_preload_value "$id" "${host_preload_libraries[@]}")"
+  fi
 
   refresh_installed_apps
   if ! path="$(registered_path "$desktop_id")"; then
@@ -434,6 +666,13 @@ reconcile_present() {
     fi
     return 1
   fi
+  if [[ -n "$preload_value" ]] && \
+    ! reconcile_host_preload "$id" "$desktop_id" "$preload_value"; then
+    if [[ "$fresh" == true ]] && ! rollback_new_integration "$id" "$desktop_id" "$appimage" "$path"; then
+      printf 'Could not fully roll back AppImage after host preload failure: %s\n' "$id" >&2
+    fi
+    return 1
+  fi
 }
 
 reconcile_absent() {
@@ -461,6 +700,11 @@ reconcile_absent() {
 # shellcheck disable=SC2194
 case {{ $app.state | quote }} in
   present)
+    host_preload_libraries=(
+{{- range (get $app "host_preload_libraries" | default (list)) }}
+      {{ . | quote }}
+{{- end }}
+    )
     update_options=(
 {{- range $key, $value := $app.update_options }}
       {{ printf "%s=%v" $key $value | quote }}
@@ -471,6 +715,9 @@ case {{ $app.state | quote }} in
       {{ $app.desktop_id | quote }} \
       {{ $app.download_url | quote }} \
       {{ $app.update_manager | quote }} \
+      "${#host_preload_libraries[@]}" \
+      "${host_preload_libraries[@]}" \
+      -- \
       "${update_options[@]}"
     ;;
   absent)
