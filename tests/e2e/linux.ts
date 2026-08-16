@@ -374,7 +374,7 @@ async function runLinuxTarget(
       userExec(config, containerName, [
         "/bin/bash",
         "-c",
-        `set -euo pipefail; expected=$(printf '%s\\n' ' R .chezmoiscripts/linux/distrobox.sh' ' R .chezmoiscripts/linux/flatpak.sh'); actual=$(${config.home}/.local/bin/chezmoi --source /tmp/source status); test \"$actual\" = \"$expected\"; ${config.home}/.local/bin/chezmoi --source /tmp/source apply --dry-run --verbose`,
+        `set -euo pipefail; expected=$(printf '%s\\n' ' R .chezmoiscripts/linux/distrobox.sh' ' R .chezmoiscripts/linux/flatpak.sh' ' R .chezmoiscripts/linux/z_gearlever_appimages.sh'); actual=$(${config.home}/.local/bin/chezmoi --source /tmp/source status); test \"$actual\" = \"$expected\"; ${config.home}/.local/bin/chezmoi --source /tmp/source apply --dry-run --verbose`,
       ]).signal(signal),
     );
     await execute(

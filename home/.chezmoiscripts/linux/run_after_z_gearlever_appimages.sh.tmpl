@@ -1,0 +1,484 @@
+#!/usr/bin/env -S bash -euo pipefail
+
+{{- $apps := list -}}
+{{- range $app := .appimages.apps -}}
+{{-   $roleSelected := not (hasKey $app "roles") -}}
+{{-   range $role := ($app.roles | default (list)) -}}
+{{-     if has $role $.roles -}}
+{{-       $roleSelected = true -}}
+{{-     end -}}
+{{-   end -}}
+{{-   $archSelected := not (hasKey $app "arches") -}}
+{{-   range $arch := ($app.arches | default (list)) -}}
+{{-     if eq $arch $.chezmoi.arch -}}
+{{-       $archSelected = true -}}
+{{-     end -}}
+{{-   end -}}
+{{-   if and $roleSelected $archSelected -}}
+{{-     $apps = append $apps $app -}}
+{{-   end -}}
+{{- end }}
+if (({{ len $apps }} == 0)); then
+  exit 0
+fi
+if ! command -v flatpak >/dev/null 2>&1; then
+  exit 0
+fi
+if ! flatpak info --system it.mijorus.gearlever >/dev/null 2>&1; then
+  printf 'Cannot reconcile AppImages: Gear Lever is not installed as a system Flatpak.\n' >&2
+  exit 1
+fi
+
+gearlever=(flatpak run it.mijorus.gearlever)
+applications_dir="$HOME/.local/share/applications"
+installed_apps=""
+work_dir=""
+declare -A integration_preexisting_paths=()
+declare -A integration_preexisting_desktops=()
+declare -A integration_desktop_backups=()
+declare -A integration_icon_backups=()
+integration_expected_desktop_preexisting=false
+integration_expected_desktop_backup=""
+
+cleanup() {
+  [[ -z "$work_dir" ]] || rm -rf -- "$work_dir"
+}
+trap cleanup EXIT
+
+refresh_installed_apps() {
+  if ! installed_apps="$("${gearlever[@]}" --list-installed)"; then
+    printf 'Cannot read Gear Lever AppImage entries.\n' >&2
+    return 1
+  fi
+}
+
+validate_identity() {
+  local id="${1:?AppImage ID is required}"
+  local desktop_id="${2:?desktop ID is required}"
+
+  [[ "$id" =~ ^[a-z0-9][a-z0-9._-]*$ ]] || {
+    printf 'Invalid AppImage ID: %s\n' "$id" >&2
+    return 1
+  }
+  [[ "$desktop_id" =~ ^[A-Za-z0-9._-]+\.desktop$ ]] || {
+    printf 'Invalid AppImage desktop ID for %s: %s\n' "$id" "$desktop_id" >&2
+    return 1
+  }
+}
+
+validate_update_options() {
+  local id="${1:?AppImage ID is required}"
+  local manager="${2:?update manager is required}"
+  local option url="" url_count=0
+  shift 2
+
+  if [[ "$manager" == StaticFileUpdater ]]; then
+    for option in "$@"; do
+      if [[ "$option" == url=* ]]; then
+        url="${option#url=}"
+        url_count=$((url_count + 1))
+      fi
+    done
+    if ((url_count != 1)) || [[ "$url" != https://* ]]; then
+      printf 'StaticFileUpdater requires one HTTPS url for %s.\n' "$id" >&2
+      return 1
+    fi
+  fi
+}
+
+desktop_try_exec() {
+  local desktop_id="${1:?desktop ID is required}"
+  local desktop_file="$applications_dir/$desktop_id"
+  local path
+
+  [[ -f "$desktop_file" ]] || return 1
+  path="$(sed -n 's/^TryExec=//p' "$desktop_file" | head -n 1)"
+  [[ -n "$path" && -f "$path" ]] || return 1
+  printf '%s\n' "$path"
+}
+
+registered_path() {
+  local desktop_id="${1:?desktop ID is required}"
+  local path
+
+  path="$(desktop_try_exec "$desktop_id")" || return 1
+
+  list_has_path "$path" || return 1
+  printf '%s\n' "$path"
+}
+
+list_has_path() {
+  local path="${1:?AppImage path is required}"
+  local line
+
+  while IFS= read -r line; do
+    line="${line%"${line##*[![:space:]]}"}"
+    if [[ "$line" == *" $path" ]]; then
+      return 0
+    fi
+  done <<<"$installed_apps"
+  return 1
+}
+
+snapshot_integration_state() {
+  local desktop_id="${1:?desktop ID is required}"
+  local path desktop_file="$applications_dir/$desktop_id"
+  local backup_dir="$work_dir/preexisting-desktops"
+  local backup icon_path index=0
+
+  integration_preexisting_paths=()
+  if [[ -d "$HOME/AppImages" ]]; then
+    while IFS= read -r -d '' path; do
+      integration_preexisting_paths["$path"]=1
+    done < <(find "$HOME/AppImages" -type f -print0)
+  fi
+
+  integration_preexisting_desktops=()
+  integration_desktop_backups=()
+  integration_icon_backups=()
+  if [[ -d "$applications_dir" ]]; then
+    mkdir -p -- "$backup_dir"
+    while IFS= read -r -d '' path; do
+      integration_preexisting_desktops["$path"]=1
+      backup="$backup_dir/$index.desktop"
+      cp -p -- "$path" "$backup"
+      integration_desktop_backups["$path"]="$backup"
+      icon_path="$(sed -n 's/^Icon=//p' "$path" | head -n 1)"
+      if [[ "$icon_path" == /* && -f "$icon_path" && ! ${integration_icon_backups[$icon_path]+backed_up} ]]; then
+        backup="$backup_dir/$index.icon"
+        cp -p -- "$icon_path" "$backup"
+        integration_icon_backups["$icon_path"]="$backup"
+      fi
+      index=$((index + 1))
+    done < <(find "$applications_dir" -maxdepth 1 -type f -name '*.desktop' -print0)
+  fi
+
+  integration_expected_desktop_preexisting=false
+  integration_expected_desktop_backup=""
+  if [[ -f "$desktop_file" ]]; then
+    integration_expected_desktop_preexisting=true
+    integration_expected_desktop_backup="${integration_desktop_backups[$desktop_file]}"
+  fi
+}
+
+is_new_integration_path() {
+  local path="${1:?path is required}"
+
+  [[ ! ${integration_preexisting_paths[$path]+preexisting} ]]
+}
+
+desktop_for_path() {
+  local path="${1:?AppImage path is required}"
+  local desktop_file try_exec
+
+  [[ -d "$applications_dir" ]] || return 1
+  while IFS= read -r -d '' desktop_file; do
+    try_exec="$(sed -n 's/^TryExec=//p' "$desktop_file" | head -n 1)"
+    if [[ "$try_exec" == "$path" ]]; then
+      printf '%s\n' "$desktop_file"
+      return 0
+    fi
+  done < <(find "$applications_dir" -maxdepth 1 -type f -name '*.desktop' -print0)
+  return 1
+}
+
+new_integration_path_from_desktop() {
+  local desktop_file path
+
+  [[ -d "$applications_dir" ]] || return 1
+  while IFS= read -r -d '' desktop_file; do
+    [[ ! ${integration_preexisting_desktops[$desktop_file]+preexisting} ]] || continue
+    path="$(sed -n 's/^TryExec=//p' "$desktop_file" | head -n 1)"
+    if [[ -n "$path" && -f "$path" ]]; then
+      printf '%s\n' "$path"
+      return 0
+    fi
+  done < <(find "$applications_dir" -maxdepth 1 -type f -name '*.desktop' -print0)
+  return 1
+}
+
+restore_preexisting_file() {
+  local backup="${1:?backup path is required}"
+  local destination="${2:?destination path is required}"
+
+  if ! mkdir -p -- "$(dirname -- "$destination")"; then
+    printf 'Could not recreate directory while rolling back: %s\n' "$destination" >&2
+    return 1
+  fi
+  if ! cp -p -- "$backup" "$destination"; then
+    printf 'Could not restore preexisting file during rollback: %s\n' "$destination" >&2
+    return 1
+  fi
+  if ! cmp -s "$backup" "$destination"; then
+    printf 'Restored file does not match its pre-integration state: %s\n' "$destination" >&2
+    return 1
+  fi
+}
+
+restore_preexisting_desktop() {
+  local desktop_file="${1:?desktop path is required}"
+  local backup="${integration_desktop_backups[$desktop_file]-}"
+
+  [[ -n "$backup" ]] || return 0
+  restore_preexisting_file "$backup" "$desktop_file"
+}
+
+trash_path() {
+  local path="${1:?path is required}"
+
+  [[ -e "$path" ]] || return 0
+  command -v gio >/dev/null 2>&1 || {
+    printf 'Cannot roll back generated path because gio is unavailable: %s\n' "$path" >&2
+    return 1
+  }
+  gio trash "$path"
+  if [[ -e "$path" ]]; then
+    printf 'Generated path remains after rollback: %s\n' "$path" >&2
+    return 1
+  fi
+}
+
+matching_default_appimage() {
+  local source="${1:?source AppImage is required}"
+  local candidate
+
+  [[ -f "$source" && -d "$HOME/AppImages" ]] || return 1
+  while IFS= read -r -d '' candidate; do
+    is_new_integration_path "$candidate" || continue
+    if cmp -s "$source" "$candidate"; then
+      printf '%s\n' "$candidate"
+      return 0
+    fi
+  done < <(find "$HOME/AppImages" -maxdepth 1 -type f -print0)
+  return 1
+}
+
+rollback_new_integration() {
+  local id="${1:?AppImage ID is required}"
+  local desktop_id="${2:?desktop ID is required}"
+  local source="${3:?source AppImage is required}"
+  local path="${4:-}"
+  local desktop_file="$applications_dir/$desktop_id"
+  local generated_desktop="" icon_path="" icon_backup="" rollback_status=0
+
+  refresh_installed_apps || rollback_status=1
+  if [[ -n "$path" ]] && ! is_new_integration_path "$path"; then
+    path=""
+  fi
+  if [[ -z "$path" && "$integration_expected_desktop_preexisting" == false ]]; then
+    path="$(desktop_try_exec "$desktop_id")" || true
+  fi
+  if [[ -z "$path" ]]; then
+    path="$(new_integration_path_from_desktop)" || true
+  fi
+  if [[ -z "$path" ]]; then
+    path="$(matching_default_appimage "$source")" || true
+  fi
+
+  if [[ -n "$path" ]]; then
+    generated_desktop="$(desktop_for_path "$path")" || true
+    if [[ -n "$generated_desktop" ]]; then
+      icon_path="$(sed -n 's/^Icon=//p' "$generated_desktop" | head -n 1)"
+    fi
+    if list_has_path "$path" && "${gearlever[@]}" --remove "$path" --yes; then
+      :
+    else
+      printf 'Gear Lever could not roll back fresh AppImage %s; using Trash directly.\n' "$id" >&2
+      trash_path "$path" || rollback_status=1
+      if [[ -n "$generated_desktop" && ! ${integration_preexisting_desktops[$generated_desktop]+preexisting} ]]; then
+        trash_path "$generated_desktop" || rollback_status=1
+      fi
+      if [[ "$icon_path" == /* ]] && is_new_integration_path "$icon_path"; then
+        trash_path "$icon_path" || rollback_status=1
+      fi
+    fi
+  fi
+
+  if [[ -n "$generated_desktop" ]] && ! restore_preexisting_desktop "$generated_desktop"; then
+    rollback_status=1
+  fi
+  if [[ "$integration_expected_desktop_preexisting" == true && "$generated_desktop" != "$desktop_file" ]] && \
+    ! restore_preexisting_desktop "$desktop_file"; then
+    rollback_status=1
+  fi
+  if [[ -n "$icon_path" ]]; then
+    icon_backup="${integration_icon_backups[$icon_path]-}"
+  fi
+  if [[ -n "$icon_backup" ]] && ! restore_preexisting_file "$icon_backup" "$icon_path"; then
+    rollback_status=1
+  fi
+
+  generated_desktop=""
+  if [[ -n "$path" ]]; then
+    generated_desktop="$(desktop_for_path "$path")" || true
+  fi
+  if [[ (-n "$path" && -e "$path") || -n "$generated_desktop" || \
+    ("$integration_expected_desktop_preexisting" == false && -e "$desktop_file") ]]; then
+    printf 'Fresh AppImage rollback left generated state for %s.\n' "$id" >&2
+    rollback_status=1
+  fi
+  if [[ "$integration_expected_desktop_preexisting" == true ]] && \
+    ! cmp -s "$integration_expected_desktop_backup" "$desktop_file"; then
+    printf 'Preexisting desktop was not restored for %s.\n' "$id" >&2
+    rollback_status=1
+  fi
+  if [[ -n "$icon_backup" ]] && ! cmp -s "$icon_backup" "$icon_path"; then
+    printf 'Preexisting icon was not restored for %s: %s\n' "$id" "$icon_path" >&2
+    rollback_status=1
+  fi
+  if ! refresh_installed_apps; then
+    printf 'Cannot verify Gear Lever state after rolling back %s.\n' "$id" >&2
+    rollback_status=1
+  elif [[ -n "$path" ]] && list_has_path "$path"; then
+    printf 'Gear Lever still lists AppImage after rollback: %s\n' "$id" >&2
+    rollback_status=1
+  fi
+  return "$rollback_status"
+}
+
+entry_has_manager() {
+  local path="${1:?AppImage path is required}"
+  local manager="${2:?update manager is required}"
+  local line
+
+  while IFS= read -r line; do
+    line="${line%"${line##*[![:space:]]}"}"
+    if [[ "$line" == *"[$manager]"* && "$line" == *" $path" ]]; then
+      return 0
+    fi
+  done <<<"$installed_apps"
+  return 1
+}
+
+reconcile_present() {
+  local id="${1:?AppImage ID is required}"
+  local desktop_id="${2:?desktop ID is required}"
+  local download_url="${3:?download URL is required}"
+  local update_manager="${4:?update manager is required}"
+  local appimage path="" status fresh=false
+  shift 4
+
+  validate_identity "$id" "$desktop_id"
+  [[ "$download_url" == https://* ]] || {
+    printf 'AppImage download URL must use HTTPS for %s: %s\n' "$id" "$download_url" >&2
+    return 1
+  }
+  [[ "$update_manager" =~ ^[A-Za-z0-9_]+$ ]] || {
+    printf 'Invalid Gear Lever update manager for %s: %s\n' "$id" "$update_manager" >&2
+    return 1
+  }
+  validate_update_options "$id" "$update_manager" "$@"
+
+  refresh_installed_apps
+  if ! path="$(registered_path "$desktop_id")"; then
+    command -v curl >/dev/null 2>&1 || {
+      printf 'Cannot install AppImage %s: curl is unavailable.\n' "$id" >&2
+      return 1
+    }
+    [[ -n "$work_dir" ]] || work_dir="$(mktemp -d)"
+    appimage="$work_dir/$id.AppImage"
+    curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 \
+      --output "$appimage" "$download_url"
+    [[ -s "$appimage" ]] || {
+      printf 'Downloaded AppImage is empty: %s\n' "$id" >&2
+      return 1
+    }
+    snapshot_integration_state "$desktop_id"
+    status=0
+    "${gearlever[@]}" --integrate "$appimage" --yes || status=$?
+    refresh_installed_apps || {
+      if ! rollback_new_integration "$id" "$desktop_id" "$appimage"; then
+        printf 'Could not fully roll back fresh AppImage after list failure: %s\n' "$id" >&2
+      fi
+      return 1
+    }
+    if ! path="$(registered_path "$desktop_id")"; then
+      printf 'Gear Lever did not publish the expected desktop entry for %s: %s\n' \
+        "$id" "$desktop_id" >&2
+      if ! rollback_new_integration "$id" "$desktop_id" "$appimage"; then
+        printf 'Could not fully roll back incomplete AppImage integration: %s\n' "$id" >&2
+        return 1
+      fi
+      ((status == 0)) && status=1
+      return "$status"
+    fi
+    fresh=true
+    if ((status != 0)); then
+      if ! rollback_new_integration "$id" "$desktop_id" "$appimage" "$path"; then
+        printf 'Could not fully roll back failed AppImage integration: %s\n' "$id" >&2
+        return 1
+      fi
+      return "$status"
+    fi
+  fi
+
+  status=0
+  "${gearlever[@]}" --set-update-source "$path" --manager "$update_manager" "$@" || status=$?
+  if ((status != 0)); then
+    if [[ "$fresh" == true ]] && ! rollback_new_integration "$id" "$desktop_id" "$appimage" "$path"; then
+      printf 'Could not fully roll back AppImage after update-source failure: %s\n' "$id" >&2
+      return 1
+    fi
+    return "$status"
+  fi
+  if ! refresh_installed_apps; then
+    if [[ "$fresh" == true ]] && ! rollback_new_integration "$id" "$desktop_id" "$appimage" "$path"; then
+      printf 'Could not fully roll back AppImage after list failure: %s\n' "$id" >&2
+    fi
+    return 1
+  fi
+  if ! entry_has_manager "$path" "$update_manager"; then
+    printf 'Gear Lever did not retain update manager %s for %s.\n' "$update_manager" "$id" >&2
+    if [[ "$fresh" == true ]] && ! rollback_new_integration "$id" "$desktop_id" "$appimage" "$path"; then
+      printf 'Could not fully roll back AppImage after manager verification failure: %s\n' "$id" >&2
+    fi
+    return 1
+  fi
+}
+
+reconcile_absent() {
+  local id="${1:?AppImage ID is required}"
+  local desktop_id="${2:?desktop ID is required}"
+  local path
+
+  validate_identity "$id" "$desktop_id"
+  refresh_installed_apps
+  if path="$(registered_path "$desktop_id")"; then
+    "${gearlever[@]}" --remove "$path" --yes
+    refresh_installed_apps
+    if registered_path "$desktop_id" >/dev/null; then
+      printf 'Gear Lever did not remove AppImage entry: %s\n' "$id" >&2
+      return 1
+    fi
+  elif [[ -e "$applications_dir/$desktop_id" ]]; then
+    printf 'Cannot remove unmanaged or stale AppImage desktop entry: %s\n' "$desktop_id" >&2
+    return 1
+  fi
+}
+
+{{ range $app := $apps -}}
+# chezmoi renders one constant case per declared app.
+# shellcheck disable=SC2194
+case {{ $app.state | quote }} in
+  present)
+    update_options=(
+{{- range $key, $value := $app.update_options }}
+      {{ printf "%s=%v" $key $value | quote }}
+{{- end }}
+    )
+    reconcile_present \
+      {{ $app.id | quote }} \
+      {{ $app.desktop_id | quote }} \
+      {{ $app.download_url | quote }} \
+      {{ $app.update_manager | quote }} \
+      "${update_options[@]}"
+    ;;
+  absent)
+    reconcile_absent {{ $app.id | quote }} {{ $app.desktop_id | quote }}
+    ;;
+  *)
+    printf 'Invalid AppImage state for %s: %s\n' {{ $app.id | quote }} {{ $app.state | quote }} >&2
+    exit 1
+    ;;
+esac
+{{ end -}}

@@ -46,6 +46,7 @@ run = '''
 mise run check
 mise run test:distrobox
 mise run test:flatpak
+mise run test:appimages
 mise run test:chrome-web-apps
 mise run test:chatgpt
 mise run test:roles
@@ -65,6 +66,10 @@ bash tests/distrobox-service-restart.sh
 [tasks."test:flatpak"]
 description = "Test Flatpak lifecycle installation"
 run = "bash tests/flatpak-install.sh"
+
+[tasks."test:appimages"]
+description = "Test Gear Lever AppImage entry convergence"
+run = "bash tests/gearlever-appimages.sh"
 
 [tasks."test:chrome-web-apps"]
 description = "Test portable Chrome web app configuration"
