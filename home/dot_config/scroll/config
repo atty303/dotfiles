@@ -174,6 +174,12 @@ for_window [class="^steam$"] {
     set_size h 1
     set_size v 0.33333333
 }
+for_window [class="^steam_app_infinitas$"] {
+    fullscreen application enable
+    fullscreen disable
+    floating enable
+    resize set width 1920px height 1080px
+}
 
 for_window [app_id="app.zen_browser.zen"] {
     move container to workspace 1
