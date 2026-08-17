@@ -180,6 +180,7 @@ for_window [class="^steam_app_infinitas$"] {
     floating enable
     resize set width 1920px height 1080px
 }
+lua $lua_scripts/infinitas_fullscreen.lua
 
 for_window [app_id="app.zen_browser.zen"] {
     move container to workspace 1
