@@ -1,0 +1,145 @@
+#!/bin/sh
+
+set -eu
+
+{{- $resticEnabled := false }}
+{{- if and (has "secrets" .roles) (hasKey .restic.hosts .chezmoi.hostname) }}
+{{-   $resticEnabled = (index .restic.hosts .chezmoi.hostname).enabled }}
+{{- end }}
+keep_credentials=
+keep_password=
+{{ if $resticEnabled -}}
+keep_credentials="$HOME/.config/restic/credentials/{{ .chezmoi.hostname }}.env"
+keep_password="$HOME/.config/restic/passwords/{{ .chezmoi.hostname }}"
+{{ end -}}
+cleanup_restic_secrets() {
+  for secret in \
+    "$HOME/.config/restic/credentials/"* \
+    "$HOME/.config/restic/credentials/".[!.]* \
+    "$HOME/.config/restic/credentials/"..?*; do
+    [ -e "$secret" ] || [ -L "$secret" ] || continue
+    [ "$secret" = "$keep_credentials" ] || rm -rf "$secret"
+  done
+  for secret in \
+    "$HOME/.config/restic/passwords/"* \
+    "$HOME/.config/restic/passwords/".[!.]* \
+    "$HOME/.config/restic/passwords/"..?*; do
+    [ -e "$secret" ] || [ -L "$secret" ] || continue
+    [ "$secret" = "$keep_password" ] || rm -rf "$secret"
+  done
+}
+{{ if not $resticEnabled }}
+restic_artifacts=false
+for path in \
+  "$HOME/.local/bin/restic-home" \
+  "$HOME/.config/restic/excludes" \
+  "$HOME/.config/systemd/user/restic-backup.service" \
+  "$HOME/.config/systemd/user/restic-backup.timer" \
+  "$HOME/.config/systemd/user/restic-check.service" \
+  "$HOME/.config/systemd/user/restic-check.timer" \
+  "$HOME/.config/systemd/user/restic-failure-notify@.service" \
+  "$HOME/.config/systemd/user/restic-maintenance.service" \
+  "$HOME/.config/systemd/user/restic-maintenance.timer" \
+  "$HOME/.config/systemd/user/timers.target.wants/restic-backup.timer" \
+  "$HOME/.config/systemd/user/timers.target.wants/restic-check.timer" \
+  "$HOME/.config/systemd/user/timers.target.wants/restic-maintenance.timer"; do
+  if [ -e "$path" ] || [ -L "$path" ]; then
+    restic_artifacts=true
+    break
+  fi
+done
+
+manager_available=false
+if [ "$restic_artifacts" = false ]; then
+  :
+elif systemctl --user show-environment >/dev/null 2>&1; then
+  manager_available=true
+  for timer in restic-backup.timer restic-maintenance.timer restic-check.timer; do
+    timer_status=0
+    timer_state=$(systemctl --user is-active "$timer" 2>/dev/null) || timer_status=$?
+    case $timer_state in
+      active | activating | reloading)
+      if ! systemctl --user stop "$timer" >/dev/null 2>&1; then
+        printf 'Could not stop restic user timer: %s\n' "$timer" >&2
+        exit 1
+      fi
+      timer_status=0
+      timer_state=$(systemctl --user is-active "$timer" 2>/dev/null) || timer_status=$?
+      if [ -z "$timer_state" ] && [ "$timer_status" -ne 0 ]; then
+        printf 'Could not verify stopped restic user timer: %s\n' "$timer" >&2
+        exit 1
+      fi
+      ;;
+      inactive | failed | unknown)
+        ;;
+      '')
+        [ "$timer_status" -eq 0 ] || {
+          printf 'Could not query restic user timer state: %s\n' "$timer" >&2
+          exit 1
+        }
+        ;;
+      *)
+        printf 'Unknown restic user timer state for %s: %s\n' "$timer" "$timer_state" >&2
+        exit 1
+        ;;
+    esac
+    case $timer_state in
+      active | activating | reloading)
+        printf 'Restic user timer is still active: %s\n' "$timer" >&2
+        exit 1
+        ;;
+    esac
+    enabled_status=0
+    enabled_state=$(systemctl --user is-enabled "$timer" 2>/dev/null) || enabled_status=$?
+    case $enabled_state in
+      enabled | enabled-runtime | linked | linked-runtime | alias)
+        if ! systemctl --user disable "$timer" >/dev/null 2>&1; then
+          printf 'Could not disable restic user timer: %s\n' "$timer" >&2
+          exit 1
+        fi
+        ;;
+      disabled | static | indirect | masked | generated | transient | not-found)
+        ;;
+      '')
+        [ "$enabled_status" -eq 0 ] || {
+          printf 'Could not query restic user timer enablement: %s\n' "$timer" >&2
+          exit 1
+        }
+        ;;
+      *)
+        printf 'Unknown restic user timer enablement for %s: %s\n' "$timer" "$enabled_state" >&2
+        exit 1
+        ;;
+    esac
+  done
+elif [ "$restic_artifacts" = true ]; then
+  printf 'Could not contact the systemd user manager to stop restic timers.\n' >&2
+  exit 1
+fi
+
+cleanup_restic_secrets
+rm -f \
+  "$HOME/.local/bin/restic-home" \
+  "$HOME/.config/restic/excludes" \
+  "$HOME/.config/systemd/user/restic-backup.service" \
+  "$HOME/.config/systemd/user/restic-backup.timer" \
+  "$HOME/.config/systemd/user/restic-check.service" \
+  "$HOME/.config/systemd/user/restic-check.timer" \
+  "$HOME/.config/systemd/user/restic-failure-notify@.service" \
+  "$HOME/.config/systemd/user/restic-maintenance.service" \
+  "$HOME/.config/systemd/user/restic-maintenance.timer" \
+  "$HOME/.config/systemd/user/timers.target.wants/restic-backup.timer" \
+  "$HOME/.config/systemd/user/timers.target.wants/restic-check.timer" \
+  "$HOME/.config/systemd/user/timers.target.wants/restic-maintenance.timer"
+rmdir \
+  "$HOME/.config/restic/credentials" \
+  "$HOME/.config/restic/passwords" \
+  "$HOME/.config/restic" \
+  "$HOME/.config/systemd/user/timers.target.wants" 2>/dev/null || true
+
+if [ "$manager_available" = true ]; then
+  systemctl --user daemon-reload >/dev/null
+fi
+{{ else }}
+cleanup_restic_secrets
+{{ end }}

@@ -1,0 +1,11 @@
+[Unit]
+Description=Check the home restic repository monthly
+
+[Timer]
+OnCalendar={{ (index .restic.hosts .chezmoi.hostname).check_calendar }}
+RandomizedDelaySec={{ .restic.defaults.randomized_delay }}
+Persistent=true
+Unit=restic-check.service
+
+[Install]
+WantedBy=timers.target

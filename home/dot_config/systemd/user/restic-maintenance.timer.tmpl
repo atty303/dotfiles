@@ -1,0 +1,11 @@
+[Unit]
+Description=Prune the home restic repository weekly
+
+[Timer]
+OnCalendar={{ (index .restic.hosts .chezmoi.hostname).maintenance_calendar }}
+RandomizedDelaySec={{ .restic.defaults.randomized_delay }}
+Persistent=true
+Unit=restic-maintenance.service
+
+[Install]
+WantedBy=timers.target

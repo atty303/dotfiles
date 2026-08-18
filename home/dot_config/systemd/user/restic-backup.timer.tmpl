@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the home restic backup daily
+
+[Timer]
+OnCalendar={{ (index .restic.hosts .chezmoi.hostname).backup_calendar }}
+RandomizedDelaySec={{ .restic.defaults.randomized_delay }}
+Persistent=true
+Unit=restic-backup.service
+
+[Install]
+WantedBy=timers.target

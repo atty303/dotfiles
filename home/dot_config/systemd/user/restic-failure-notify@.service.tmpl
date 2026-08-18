@@ -1,0 +1,6 @@
+[Unit]
+Description=Notify that a restic user service failed
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/env notify-send --urgency=critical "Restic backup failed" "Inspect %I with journalctl --user -u %I"

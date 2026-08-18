@@ -1,0 +1,32 @@
+{{- $home := .chezmoi.homeDir -}}
+{{ $home }}/.cache
+{{ $home }}/.Trash
+{{ $home }}/.Trash-*
+{{ $home }}/.local/share/Trash
+{{ $home }}/.screenpipe
+
+{{ $home }}/.local/share/flatpak
+{{ $home }}/.var/app/**/cache
+{{ $home }}/.var/app/**/.cache
+{{ $home }}/.local/share/mise
+{{ $home }}/.local/opt
+{{ $home }}/.local/share/JetBrains
+
+{{ $home }}/.local/share/containers/cache
+{{ $home }}/.local/share/containers/storage/overlay*
+{{ $home }}/.local/share/containers/storage/volumes/*
+!{{ $home }}/.local/share/containers/storage/volumes/zmk-config
+!{{ $home }}/.local/share/containers/storage/volumes/zmk-modules
+
+{{ $home }}/.local/share/Steam/*
+!{{ $home }}/.local/share/Steam/userdata
+!{{ $home }}/.local/share/Steam/steamapps
+{{ $home }}/.local/share/Steam/steamapps/*
+!{{ $home }}/.local/share/Steam/steamapps/compatdata
+
+{{ $home }}/Games/Heroic
+{{ $home }}/Games/konamate
+
+**/node_modules
+**/.venv
+**/target

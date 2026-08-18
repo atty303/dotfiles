@@ -1,0 +1,12 @@
+[Unit]
+Description=Check the home restic repository
+Wants=network-online.target
+After=network-online.target
+OnFailure=restic-failure-notify@%n.service
+
+[Service]
+Type=oneshot
+ExecStart={{ joinPath .chezmoi.homeDir ".local/bin/restic-home" }} check
+Nice=10
+IOSchedulingClass=idle
+UMask=0077

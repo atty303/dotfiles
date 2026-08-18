@@ -1,0 +1,12 @@
+[Unit]
+Description=Apply the home restic retention policy
+Wants=network-online.target
+After=network-online.target
+OnFailure=restic-failure-notify@%n.service
+
+[Service]
+Type=oneshot
+ExecStart={{ joinPath .chezmoi.homeDir ".local/bin/restic-home" }} maintenance
+Nice=10
+IOSchedulingClass=idle
+UMask=0077

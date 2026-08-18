@@ -1,0 +1,12 @@
+[Unit]
+Description=Back up the home directory with restic
+Wants=network-online.target
+After=network-online.target
+OnFailure=restic-failure-notify@%n.service
+
+[Service]
+Type=oneshot
+ExecStart={{ joinPath .chezmoi.homeDir ".local/bin/restic-home" }} backup
+Nice=10
+IOSchedulingClass=idle
+UMask=0077

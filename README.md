@@ -129,6 +129,79 @@ Disable `secrets` when their encrypted bootstrap artifacts should not be managed
 After this roles redesign, existing installations must run the wrapper once again (with
 `--prompt-roles` when the defaults are not appropriate) to regenerate the chezmoi config.
 
+## Home backups
+
+The Linux host `cristina` has a host-scoped restic configuration for daily encrypted
+home-directory backups. It is rendered only when the `secrets` role is selected and the
+current hostname has an enabled entry in `home/.chezmoidata/restic.toml`. Other hosts and
+operating systems do not manage the wrapper, credentials, or timers until they receive an
+explicit host entry and native scheduler integration.
+
+Create a private Backblaze B2 bucket without Object Lock, configure its lifecycle to keep
+only the latest version of each object, and create a standard Read and Write application
+key restricted to both that bucket and the `restic/cristina/` prefix. Do not use the
+account master key. Put these exact unquoted assignments in
+`~/.config/restic/credentials/cristina.env`:
+
+```text
+AWS_ACCESS_KEY_ID=REPLACE_WITH_KEY_ID
+AWS_SECRET_ACCESS_KEY=REPLACE_WITH_APPLICATION_KEY
+RESTIC_REPOSITORY=s3:https://REPLACE_WITH_ENDPOINT/REPLACE_WITH_BUCKET/restic/cristina
+```
+
+Put a generated restic repository password on one line in
+`~/.config/restic/passwords/cristina`, then restrict and encrypt both files into the
+chezmoi source state:
+
+```nu
+^chmod 700 ~/.config/restic ~/.config/restic/credentials ~/.config/restic/passwords
+```
+
+```nu
+^chmod 600 ~/.config/restic/credentials/cristina.env ~/.config/restic/passwords/cristina
+```
+
+```nu
+chezmoi add --encrypt ~/.config/restic/credentials/cristina.env
+```
+
+```nu
+chezmoi add --encrypt ~/.config/restic/passwords/cristina
+```
+
+Apply the credentials, wrapper, exclude file, services, and timer unit files as explicit
+targets. Timer enablement is intentionally not part of the chezmoi source state, so a fresh
+bootstrap cannot schedule maintenance before its repository has been verified. Initialize
+the repository, create the first snapshot, run a check, and restore a representative file
+to a temporary directory before enabling automatic execution:
+
+```nu
+restic-home init
+```
+
+```nu
+restic-home backup
+```
+
+```nu
+restic-home check
+```
+
+After the restore comparison succeeds, explicitly enable and start the timers:
+
+```nu
+systemctl --user daemon-reload
+```
+
+```nu
+systemctl --user enable --now restic-backup.timer restic-maintenance.timer restic-check.timer
+```
+
+Backup, retention, and integrity failures remain visible as failed user units in the
+journal and also trigger a desktop notification. If the host entry is disabled, the host
+becomes unknown, or the `secrets` role is removed, the next full chezmoi apply stops the
+timers and removes the host-scoped credentials and automation files.
+
 ## Maintenance
 
 Preview source-state changes before applying them:

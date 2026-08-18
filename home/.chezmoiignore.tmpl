@@ -25,6 +25,40 @@ AppData/
 .local/share/atuin/key
 {{ end }}
 
+{{- $resticEnabled := false }}
+{{- if and (eq .chezmoi.os "linux") (has "secrets" .roles) (hasKey .restic.hosts .chezmoi.hostname) }}
+{{-   $resticEnabled = (index .restic.hosts .chezmoi.hostname).enabled }}
+{{- end }}
+{{ if not $resticEnabled }}
+# Host-scoped restic configuration is only rendered for configured Linux secret hosts.
+.config/restic/
+.local/bin/restic-home
+.config/systemd/user/restic-backup.service
+.config/systemd/user/restic-backup.timer
+.config/systemd/user/restic-check.service
+.config/systemd/user/restic-check.timer
+.config/systemd/user/restic-failure-notify@.service
+.config/systemd/user/restic-maintenance.service
+.config/systemd/user/restic-maintenance.timer
+.config/systemd/user/timers.target.wants/restic-backup.timer
+.config/systemd/user/timers.target.wants/restic-check.timer
+.config/systemd/user/timers.target.wants/restic-maintenance.timer
+{{ else }}
+# Never decrypt another host's repository credentials onto this host.
+{{ range glob (joinPath .chezmoi.sourceDir "dot_config/private_restic/private_credentials/encrypted_private_*.age") -}}
+{{ $target := trimSuffix ".age" (trimPrefix "encrypted_private_" (base .)) -}}
+{{ if ne $target (printf "%s.env" $.chezmoi.hostname) -}}
+.config/restic/credentials/{{ $target }}
+{{ end -}}
+{{ end -}}
+{{ range glob (joinPath .chezmoi.sourceDir "dot_config/private_restic/private_passwords/encrypted_private_*.age") -}}
+{{ $target := trimSuffix ".age" (trimPrefix "encrypted_private_" (base .)) -}}
+{{ if ne $target $.chezmoi.hostname -}}
+.config/restic/passwords/{{ $target }}
+{{ end -}}
+{{ end -}}
+{{ end }}
+
 .Trash/
 .android/
 .cache/
