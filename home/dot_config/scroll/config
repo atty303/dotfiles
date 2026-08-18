@@ -177,7 +177,7 @@ for_window [class="^steam$"] {
 for_window [class="^steam_app_infinitas$"] {
     fullscreen application enable
     fullscreen disable
-    floating enable
+    floating disable
     resize set width 1920px height 1080px
 }
 lua $lua_scripts/infinitas_fullscreen.lua
