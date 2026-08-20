@@ -42,7 +42,8 @@
 - `hk.pkl` をformatter、lint、静的検査および軽量テストなどGit hookで常用できる高速な検証と修正の原典とし、Git hook、`hk check` および `hk fix` から同じstep群を再利用する。複雑なstepは選択されたファイルを維持して内部の `mise` child taskを呼び出せるが、そのtaskから標準入口へ戻る循環依存を作らない。
 - `mise run check [FILES...]` と `mise run fix [FILES...]` は、それぞれ `hk check` と `hk fix` の共通入口とする。ファイルを指定した場合はそのファイルだけを対象とし、引数なしではstaged filesに限定せずrepository全体を対象とする。`check` はファイルを変更せず、`fix` は利用可能な修正を適用する。
 - `mise run test` は `check` を含む再現可能な全検証の入口とし、コンパイルが必要なlintや型検査、build、重いテストおよび統合・E2Eテストを含める。実機または外部serviceに依存するlive検証は個別taskに分離し、必要な変更やリリース前に別途実行する。CIの総合検証は `mise run test` を実行する。
-- 利用者価値が高い重要フローと重大障害につながる経路はE2Eで保証する。E2E対象では、成功判定だけでなく、機密情報を露出せずに、失敗時に原因となった段階、関連する入力および状態をagentが特定できる観測経路を実装時に確保する。既存のログ、状態照会、test artifact、標準出力またはscreenshotを優先し、結果が症状だけを報告する状態ではE2E契約を完了扱いにしない。
+- 利用者価値が高い重要フローと重大障害につながる経路はE2Eで保証する。[program観測契約](../../../references/agent-computer-interface-observability.md)の
+  適用対象では、変更経路に関連するconformance scenarioも検証し、結果が症状だけを報告する状態ではE2E契約を完了扱いにしない。
 - バグを型や設計で再発不能にできた場合、回帰テストを必須にしない。静的に排除できない再発リスクが残る場合だけ追加する。
 
 ### Reproducibility

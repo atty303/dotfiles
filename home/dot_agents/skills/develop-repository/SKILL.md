@@ -1,6 +1,6 @@
 ---
 name: develop-repository
-description: 開発、修正、リファクタリング、レビュー対応など、リポジトリを変更するタスクで、対象リポジトリに応じた実装、検証、ドキュメントおよび再現性の方針を適用する。
+description: 開発、修正、リファクタリング、レビュー対応など、リポジトリを変更するタスクで、対象リポジトリに応じた観測可能な実装、検証、ドキュメントおよび再現性の方針を適用する。
 ---
 
 # Development Tasks
@@ -29,6 +29,23 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 - 一時的な環境状態、原因または反証により恒久的な再発経路がないと確認した失敗経路および未確認の将来要件を、恒久的なコード、移行処理、テスト、コメントまたは文書へ変換しない。
 - commit前に、最終成果物をdiffや実装経緯から切り離して確認する。追加・変更が現在の具体的要件に必要で、同じ正しさを得るより保守コストの低い代替がないことを説明できない場合は、不要な追加を削除し、不要な変更を取り消す。永続変更が残らなければcommitしない。
 
+### Problem Fixes
+
+- 不具合、障害、回帰または期待と異なる挙動を修正する場合は、product codeを変更する前に
+  `investigate-problem` を使用する。利用者が失敗と判断した最終状態、保持済みdiagnostic run、failure oracleおよび原因を
+  確認してから修正へ進む。
+- 既存の観測証拠ではfailure段階を識別できず、対象経路がprogram観測契約の適用対象なら、product fixより先に
+  `design-program-observability` で最小の観測経路を実装し、同じfailureを取得できることを確認する。既存証拠で十分なら
+  不要なinstrumentationを追加しない。
+
+### Program Observability
+
+- program経路を追加または変更する前に、[$design-program-observability](../design-program-observability/SKILL.md)を使用して
+  適用判定を行う。適用対象では、結果面、操作面およびout-of-bandな観測面を最初の実装から分離し、診断情報をpublicな
+  stdout、stderr、API responseまたはUIへ後付けしない。
+- 既存programでは、今回変更する経路とそこから再利用される共有境界を準拠させる。依頼がない限り、変更経路外のprogram
+  全体を観測契約へ移行しない。
+
 ### Generated Artifacts
 
 - 自動生成fileとlockfileは手動編集せず、生成元または採用済みpackage managerを変更し、repositoryで定義された手順で更新する。ownerまたは生成手順を特定できない場合は、推測で編集せず停止する。
@@ -40,10 +57,11 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 - `mise run check` で自動修正可能なformatterまたはlint違反が判明した場合は、表示された修正diffの精査や手動編集より、対象を限定した `mise run fix` を優先し、その後にcheckを再実行する。
 - 検証を通すことだけを目的にlint suppressionを追加・変更せず、型検査を無効化せず、testをskipしない。要件上必要な例外は理由、影響および代替検証を示して承認を得る。既存の正当な例外を依頼と無関係に除去しない。
 - 検証が予期せず失敗、停止またはtimeoutした場合は、入力変更、代替経路または再試行を重ねる前に
-  `investigate-problem` を使用する。失敗段階を観測できなければ、operation、関連入力、状態および終了理由を識別できる最小の観測経路を先に追加する。
+  `investigate-problem` を使用する。観測面が不足している場合は、`design-program-observability` へ引き渡してから元の開発へ戻る。
 - 原因をsource、test harness、taskまたはbuild process、実行環境、一時的外因のいずれかへ分類する。依頼範囲内にある決定的な再発経路は最も近い原典で除去し、その修正を検証してから元の開発と検証を再開する。依頼範囲内の原典で解消できない横断的問題、未確定または非決定的な問題だけを最終報告時の永続化評価へ残し、一時的外因は永続化候補にしない。
 - CI、外部service、container、権限または複数runtimeの境界をまたぐ広範な変更では、全面実装前に代表的な1経路のvertical spikeを実装し、各境界を実環境相当で検証する。spikeが成功してから同じ設計を残りの対象へ展開する。
-- CLIから操作および観測できる設計を優先する。必要に応じて、application固有の設定・データパス、test profile、状態照会またはexport用のCLI・API、structured logおよびscreenshot生成を、通常動作と同じcode pathへ追加する。
+- CLIまたはAPIから操作と状態照会を行える設計を優先する。診断証拠はprogram観測契約に従うout-of-bandな観測面または
+  artifactから取得し、publicな結果面をagent向けdiagnostic transportとして歪めない。
 - 状態を変更する検証は、temporary directory、test profile、専用database、containerまたはsimulatorなどの使い捨て可能な隔離環境で行う。実データ、通常profile、利用中の設定および実serviceを検証用に直接変更しない。隔離できず実環境での検証が必要な場合は、対象、操作、想定される状態変更および復旧方法を示して事前承認を求める。
 - CLIによる検証後もGUIの表示または操作結果が未確認の場合は、[$verify-with-computer-use](../verify-with-computer-use/SKILL.md)を使用する。Computer Useが設定済みまたは利用可能だと仮定しない。
 - 実行できない検証がある場合は、確認済みの範囲、未確認の結果、理由、代替検証および必要な人間確認を報告する。

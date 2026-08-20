@@ -1,7 +1,7 @@
 interface:
   display_name: "問題調査"
-  short_description: "症状を再現し、観測証拠と反証から技術的な根本原因を特定する"
-  default_prompt: "$investigate-problem を使って、この問題を再現し、根本原因と根拠を報告してください。"
+  short_description: "保持済み観測を優先し、必要な再現と反証から根本原因を特定する"
+  default_prompt: "$investigate-problem を使って、保持済みの観測証拠を先に確認し、必要な再現と反証から根本原因を報告してください。"
 
 policy:
   allow_implicit_invocation: true

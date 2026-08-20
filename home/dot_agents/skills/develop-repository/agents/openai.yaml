@@ -1,4 +1,4 @@
 interface:
   display_name: "リポジトリ開発"
-  short_description: "個人方針に従ってリポジトリの開発と検証を一貫して進める"
-  default_prompt: "$develop-repository を使って、このリポジトリの変更を実装・検証してください。"
+  short_description: "観測可能性を含む個人方針でリポジトリの開発と検証を進める"
+  default_prompt: "$develop-repository を使って、観測可能性を実装前に確認し、このリポジトリの変更を実装・検証してください。"
