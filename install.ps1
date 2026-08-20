@@ -33,9 +33,15 @@ if ($promptRoles) {
 }
 
 $source = $PSScriptRoot
-& $chezmoiPath init --apply --verbose --no-tty `
-    --promptString "Roles=$roles" `
-    "--source=$source" @ChezmoiArguments
-if ($LASTEXITCODE -ne 0) {
-    exit $LASTEXITCODE
+Push-Location $HOME
+try {
+    & $chezmoiPath init --apply --verbose --no-tty `
+        --promptString "Roles=$roles" `
+        "--source=$source" @ChezmoiArguments
+    $chezmoiExitCode = $LASTEXITCODE
+} finally {
+    Pop-Location
+}
+if ($chezmoiExitCode -ne 0) {
+    exit $chezmoiExitCode
 }

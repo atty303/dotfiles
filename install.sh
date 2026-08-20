@@ -46,6 +46,9 @@ if [ "$prompt_roles" = true ]; then
   fi
 fi
 
+# Keep commands launched by chezmoi independent of project-local configuration.
+cd "$HOME"
+
 # exec: replace current process with chezmoi init
 exec "$chezmoi" init --apply --verbose --no-tty \
   --promptString "Roles=$roles" \

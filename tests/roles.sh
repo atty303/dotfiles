@@ -25,6 +25,9 @@ fake_bin="$temporary/bin"
 mkdir -p "$fake_bin"
 cat >"$fake_bin/chezmoi" <<'EOF'
 #!/bin/sh
+if [ -n "${FAKE_CWD_LOG:-}" ]; then
+  pwd >"$FAKE_CWD_LOG"
+fi
 printf '%s\n' "$@" >"$FAKE_LOG"
 exit "${FAKE_CHEZMOI_STATUS:-0}"
 EOF
@@ -54,6 +57,15 @@ done
 run_install() {
   FAKE_LOG="$1" PATH="$fake_bin:/usr/bin:/bin" /bin/sh "$repository/install.sh" "${@:2}"
 }
+
+installer_home="$temporary/installer-home"
+mkdir -p "$installer_home"
+log="$temporary/installer-cwd.log"
+(
+  cd "$repository"
+  HOME="$installer_home" FAKE_CWD_LOG="$log.cwd" run_install "$log"
+)
+[[ $(<"$log.cwd") == "$installer_home" ]]
 
 log="$temporary/linux-headless.log"
 FAKE_UNAME=Linux CODESPACES=true REMOTE_CONTAINERS_IPC=test \
@@ -185,8 +197,10 @@ set -e
 
 expected_ps_roles="\$roles = 'development,desktop,secrets'"
 expected_ps_prompt='--promptString "Roles='"\$roles"'"'
+expected_ps_home="Push-Location \$HOME"
 grep -Fq "$expected_ps_roles" "$repository/install.ps1"
 grep -Fq -- "$expected_ps_prompt" "$repository/install.ps1"
+grep -Fq "$expected_ps_home" "$repository/install.ps1"
 if command -v pwsh >/dev/null 2>&1; then
   pwsh -NoLogo -NoProfile -Command \
     "[void][System.Management.Automation.Language.Parser]::ParseFile('$repository/install.ps1',[ref]\$null,[ref]\$null)"
