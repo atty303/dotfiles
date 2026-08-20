@@ -212,9 +212,14 @@ for_window [app_id="gamescope" title="Forza Horizon 6"] {
     resize set height 2160px
     fullscreen enable
 }
-for_window [title="Endfield"] {
+for_window [app_id="^steam_app_0$" title="^Arknights: Endfield$"] {
     move container to workspace 1
-#    fullscreen enable
+}
+for_window [app_id="^steam_app_0$" title="^Endfield$"] {
+    move container to workspace 1
+    floating disable
+    border none
+    resize set width 2160px height 1440px
 }
 
 include /home/atty/.config/scroll/config.d/*
