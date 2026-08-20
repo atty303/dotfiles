@@ -21,8 +21,9 @@ floating_modifier $mod
 # Reload the configuration file
 bindsym $mod+r reload
 
-# Release a client-captured pointer
-bindsym --no-repeat --inhibited $mod+Escape seat seat0 pointer_constraint escape
+# Disable or re-enable client pointer capture
+bindsym --no-repeat --inhibited $mod+Ctrl+g seat seat0 pointer_constraint disable
+bindsym --no-repeat --inhibited $mod+Ctrl+Shift+g seat seat0 pointer_constraint enable
 
 # Exit scroll (logs you out of your Wayland session)
 bindsym $mod+Shift+q exec scrollnag -t warning -m 'You pressed the exit shortcut. Do you really want to exit scroll? This will end your Wayland session.' -B 'Yes, exit scroll' 'scrollmsg exit' -w 500 -e center -y overlay
