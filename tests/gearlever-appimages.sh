@@ -501,13 +501,6 @@ managed_autostart="$source_test_home/.config/autostart/screenpipe-chezmoi.deskto
 legacy_autostart="$source_test_home/.config/autostart/screenpipe.desktop"
 managed_preload="$source_test_home/.local/lib/appimage-host/screenpipe/libwayland-client.so.0"
 mkdir -p "$(dirname "$managed_autostart")" "$(dirname "$managed_preload")"
-rendered_autostart="$(
-  HOME="$source_test_home" chezmoi --config "$isolated_config" --source "$repository" \
-    --destination "$source_test_home" cat --override-data "$desktop_data" "$managed_autostart"
-)"
-grep -Fqx \
-  "Exec=env LD_PRELOAD=$managed_preload $source_test_home/AppImages/screenpipe.appimage --autostart" \
-  <<<"$rendered_autostart"
 resolved_preload="$(
   HOME="$source_test_home" chezmoi --config "$isolated_config" --source "$repository" \
     --destination "$source_test_home" cat --override-data "$desktop_data" "$managed_preload"
@@ -522,9 +515,11 @@ apply_conditional_sources() {
     "$(dirname "$managed_autostart")" "$(dirname "$managed_preload")"
 }
 
+printf '[Desktop Entry]\nType=Application\nVersion=1.0\nName=screenpipe\nComment=screenpipe startup script managed by chezmoi\nExec=env LD_PRELOAD=%s %s/AppImages/screenpipe.appimage --autostart\nStartupNotify=false\nTerminal=false\n' \
+  "$managed_preload" "$source_test_home" >"$managed_autostart"
 printf 'legacy screenpipe autostart\n' >"$legacy_autostart"
 apply_conditional_sources "$desktop_data"
-[[ -f "$managed_autostart" && -L "$managed_preload" && ! -e "$legacy_autostart" ]]
+[[ ! -e "$managed_autostart" && -L "$managed_preload" && ! -e "$legacy_autostart" ]]
 
 for disabled_data in \
   '{"roles":[]}' \
@@ -532,7 +527,7 @@ for disabled_data in \
   '{"roles":["desktop"],"appimages":{"apps":[{"id":"screenpipe","roles":["desktop"],"arches":["arm64"],"state":"present"}]}}'
 do
   apply_conditional_sources "$desktop_data"
-  [[ -f "$managed_autostart" && -L "$managed_preload" ]]
+  [[ ! -e "$managed_autostart" && -L "$managed_preload" ]]
   apply_conditional_sources "$disabled_data"
   if [[ -e "$managed_autostart" || -L "$managed_preload" ]]; then
     printf 'Conditional screenpipe sources survived an inapplicable transition: %s\n' \
