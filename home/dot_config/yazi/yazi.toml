@@ -1,5 +1,0 @@
-[open]
-prepend_rules = [
-	{ mime = "text/*", use = [ "open", "edit", "reveal" ] },
-	{ mime = "application/{json,ndjson,javascript,wine-extension-ini}", use = [ "open", "edit", "reveal" ] },
-]
