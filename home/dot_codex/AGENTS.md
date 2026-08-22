@@ -12,6 +12,10 @@
 
 ## Secret Handling
 
+- 情報は文字列の見た目ではなく、値が与える能力、明示的なconfidentiality contractおよび出力先で分類する。`secret`は所持により認証、認可、復号、署名またはなりすましが可能なpassword、private key、access/refresh token、session cookie、認証header、credential入りURLおよび署名付きURLなどとし、raw値または復元可能な表現を出力先にかかわらず記録、表示またはcommitしない。
+- ユーザー、repository、契約またはdata ownerが非公開と指定した本文やdataは`confidential content`とし、authorizedなtask内で必要な範囲だけ処理し、無関係な外部service、public artifactまたはlogへ送らない。実名、email、住所、位置、行動履歴、会話、画面または個人fileの内容は`privacy-sensitive data`とし、secretとは呼ばず、authorizedなtask surfaceでは必要に応じて利用し、publicまたは無関係な外部sinkでは目的に不要な値を最小化する。
+- usernameを含むhome path、hostname、account名、IP、PID、port、device名、repository path、UUID、digestおよびcommit IDは、明示的な別contractがない限り`operational identifier`とする。Codexの会話、許可されたtool outputおよび利用者専用local diagnosticではそのまま利用できる。Public artifactで不要な個人・host固有値をplaceholder、相対pathまたは一般例へ置き換える場合は、secret redactionではなくprivacyまたはportability上の最小化として扱う。
+- 高entropy、長い文字列、`user`を含むpath、private permissionまたは環境固有性だけをsecretの根拠にしない。Credential形式、auth field、値が与える能力または明示的なconfidentiality contractから判定する。判定不能な値は文脈を確認するまでrawで再掲しないが、entropyだけで恒久的にredactしない。
 - 認証、IAM、OAuthまたは外部サービスの設定をAPIやCLIで取得するときは、raw responseをterminalやtool outputへ出さない。取得時点でallowlistにより必要な非機密fieldだけを抽出し、client secret、access/refresh token、API keyおよびprivate keyを除外する。
 - 外部サービスの新しい認証経路では、既存のagent専用actorまたはidentity boundaryと短期・最小権限credentialを優先し、固定key、長期credentialまたは人間用credentialへ到達する迂回経路を追加・拡張しない。
 - 外部サービスへの操作が権限不足で失敗した場合、IAM管理自体が依頼または承認済みでない限り、IAM policy、role、permission boundary、profile、credentialまたはidentityを変更せず、より広いidentityやscopeへ切り替えない。失敗したactionとresourceを示して停止する。この規則をsandboxのcommandやnetworkの承認、および設定済みconnectorを既存権限内で利用する操作には適用しない。

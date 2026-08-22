@@ -28,9 +28,42 @@ function record(type: string, timestamp: string, payload: Record<string, unknown
 
 function rootSession(
   id: string,
-  options: { completed?: boolean; start?: string; assistantText?: string } = {},
+  options: { completed?: boolean; start?: string; assistantText?: string; userText?: string } = {},
 ): string {
   const start = options.start ?? ROOT_START;
+  const userText = options.userText ?? [
+    "fix this with ghp_abcdefghijklmnopqrstuvwxyz123456",
+    "password is hunter2",
+    "token=token-value-123",
+    "example --password flag-secret",
+    "https://alice:hunter2@example.com/path",
+    `xoxb-${"1234567890"}-abcdefghijklmnop`,
+    "AKIAABCDEFGHIJKLMNOP",
+    "npm_abcdefghijklmnopqrstuvwxyz123456",
+    "eyJheader123.eyJpayload456.signature789",
+    "Bearer bearer-token-123",
+    "Bearer abcdefghijklmnopqrstuvwxyz",
+    "Bearer zyxwvutsrqponmlkjihgfedcba was rejected",
+    "Basic YWxpY2U6aHVudGVyMg==",
+    "Basic dXNlcjpwYXNz",
+    "Basic dXNlcjphYmNk was rejected",
+    "Cookie: session=private-cookie",
+    "prefix Cookie: session=embedded-cookie",
+    "Authorization: Digest username=alice, response=digest-secret",
+    '{"Authorization":"Digest username=alice, response=json-auth-secret"}',
+    'request={"password":"json-password","token":"json-token","Cookie":"json-cookie"}',
+    '{"password":"\\"escaped-json-secret"}',
+    'password = "correct horse battery staple"',
+    '--password "quoted flag secret"',
+    "session_cookie=session-cookie-secret",
+    "AWS_SECRET_ACCESS_KEY=aws-secret-access-key",
+    "GITHUB_TOKEN=github-field-token",
+    "DB_PASSWORD=db-password",
+    "https://example.com/login?client_secret=query-secret&x=1",
+    "https://example.com/login?X-Amz-Security-Token=aws-session-secret&x=1",
+    "https://example.com/file?X-Amz-Signature=private-signature",
+    `-----BEGIN ${"PRIVATE"} KEY-----\nfake-private-key\n-----END ${"PRIVATE"} KEY-----`,
+  ].join("\n");
   const lines = [
     record("session_meta", start, { id, cwd: "/repo", source: "vscode" }),
     record("response_item", "2026-08-10T00:00:01.000Z", {
@@ -40,8 +73,7 @@ function rootSession(
         { type: "input_text", text: "# AGENTS.md instructions for /repo\nsecret context" },
         {
           type: "input_text",
-          text:
-            "fix this with ghp_abcdefghijklmnopqrstuvwxyz123456\npassword is hunter2\nhttps://alice:hunter2@example.com/path\nxoxb-1234567890-abcdefghijklmnop",
+          text: userText,
         },
       ],
     }),
@@ -107,6 +139,40 @@ Deno.test("collects completed roots without tool arguments or raw outputs", asyn
     assertFalse(evidence.includes("hunter2"));
     assertFalse(evidence.includes("alice:"));
     assertFalse(evidence.includes("xoxb-"));
+    assertFalse(evidence.includes("private-cookie"));
+    assertFalse(evidence.includes("private-signature"));
+    assertFalse(evidence.includes("embedded-cookie"));
+    assertFalse(evidence.includes("digest-secret"));
+    assertFalse(evidence.includes("json-auth-secret"));
+    assertFalse(evidence.includes("json-password"));
+    assertFalse(evidence.includes("json-token"));
+    assertFalse(evidence.includes("json-cookie"));
+    assertFalse(evidence.includes("escaped-json-secret"));
+    assertFalse(evidence.includes("correct horse battery staple"));
+    assertFalse(evidence.includes("quoted flag secret"));
+    assertFalse(evidence.includes("session-cookie-secret"));
+    assertFalse(evidence.includes("aws-secret-access-key"));
+    assertFalse(evidence.includes("github-field-token"));
+    assertFalse(evidence.includes("db-password"));
+    assertFalse(evidence.includes("query-secret"));
+    assertFalse(evidence.includes("aws-session-secret"));
+    assertFalse(evidence.includes("AKIAABCDEFGHIJKLMNOP"));
+    assertFalse(evidence.includes("npm_abcdefghijklmnopqrstuvwxyz123456"));
+    assertFalse(evidence.includes("eyJheader123.eyJpayload456.signature789"));
+    assertFalse(evidence.includes("bearer-token-123"));
+    assertFalse(evidence.includes("YWxpY2U6aHVudGVyMg=="));
+    assertFalse(evidence.includes("abcdefghijklmnopqrstuvwxyz"));
+    assertFalse(evidence.includes("zyxwvutsrqponmlkjihgfedcba"));
+    assertFalse(evidence.includes("dXNlcjpwYXNz"));
+    assertFalse(evidence.includes("dXNlcjphYmNk"));
+    assertFalse(evidence.includes("fake-private-key"));
+    assertFalse(evidence.includes("token-value-123"));
+    assertFalse(evidence.includes("flag-secret"));
+    assert(evidence.includes("password is [REDACTED]"));
+    assert(evidence.includes("token=[REDACTED]"));
+    assert(evidence.includes("--password [REDACTED]"));
+    assert(evidence.includes("Cookie: [REDACTED]"));
+    assertFalse(evidence.includes("Cookie: [REDACTED]]"));
     assertFalse(evidence.includes("AGENTS.md instructions"));
     assert(result.sessions[0].redactedMessages > 0);
     assertEquals(result.sessions[0].tools, [{
@@ -114,6 +180,46 @@ Deno.test("collects completed roots without tool arguments or raw outputs", asyn
       status: "completed",
       outcome: "succeeded",
     }]);
+  });
+});
+
+Deno.test("retains operational identifiers and non-secret credential discussion", async () => {
+  await withCodexHome(async (home) => {
+    const operational = [
+      "/home/atty/src/project",
+      "host=personal-workstation uid=1000 pid=4242 port=3030",
+      "uuid=019c6e27-e55b-73d1-87d8-4e01f1f75043",
+      "commit=75650fe822b12cf54816f263106a2e68aff59311",
+      "sha256=b92bbba31b8f9c3f968afe8481f65aec411f95d4f211c19f671c67752d8d275d",
+      "artifact=BuildResult2026ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnop",
+      "credential policy was reviewed without exposing a value",
+      "token is a lexical unit in the parser",
+      "secret is a TypeScript keyword in this example",
+      "Bearer token handling is documented",
+      "Basic authentication policy is documented",
+      "Use Bearer authentication.",
+      "Use Bearer authorization.",
+      "Use Basic authentication.",
+      "Use Basic authorization.",
+      "token: a lexical unit in the parser",
+      "secret: a TypeScript keyword in this example",
+      "Cookie: HTTP state is described here",
+    ].join("\n");
+    await writeLog(
+      home,
+      "sessions/rollout-operational.jsonl",
+      rootSession("operational", {
+        assistantText: operational,
+        userText: "inspect the authorized local diagnostic output",
+      }),
+    );
+
+    const result = await collectSessionEvidence({ codexHome: home });
+    const evidence = serialized(result.sessions[0]);
+    for (const value of operational.split("\n")) {
+      assert(evidence.includes(value), `expected operational value to remain: ${value}`);
+    }
+    assertEquals(result.sessions[0].redactedMessages, 0);
   });
 });
 

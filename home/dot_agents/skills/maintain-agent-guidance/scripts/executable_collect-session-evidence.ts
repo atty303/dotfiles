@@ -95,21 +95,69 @@ function redactSecrets(text: string): { text: string; redacted: boolean } {
     .replace(/\bnpm_[A-Za-z0-9]{20,}\b/g, "[REDACTED_NPM_TOKEN]")
     .replace(/\bAIza[A-Za-z0-9_-]{20,}\b/g, "[REDACTED_GOOGLE_API_KEY]")
     .replace(/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g, "[REDACTED_JWT]")
-    .replace(/\bBearer\s+[A-Za-z0-9._~+\/-]+=*/gi, "Bearer [REDACTED]")
-    .replace(/\bBasic\s+[A-Za-z0-9+/]+=*/gi, "Basic [REDACTED]")
+    .replace(/(["']?(?:proxy-)?authorization["']?\s*:\s*)"(?:\\.|[^"\\])*"/gi, '$1"[REDACTED]"')
+    .replace(/(["']?(?:proxy-)?authorization["']?\s*:\s*)'(?:\\.|[^'\\])*'/gi, "$1'[REDACTED]'")
+    .replace(/(\b(?:proxy-)?authorization\s*:\s*)[^\r\n]+/gi, "$1[REDACTED]")
+    .replace(
+      /\bBearer\s+([A-Za-z0-9._~+\/-]{8,}?=*)(?=$|\s|[.,;)}\]])/gim,
+      (match, value: string) =>
+        /^[A-Za-z]+$/.test(value) && value.length < 20 ? match : "Bearer [REDACTED]",
+    )
+    .replace(
+      /\bBasic\s+([A-Za-z0-9+/]{8,}={0,2})(?=$|\s|[.,;)}\]])/gim,
+      (match, value: string) => {
+        try {
+          return atob(value).includes(":") ? "Basic [REDACTED]" : match;
+        } catch {
+          return match;
+        }
+      },
+    )
     .replace(/(https?:\/\/)[^/\s:@]+:[^@\s/]+@/gi, "$1[REDACTED]@")
     .replace(
-      /(^|\n)(\s*[A-Za-z0-9_.-]*(?:api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|password|refresh[_-]?token|secret|token)\s*[:=]\s*)([^\s#]+)/gi,
-      "$1$2[REDACTED]",
+      /([?&](?:x-(?:amz|goog)-(?:signature|security-token)|sig|signature|access_token|api_key|client_secret|password|token)=)[^&#\s]+/gi,
+      "$1[REDACTED]",
+    )
+    .replace(/(\b(?:cookie|set-cookie)\s*:\s*)(?=[^\r\n]*=)[^\r\n]+/gi, "$1[REDACTED]")
+    .replace(
+      /(["']?(?:(?:[A-Za-z0-9]+[_.-])*(?:api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|password|passphrase|refresh[_-]?token|session[_-]?cookie|cookie|secret|token))["']?\s*(?::|=)\s*)"(?:\\.|[^"\\])*"/gi,
+      '$1"[REDACTED]"',
     )
     .replace(
-      /\b[A-Za-z0-9_-]{48,}\b/g,
-      (value) =>
-        /[A-Za-z]/.test(value) && /\d/.test(value) ? "[REDACTED_HIGH_ENTROPY_VALUE]" : value,
+      /(["']?(?:(?:[A-Za-z0-9]+[_.-])*(?:api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|password|passphrase|refresh[_-]?token|session[_-]?cookie|cookie|secret|token))["']?\s*(?::|=)\s*)'(?:\\.|[^'\\])*'/gi,
+      "$1'[REDACTED]'",
     )
     .replace(
-      /^.*\b(?:password|passphrase|client secret|private key|api key|access key|refresh token|credential)\b.*$/gim,
-      "[REDACTED_CREDENTIAL_CONTEXT]",
+      /(\b(?:(?:[A-Za-z0-9]+[_.-])*(?:api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|password|passphrase|refresh[_-]?token|session[_-]?cookie|cookie|secret|token))\s*=\s*)([^\s#,'"}\[\]]+)/gi,
+      "$1[REDACTED]",
+    )
+    .replace(
+      /(\b(?:(?:[A-Za-z0-9]+[_.-])*(?:api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|password|passphrase|refresh[_-]?token|session[_-]?cookie|cookie|secret|token))\s*:\s*)([^\s#,'"}\[\]]+)(?=$|[.,;)}\]])/gim,
+      "$1[REDACTED]",
+    )
+    .replace(
+      /(\b(?:(?:[A-Za-z0-9]+[_.-])*(?:password|passphrase|api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|refresh[_-]?token|session[_-]?cookie))\s+is\s+)"(?:\\.|[^"\\])*"/gi,
+      '$1"[REDACTED]"',
+    )
+    .replace(
+      /(\b(?:(?:[A-Za-z0-9]+[_.-])*(?:password|passphrase|api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|refresh[_-]?token|session[_-]?cookie))\s+is\s+)'(?:\\.|[^'\\])*'/gi,
+      "$1'[REDACTED]'",
+    )
+    .replace(
+      /(\b(?:(?:[A-Za-z0-9]+[_.-])*(?:password|passphrase|api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|refresh[_-]?token|session[_-]?cookie))\s+is\s+)([^\s#,'"}\[\]]+)/gi,
+      "$1[REDACTED]",
+    )
+    .replace(
+      /(\B--(?:password|passphrase|client-secret|api-key|access-key|refresh-token|token|secret)(?:=|\s+))"(?:\\.|[^"\\])*"/gi,
+      '$1"[REDACTED]"',
+    )
+    .replace(
+      /(\B--(?:password|passphrase|client-secret|api-key|access-key|refresh-token|token|secret)(?:=|\s+))'(?:\\.|[^'\\])*'/gi,
+      "$1'[REDACTED]'",
+    )
+    .replace(
+      /(\B--(?:password|passphrase|client-secret|api-key|access-key|refresh-token|token|secret)(?:=|\s+))[^\s]+/gi,
+      "$1[REDACTED]",
     );
   return { text: redacted, redacted: redacted !== text };
 }

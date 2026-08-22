@@ -92,7 +92,7 @@ recording subsystemのhealthまたはdegradation状態から確認できるよ�
 観測情報を生成した実行主体を表す。少なくともprogramまたはservice名とversionを識別できることを必須とし、診断に必要な
 場合はruntime、OS、architecture、deployment environment、processまたはbuild identityを含める。
 
-host固有値や利用者identityは、必要性、cardinalityおよびprivacyを確認せず記録してはならない。
+host固有値や利用者identityをresourceへ含める場合は、診断上の必要性、cardinality、保存先およびprivacyを確認する。利用者が所有するlocal recordingでは必要なoperational identifierをallowlistできるが、remote exportまたはpublic artifactでは目的に不要な個人・host固有値を最小化する。
 
 ### Operation
 
@@ -190,17 +190,23 @@ service、別machineまたはcloud backendへのexportは別の明示的なopt-i
 
 観測dataは、後段で削除する前提ではなく、instrumentation時点のallowlistによって最小化する。
 
+情報は文字列の見た目ではなく、値が与える能力、明示的なconfidentiality contractおよび保存・出力先で分類する。
+
+- `secret`: 所持により認証、認可、復号、署名またはなりすましが可能な値。
+- `confidential content`: 利用者、repository、契約またはdata ownerが非公開と指定した本文またはdata。
+- `privacy-sensitive data`: 実名、email、住所、位置、行動履歴、会話、画面または個人fileの内容など、公開先と必要性により扱いが変わるdata。
+- `operational identifier`: usernameを含むfilesystem path、hostname、account名、IP、PID、port、device名、repository path、UUID、digestまたはcommit IDなど、実行や診断を識別する値。明示的な別contractがない限りsecretではない。
+
+高entropy、長い文字列、private permissionまたは環境固有性だけをsecretの根拠にしない。Credential形式、auth field、値が与える能力または明示的なconfidentiality contractから判定する。
+
 credential、access token、refresh token、API key、cookie、private keyおよび認証headerのraw値または復元可能な表現は、
 観測recordとartifactへ記録してはならない。診断に必要な場合も、credential種別、key ID、期限など、秘密値そのものではない
 明示的にallowlistされたmetadataだけを使用する。非可逆fingerprintは入力空間と照合可能性を評価し、秘密値の推測または
 照合に利用できない場合だけ使用できる。
 
-次の情報は、対象programが必要性と安全な表現を明示的に定義しない限り記録してはならない。
+Requestまたはresponse body、clipboard、入力文、会話、画面および個人fileの内容は、必要性と安全な表現を明示的に定義した場合だけ記録する。Email、実名その他のprivacy-sensitive dataはsecretとは呼ばず、利用者が所有するlocal recordingでは診断に必要な範囲をallowlistできるが、remote exportまたはpublic artifactでは目的に不要な値を最小化する。
 
-- requestまたはresponse body、clipboard、入力文、会話内容および個人fileの内容
-- email address、account名、利用者identityその他の個人情報
-- 完全なfilesystem path、URL queryおよび任意のcommand line
-- exception message、stacktrace、environment variableまたはprocess environmentの全体
+完全なfilesystem pathを含むoperational identifierは、利用者が所有するlocal recordingでfailureの識別に必要ならallowlistできる。URL query、command line、exception message、stacktrace、environment variableまたはprocess environmentの全体は一括記録せず、必要な個別fieldを分類してallowlistする。Credentialまたは署名付きURLを含み得るfieldはraw値を記録しない。
 
 hash化は常に匿名化になるとは限らない。入力空間が小さいidentifierをhash化するだけで安全と判断しない。Collector、processor
 またはexporterでのfilterとredactionは防御層として利用できるが、sourceでのdata minimizationを置き換えない。
@@ -253,7 +259,7 @@ hash化は常に匿名化になるとは限らない。入力空間が小さいi
 | Remote未設定 | 診断dataをprocess外のremote destinationへ送信しない |
 | Asyncとretry | 親子context、link、試行と最終結果を区別できる |
 | Timeout、cancel、crash | 相互に異なるstatusまたはerror typeとして識別でき、crashは可能な範囲で直前bufferを保持する |
-| Sensitive input | credential類のraw値と復元可能な表現はallowlistにかかわらず入らず、その他のsensitive inputは明示的allowlist外の値が入らない |
+| Classified input | secretのraw値と復元可能な表現はallowlistにかかわらず入らず、confidential contentとprivacy-sensitive dataは保存先に応じた明示的allowlist外の値が入らない。local recordingに必要なoperational identifierは保持でき、remote exportまたはpublic artifactでは不要な個人・host固有値が最小化される |
 | 単純な決定的処理 | 適用除外条件を満たし、既存error contractだけで失敗箇所を一意に説明できる |
 | Instrumented library | hostが保存先とconsumerを所有し、library単独ではSDK、exporterまたはglobal providerを構成しない |
 
