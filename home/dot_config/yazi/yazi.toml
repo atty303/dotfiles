@@ -1,0 +1,48 @@
+#:schema https://yazi-rs.github.io/schemas/yazi.json
+
+[opener]
+preview-text = [
+	{ run = "bat --paging=always -- %s1", desc = "Preview text", for = "linux", block = true },
+]
+preview-image = [
+	{ run = "mpv --profile=image -- %s1", desc = "Preview image", for = "linux", block = true },
+]
+preview-pdf = [
+	{ run = "termpdf %s1", desc = "Preview PDF", for = "linux", block = true },
+]
+preview-media = [
+	{ run = "mpv -- %s1", desc = "Preview media", for = "linux", block = true },
+]
+preview-archive = [
+	{ run = "7z l %s1 | less", desc = "List archive", for = "linux", block = true },
+]
+preview-fallback = [
+	{ run = "file -- %s1 | less", desc = "Inspect file", for = "linux", block = true },
+]
+preview-unavailable = [
+	{ run = "printf '%s\n' 'File is not available locally. Use Open with to download it.' | less", desc = "Explain unavailable file", for = "linux", block = true },
+]
+
+[open]
+rules = [
+	# Folder
+	{ url = "*/", use = [ "edit", "open", "reveal" ] },
+	# Text
+	{ mime = "text/*", use = [ "preview-text", "edit", "reveal" ] },
+	# Image
+	{ mime = "image/*", use = [ "preview-image", "open", "reveal" ] },
+	# PDF
+	{ mime = "application/pdf", use = [ "preview-pdf", "open", "reveal" ] },
+	# Media
+	{ mime = "{audio,video}/*", use = [ "preview-media", "play", "reveal" ] },
+	# Code
+	{ mime = "application/{json,ndjson,javascript,wine-extension-ini}", use = [ "preview-text", "edit", "reveal" ] },
+	# Archive
+	{ mime = "application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", use = [ "preview-archive", "extract", "reveal" ] },
+	# Empty file
+	{ mime = "inode/empty", use = [ "preview-fallback", "edit", "reveal" ] },
+	# Virtual file system
+	{ mime = "vfs/{absent,stale}", use = [ "preview-unavailable", "download" ] },
+	# Fallback
+	{ url = "*", use = [ "preview-fallback", "open", "reveal" ] },
+]

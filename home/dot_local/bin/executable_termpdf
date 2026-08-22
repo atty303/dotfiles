@@ -1,0 +1,16 @@
+#!/usr/bin/env -S mise tool-stub
+
+tool = "github:NiJingzhe/TermPDF"
+version = "0.4.2"
+
+[lock]
+
+[lock.platforms]
+
+[lock.platforms.linux-arm64]
+url = "https://github.com/NiJingzhe/TermPDF/releases/download/v0.4.2/termpdf-0.4.2-aarch64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:13f82940269726fd41a6160304c5705f3b6172bf123431b00804a1f7c8aa3bb5"
+
+[lock.platforms.linux-x64]
+url = "https://github.com/NiJingzhe/TermPDF/releases/download/v0.4.2/termpdf-0.4.2-x86_64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:46f778124ade5f58ce0bec5f34bf03a408093849ce1ef050aa7325299c488d2a"

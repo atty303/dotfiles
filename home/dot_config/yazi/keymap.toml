@@ -9,6 +9,11 @@ run  = "quit"
 desc = "Quit the process"
 
 [[mgr.prepend_keymap]]
+on   = "<Enter>"
+run  = "open --hovered"
+desc = "Preview hovered file"
+
+[[mgr.prepend_keymap]]
 on   = "T"
 run  = "plugin toggle-pane max-preview"
 desc = "Maximize or restore the preview pane"
