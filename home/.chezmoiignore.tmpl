@@ -117,6 +117,9 @@ src/
 
 # Linux
 .local/share/fonts/
+{{ if or (ne .chezmoi.os "linux") (not (has "desktop" .roles)) }}
+.var/app/io.mpv.Mpv/
+{{ end }}
 {{ if not (has "desktop" .roles) }}
 .config/chrome-web-apps/
 .local/bin/chrome-web-app
