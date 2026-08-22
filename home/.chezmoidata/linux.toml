@@ -152,6 +152,12 @@ branch = "stable"
 
 [[flatpak.apps]]
 roles = ["desktop"]
+id = "io.mpv.Mpv"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+roles = ["desktop"]
 id = "it.mijorus.gearlever"
 remote = "flathub"
 branch = "stable"

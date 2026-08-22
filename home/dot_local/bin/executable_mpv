@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec flatpak run --system --branch=stable io.mpv.Mpv "$@"
