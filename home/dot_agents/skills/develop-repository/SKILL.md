@@ -11,6 +11,15 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 - `origin` がない、またはGitHub ownerを判定できない場合は、配置、作成目的および依頼の文脈から
   `atty303` またはOtherを推定する。適用規則に影響する不明点が残る場合だけ確認を求める。
 
+### Artifact Profile and Control Domain
+
+- 変更前に、成果物を`spike`または`durable`へ分類する。`spike`は仮説検証用で、そのままrelease、常用、再利用または運用依存されない成果物とする。`durable`はそれらのいずれかを想定する成果物とする。一時領域だけで完結して残さない検証コードは`spike`と判断できるが、repositoryへ残す変更は依頼、計画またはrepositoryの原典で非本番の仮説、終了条件およびpromotion条件を確認できない限り`durable`とする。既存のdurableな経路を実装都合で`spike`へ降格しない。
+- 既定のtrusted control domainを、同一利用者が所有・管理するpersonal computing environment全体とする。明示的な相互不信またはisolation contractがない限り、そのmachine上のaccount、UID、root、process、service、filesystem、local IPC、containerおよびVMを同じdomainに含め、分離単位だけを理由に敵対者を仮定しない。
+- 外部主体が制御するnetwork endpointとの入出力、成果物が入力または未検証payloadとして受け入れる外部主体が内容を制御するdataまたは実行code、他人、別organizationまたは外部serviceが所有するaccount、credentialまたはresource、明示されたmulti-tenant環境または相互不信、保証対象であるsandbox、account、containerまたはVM間のisolation、および配布・運用主体の変更で新しく加わる外部主体をtrust boundaryとする。これらのdataとcodeはlocalへ保存した後もcontrol provenanceを維持する。正規の採用手順で固定・検証され、trusted domainのcomponentとして扱うdependencyまたはtoolは、外部由来であることだけではdomain外主体とみなさない。loopbackまたはlocal IPCは、それ自体で境界とせず、control domain外から到達する場合だけ境界とする。
+- Trust boundaryとoperational safetyを分ける。同一利用者のrootと一般UIDを敵対者関係とはみなさないが、authority、irreversibilityおよびblast radiusが増す操作は、誤削除、system破損、data lossおよび復旧可能性の観点で確認する。誤入力、partial write、crash、timeout、並行実行およびcleanup失敗は、攻撃ではなく到達可能なcorrectnessまたはreliabilityとして扱う。trustedな利用者による自身の設定や状態の意図的改変は、明示的なintegrity contractがない限り防御しない。秘密は同一利用者から隠すのではなく、control domain外への送信、記録または共有を防ぐ。
+- `spike`では、仮説を判定できること、意図しないdata loss、control domain外への秘密または保護dataの漏洩、authority逸脱を防ぐこと、および作成した一時resourceをcleanupできることだけを完了条件とする。trust boundary外との入出力が仮説に含まれる場合だけその経路を確認し、本番化しなければ価値のないhardeningを実装しない。検証済みの本番化懸念は重複排除し、該当する既存のplan、statusその他のrepository原典があればそこへ、なければ最終handoffの短いpromotion checklistへ集約する。Checklistだけを保存する新しいrepository成果物は作らない。
+- `spike`を`durable`へ昇格するときは、残す成果物全体についてcontrol domain、外部由来入力、外部resourceおよび保護対象を再確定し、spike時の確認をreview済みとみなさず、durableな成果物として検証とfresh reviewを行う。
+
 ### Repository State
 
 - 開発タスクの開始時は、変更前に `<develop-repository-dir>/scripts/vcs.sh snapshot --fetch [REMOTE]` を実行する。リポジトリを変更しない調査、説明および外部serviceの参照だけなら実行しない。
@@ -68,10 +77,10 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 
 ### Review
 
-- 自分の変更をローカルのcommitまたはchangeとして確定する前に、[$review](../review/SKILL.md)をすべて読み、fresh subagentによる独立レビューを完了する。
+- `durable`な変更をローカルのcommitまたはchangeとして確定する前に、[$review](../review/SKILL.md)をすべて読み、成果物が実際に越えるtrust boundaryとoperational safety上のblast radiusに比例したfresh subagent reviewを完了する。`spike`は独立レビューを必須とせず、上記の目的限定の完了条件を実装者が確認する。明示的にspikeのreviewを依頼された場合は、`review`へartifact profileと目的限定のacceptance criteriaを渡す。
 - 複数の論理単位がある場合は、変更の結合度とリスクから、タスク全体または論理単位ごとのレビューを選ぶ。
 - 指摘を`review`が定める基準で自動対応、棄却またはユーザー判断へ裁定する。自動対応とユーザーが採用した対応対象だけを一括修正して関連検証を再実行し、比例的な再確認と最終diffの完了条件を満たす。
-- 独立レビューを完了できない場合は通常のblockerとして扱い、該当するcommitまたはchangeを完了扱いにしない。
+- 必須となる独立レビューを完了できない場合は通常のblockerとして扱い、該当するdurableなcommitまたはchangeを完了扱いにしない。
 
 ### Compatibility and Documentation
 

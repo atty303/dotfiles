@@ -57,6 +57,7 @@
 
 - 開発、修正、リファクタリング、レビュー対応など、リポジトリを変更するタスクでは
   `$develop-repository` を使用する。
+- 開発開始時に、成果物が仮説検証用の`spike`か、release、常用、再利用または運用依存を想定する`durable`かを、依頼、計画およびrepositoryの原典から確定する。同時に、入力、コードおよびresourceを支配する主体のcontrol domainを確認し、reviewと検証の範囲を`$develop-repository`に従って決める。
 - 外部境界、状態変更、非同期・並行、複数段階または再現困難性を持つprogram経路を追加・変更するときは、実装前に
   `$design-program-observability` を使用する。観測面の原典は
   `~/.agents/references/agent-computer-interface-observability.md` とする。
