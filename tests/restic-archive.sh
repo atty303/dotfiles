@@ -69,12 +69,47 @@ HOME="$test_home" "$test_home/.local/bin/restic-archive" \
   --target "$temporary/restore" >/dev/null
 cmp "$temporary/source/keep" "$temporary/restore/keep"
 
+mount_fake="$temporary/mount-fake"
+cat >"$mount_fake" <<'EOF'
+#!/bin/sh
+printf '%s\n' "$@" >"$RESTIC_ARCHIVE_CAPTURE_FILE"
+EOF
+chmod 755 "$mount_fake"
+mkdir "$temporary/mount"
+HOME="$test_home" RESTIC_ARCHIVE_RESTIC_BIN="$mount_fake" \
+  RESTIC_ARCHIVE_CAPTURE_FILE="$temporary/mount-args" \
+  "$test_home/.local/bin/restic-archive" mount "$temporary/mount" \
+  --host external-ssd-secondary
+grep -Fxq 'mount' "$temporary/mount-args"
+grep -Fxq "$temporary/mount" "$temporary/mount-args"
+grep -Fxq -- '--host' "$temporary/mount-args"
+grep -Fxq 'external-ssd-secondary' "$temporary/mount-args"
+
+mount_cancel_fake="$temporary/mount-cancel-fake"
+cat >"$mount_cancel_fake" <<'EOF'
+#!/bin/sh
+trap 'exit 0' INT TERM
+kill -INT "$PPID"
+exit 0
+EOF
+chmod 755 "$mount_cancel_fake"
+HOME="$test_home" RESTIC_ARCHIVE_RESTIC_BIN="$mount_cancel_fake" \
+  "$test_home/.local/bin/restic-archive" mount "$temporary/mount"
+cancel_record=$(find "$state_dir/runs" -type f -name '*.cancel' -print -quit)
+test -n "$cancel_record"
+grep -Fxq 'operation=mount' "$cancel_record"
+grep -Fxq 'status=cancel' "$cancel_record"
+grep -Fxq 'error_type=cancelled' "$cancel_record"
+grep -Fxq 'exit_code=0' "$cancel_record"
+grep -Fxq 'recording_completeness=complete' "$cancel_record"
+
 success_count=$(find "$state_dir/runs" -type f -name '*.success' | wc -l)
 if ((success_count < 5)); then
   printf 'restic-archive did not retain successful diagnostic runs\n' >&2
   exit 1
 fi
 grep -R -Fq 'operation=backup' "$state_dir/runs"
+grep -R -Fq 'operation=mount' "$state_dir/runs"
 grep -R -Fq 'dry_run=true' "$state_dir/runs"
 grep -R -Fq 'dry_run=false' "$state_dir/runs"
 grep -R -Fq 'status=success' "$state_dir/runs"

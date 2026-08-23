@@ -260,8 +260,10 @@ restic-archive backup ARCHIVE_ID /absolute/path/to/manifest --dry-run
 restic-archive backup ARCHIVE_ID /absolute/path/to/manifest
 ```
 
-Use `snapshots`, `ls`, `find`, and `restore` through the same wrapper. Run `check` and a
-representative restore after each archive addition. Local diagnostic records are kept in
+Use `snapshots`, `ls`, `find`, and `restore` through the same wrapper. To browse snapshots
+with a file manager, create an empty mountpoint, run `restic-archive mount MOUNTPOINT`, and
+unmount it with `Ctrl-C` in that terminal when finished. Run `check` and a representative
+restore after each archive addition. Local diagnostic records are kept in
 `~/.local/state/restic-archive/runs`; set `RESTIC_ARCHIVE_RECORDING=off` for an invocation
 that must not retain one. The wrapper keeps the most recent 20 successful and 50 failed
 runs and never records credentials or file contents. A `.pending` or `.partial` record did

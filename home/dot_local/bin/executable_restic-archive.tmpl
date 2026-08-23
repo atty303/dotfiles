@@ -19,10 +19,12 @@ archive_id=
 manifest_digest=
 started_at=
 diagnostic_error_type=
+diagnostic_status=
 backup_dry_run=false
+mount_signal=
 
 case ${1-} in
-  init | backup | check | snapshots | ls | stats | find | restore | dump)
+  init | backup | check | snapshots | ls | stats | find | restore | dump | mount)
     operation=$1
     ;;
 esac
@@ -180,12 +182,12 @@ error_type_for_status() {
 
 finish_recording() {
   local status=$1
-  local outcome=success
+  local outcome=${diagnostic_status:-success}
   local destination
   local record_ok=true
 
   [[ $recording_enabled == true ]] || return 0
-  if ((status != 0)); then
+  if [[ -z $diagnostic_status ]] && ((status != 0)); then
     outcome=error
   fi
   record_field archive_id "$archive_id" || record_ok=false
@@ -216,12 +218,30 @@ finish_recording() {
   fi
   prune_records success "$success_limit"
   prune_records error "$failure_limit"
+  prune_records cancel "$failure_limit"
+}
+
+record_mount_signal() {
+  mount_signal=$1
 }
 
 run_restic() {
   local status=0
 
+  if [[ $operation != mount ]]; then
+    "$restic_bin" --retry-lock={{ .restic.defaults.retry_lock | quote }} "$@" || status=$?
+    finish_recording "$status"
+    return "$status"
+  fi
+
+  trap 'record_mount_signal INT' INT
+  trap 'record_mount_signal TERM' TERM
   "$restic_bin" --retry-lock={{ .restic.defaults.retry_lock | quote }} "$@" || status=$?
+  trap - INT TERM
+  if [[ -n $mount_signal ]]; then
+    diagnostic_status=cancel
+    diagnostic_error_type=cancelled
+  fi
   finish_recording "$status"
   return "$status"
 }
@@ -341,13 +361,13 @@ case ${1-} in
     done
     run_restic restore "$@"
     ;;
-  snapshots | ls | stats | find | dump)
+  snapshots | ls | stats | find | dump | mount)
     command=$1
     shift
     run_restic "$command" "$@"
     ;;
   '')
-    printf 'usage: restic-archive {init|backup|check|snapshots|ls|stats|find|restore|dump}\n' >&2
+    printf 'usage: restic-archive {init|backup|check|snapshots|ls|stats|find|restore|dump|mount}\n' >&2
     diagnostic_error_type=invalid_argument
     finish_recording 2
     exit 2
