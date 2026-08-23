@@ -6,6 +6,14 @@ repository="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 temporary="$(mktemp -d)"
 trap 'rm -rf "$temporary"' EXIT
 
+file_mode() {
+  if [[ $(uname -s) == Darwin ]]; then
+    stat -f %Lp "$1"
+  else
+    stat -c %a "$1"
+  fi
+}
+
 udev_source="$repository/root/etc/udev/rules.d/70-atty-usb-serial.rules"
 grep -Fxq 'SUBSYSTEM=="tty", KERNEL=="ttyACM[0-9]*|ttyUSB[0-9]*", TAG+="uaccess"' \
   "$udev_source"
@@ -18,6 +26,7 @@ chezmoi_args=(
   --config /dev/null
   --source "$repository/root"
   --destination "$destination"
+  --persistent-state "$temporary/integration-state.boltdb"
   --no-pager
   --no-tty
 )
@@ -26,6 +35,7 @@ chezmoi "${chezmoi_args[@]}" apply "$target"
 chezmoi "${chezmoi_args[@]}" verify "$target"
 test -z "$(chezmoi "${chezmoi_args[@]}" --use-builtin-diff diff "$target")"
 cmp "$udev_source" "$target"
+test "$(file_mode "$temporary/integration-state.boltdb")" = 600
 
 printf '# drift\n' >>"$target"
 if chezmoi "${chezmoi_args[@]}" verify "$target"; then
@@ -44,10 +54,11 @@ cat >"$fake_bin/sudo" <<'EOF'
 #!/bin/sh
 test "$1" = --
 shift
-if [ "$1" = sh ] && [ "$2" = -c ] && [ -n "${FAKE_ROOT_DIRECTORY:-}" ]; then
-  shift 3
+printf '%s\n' "$@" >>"$FAKE_SUDO_LOG"
+if [ "$1" = sh ] && [ "$2" = -c ]; then
+  shift 6
   for target do
-    if [ "$target" = "$FAKE_ROOT_DIRECTORY" ]; then
+    if [ -n "${FAKE_ROOT_DIRECTORY:-}" ] && [ "$target" = "$FAKE_ROOT_DIRECTORY" ]; then
       printf 'system target must not be a directory: %s\n' "$target" >&2
       exit 2
     fi
@@ -59,7 +70,9 @@ EOF
 chmod +x "$fake_bin/chezmoi" "$fake_bin/sudo"
 
 run_system() {
-  PATH="$fake_bin:/usr/bin:/bin" FAKE_CHEZMOI_LOG="$temporary/invocation" \
+  PATH="$fake_bin:/usr/bin:/bin" XDG_CACHE_HOME="$temporary/cache" \
+    FAKE_CHEZMOI_LOG="$temporary/invocation" \
+    FAKE_SUDO_LOG="$temporary/sudo-invocations" \
     FAKE_ROOT_DIRECTORY="${FAKE_ROOT_DIRECTORY:-}" \
     bash "$repository/scripts/system-chezmoi.sh" "$@"
 }
@@ -69,14 +82,28 @@ grep -Fxq -- '--source' "$temporary/invocation"
 grep -Fxq "$repository/root" "$temporary/invocation"
 grep -Fxq -- '--destination' "$temporary/invocation"
 grep -Fxq / "$temporary/invocation"
+grep -Fxq -- '--persistent-state' "$temporary/invocation"
+grep -Fxq "$temporary/cache/chezmoi-system/chezmoistate.boltdb" "$temporary/invocation"
 grep -Fxq -- '--use-builtin-diff' "$temporary/invocation"
 grep -Fxq diff "$temporary/invocation"
 grep -Fxq /etc/udev/rules.d/70-atty-usb-serial.rules "$temporary/invocation"
+test "$(file_mode "$temporary/cache/chezmoi-system")" = 700
 
+rm -f "$temporary/sudo-invocations"
 run_system apply /etc/udev/rules.d/70-atty-usb-serial.rules
 grep -Fxq apply "$temporary/invocation"
+grep -Fxq /root/.cache/chezmoi-system/chezmoistate.boltdb "$temporary/invocation"
+grep -Fq 'stat -c %u:%g' "$temporary/sudo-invocations"
+grep -Fxq /root/.cache/chezmoi-system "$temporary/sudo-invocations"
 run_system verify /etc/udev/rules.d/70-atty-usb-serial.rules
 grep -Fxq verify "$temporary/invocation"
+
+rm -f "$temporary/invocation" "$temporary/sudo-invocations"
+PATH="$fake_bin:/usr/bin:/bin" XDG_CACHE_HOME=/proc/chezmoi-system-review \
+  FAKE_CHEZMOI_LOG="$temporary/invocation" FAKE_SUDO_LOG="$temporary/sudo-invocations" \
+  bash "$repository/scripts/system-chezmoi.sh" apply \
+    /etc/udev/rules.d/70-atty-usb-serial.rules
+grep -Fxq apply "$temporary/invocation"
 
 rm -f "$temporary/invocation"
 if FAKE_ROOT_DIRECTORY=/etc/udev/rules.d/70-atty-usb-serial.rules \
