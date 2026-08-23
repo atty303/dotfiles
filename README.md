@@ -219,6 +219,33 @@ chezmoi apply ~/.config/example/config.toml
 chezmoi diff ~/.config/example/config.toml
 ```
 
+### System configuration
+
+The `root/` source state holds a small set of Linux system files and is separate from the
+normal HOME source state. System commands require one or more normalized absolute file
+targets that already exist in `root/`; they reject directories and never apply all of `/`.
+
+Preview, apply, and verify an explicitly selected file:
+
+```sh
+mise run system:diff -- /etc/sysusers.d/90-atty-dialout.conf
+mise run system:apply -- /etc/sysusers.d/90-atty-dialout.conf
+mise run system:verify -- /etc/sysusers.d/90-atty-dialout.conf
+```
+
+Only `system:apply` uses `sudo`. It installs the declaration but does not activate the
+subsystem-specific setting. For the serial-device membership declaration, activate it
+once after applying:
+
+```sh
+sudo systemd-sysusers /etc/sysusers.d/90-atty-dialout.conf
+```
+
+Log out completely and log in again before checking `id atty`; existing sessions retain
+their previous supplementary groups. The declaration is intentionally host-specific:
+apply it only where both the `atty` user and `dialout` group already exist, because an
+`m` sysusers entry can implicitly create a missing user or group.
+
 Repository checks are exposed through mise. The main suites are:
 
 ```sh

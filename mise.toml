@@ -53,6 +53,7 @@ mise run test:restic
 mise run test:roles
 mise run test:agent-guidance
 mise run test:vcs
+mise run test:system-config
 mise run test:e2e:harness
 mise run test:e2e
 '''
@@ -95,6 +96,31 @@ run = "deno test -A tests/agent-guidance-session-evidence_test.ts"
 [tasks."test:vcs"]
 description = "Test develop-repository VCS wrappers"
 run = "sh tests/develop-repository-vcs.sh"
+
+[tasks."test:system-config"]
+description = "Test target-limited system configuration management"
+run = "bash tests/system-config.sh"
+
+[tasks."system:diff"]
+description = "Preview explicitly named system configuration files"
+run = '''
+#!/usr/bin/env bash
+exec bash scripts/system-chezmoi.sh diff "$@"
+'''
+
+[tasks."system:apply"]
+description = "Apply explicitly named system configuration files with sudo"
+run = '''
+#!/usr/bin/env bash
+exec bash scripts/system-chezmoi.sh apply "$@"
+'''
+
+[tasks."system:verify"]
+description = "Verify explicitly named system configuration files"
+run = '''
+#!/usr/bin/env bash
+exec bash scripts/system-chezmoi.sh verify "$@"
+'''
 
 [tasks."test:e2e:linux:fedora"]
 description = "Run the full chezmoi E2E test on Fedora 44"
