@@ -50,6 +50,7 @@ mise run test:appimages
 mise run test:chrome-web-apps
 mise run test:chatgpt
 mise run test:restic
+mise run test:restic-archive
 mise run test:roles
 mise run test:agent-guidance
 mise run test:vcs
@@ -84,6 +85,10 @@ run = "bash tests/chatgpt.sh"
 [tasks."test:restic"]
 description = "Test host-scoped restic backup integration"
 run = "bash tests/restic-home.sh"
+
+[tasks."test:restic-archive"]
+description = "Test reusable manual restic archives"
+run = "bash tests/restic-archive.sh"
 
 [tasks."test:roles"]
 description = "Test role initialization and bootstrap wrappers"

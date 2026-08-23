@@ -7,6 +7,11 @@ keep_yearly = 3
 check_read_data_subset = "5%"
 randomized_delay = "1h"
 
+[restic.archive]
+enabled = true
+record_success_limit = 20
+record_failure_limit = 50
+
 [restic.hosts.cristina]
 enabled = true
 backup_calendar = "*-*-* 03:00:00"

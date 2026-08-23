@@ -59,6 +59,13 @@ AppData/
 {{ end -}}
 {{ end }}
 
+{{- $resticArchiveEnabled := and (eq .chezmoi.os "linux") (has "secrets" .roles) .restic.archive.enabled }}
+{{ if not $resticArchiveEnabled }}
+# Manual archives are shared by configured Linux secret hosts without a scheduler.
+.config/restic-archive/
+.local/bin/restic-archive
+{{ end }}
+
 .Trash/
 .android/
 .cache/

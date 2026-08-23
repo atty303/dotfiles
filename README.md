@@ -202,6 +202,68 @@ journal and also trigger a desktop notification. If the host entry is disabled, 
 becomes unknown, or the `secrets` role is removed, the next full chezmoi apply stops the
 timers and removes the host-scoped credentials and automation files.
 
+## Manual archives
+
+Linux hosts with the `secrets` role also manage `restic-archive`, a shared manual archive
+client that is independent of the host-scoped home repository. It has no timer and exposes
+no automatic retention or prune action. Use one private B2 repository at
+`restic/manual-archives/` for one-shot preservation before reusing media, reinstalling a
+machine, or retiring local data. Restrict its application key to that bucket and prefix;
+do not use the account master key or the `cristina` home-backup key.
+
+Put the archive key and endpoint in `~/.config/restic-archive/credentials.env`:
+
+```text
+AWS_ACCESS_KEY_ID=REPLACE_WITH_KEY_ID
+AWS_SECRET_ACCESS_KEY=REPLACE_WITH_APPLICATION_KEY
+RESTIC_REPOSITORY=s3:https://REPLACE_WITH_ENDPOINT/REPLACE_WITH_BUCKET/restic/manual-archives
+```
+
+Put a separate generated repository password on one line in
+`~/.config/restic-archive/password`, set both files to mode `600`, and add them to chezmoi
+with encryption. The shared archive credentials are intentionally not named after a host.
+
+```nu
+^chmod 700 ~/.config/restic-archive
+```
+
+```nu
+^chmod 600 ~/.config/restic-archive/credentials.env ~/.config/restic-archive/password
+```
+
+```nu
+chezmoi add --encrypt ~/.config/restic-archive/credentials.env
+```
+
+```nu
+chezmoi add --encrypt ~/.config/restic-archive/password
+```
+
+Initialize the repository explicitly. Write absolute source paths, one per line, to a
+private manifest. `ARCHIVE_ID` identifies the source and must use lowercase letters,
+digits, and hyphens. Backups receive both `manual-archive` and `ARCHIVE_ID` tags; paths in
+directories containing `CACHEDIR.TAG` are excluded. The manifest itself is included in the
+snapshot so the exact selection remains recoverable.
+
+```nu
+restic-archive init
+```
+
+```nu
+restic-archive backup ARCHIVE_ID /absolute/path/to/manifest --dry-run
+```
+
+```nu
+restic-archive backup ARCHIVE_ID /absolute/path/to/manifest
+```
+
+Use `snapshots`, `ls`, `find`, and `restore` through the same wrapper. Run `check` and a
+representative restore after each archive addition. Local diagnostic records are kept in
+`~/.local/state/restic-archive/runs`; set `RESTIC_ARCHIVE_RECORDING=off` for an invocation
+that must not retain one. The wrapper keeps the most recent 20 successful and 50 failed
+runs and never records credentials or file contents. A `.pending` or `.partial` record did
+not reach a complete atomic marker and must not be treated as complete evidence.
+
 ## Maintenance
 
 Preview source-state changes before applying them:
