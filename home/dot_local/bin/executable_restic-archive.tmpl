@@ -2,9 +2,9 @@
 
 set -euo pipefail
 
-readonly config_dir="${RESTIC_ARCHIVE_CONFIG_DIR:-$HOME/.config/restic-archive}"
-readonly credentials_file="$config_dir/credentials.env"
-readonly password_file="$config_dir/password"
+readonly config_dir="${RESTIC_ARCHIVE_CONFIG_DIR:-$HOME/.config/restic}"
+readonly credentials_file="$config_dir/credentials/manual-archives.env"
+readonly password_file="$config_dir/passwords/manual-archives"
 readonly restic_bin="${RESTIC_ARCHIVE_RESTIC_BIN:-$HOME/.local/bin/restic}"
 readonly state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/restic-archive"
 readonly success_limit={{ .restic.archive.record_success_limit }}

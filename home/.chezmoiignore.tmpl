@@ -29,9 +29,14 @@ AppData/
 {{- if and (eq .chezmoi.os "linux") (has "secrets" .roles) (hasKey .restic.hosts .chezmoi.hostname) }}
 {{-   $resticEnabled = (index .restic.hosts .chezmoi.hostname).enabled }}
 {{- end }}
+{{- $resticArchiveEnabled := and (eq .chezmoi.os "linux") (has "secrets" .roles) .restic.archive.enabled }}
 {{ if not $resticEnabled }}
 # Host-scoped restic configuration is only rendered for configured Linux secret hosts.
+{{ if not $resticArchiveEnabled }}
 .config/restic/
+{{ else }}
+.config/restic/excludes
+{{ end }}
 .local/bin/restic-home
 .config/systemd/user/restic-backup.service
 .config/systemd/user/restic-backup.timer
@@ -43,26 +48,30 @@ AppData/
 .config/systemd/user/timers.target.wants/restic-backup.timer
 .config/systemd/user/timers.target.wants/restic-check.timer
 .config/systemd/user/timers.target.wants/restic-maintenance.timer
-{{ else }}
-# Never decrypt another host's repository credentials onto this host.
+{{ end }}
+{{ if or $resticEnabled $resticArchiveEnabled }}
+# Never decrypt another host's repository credentials onto this host. The manual archive
+# credential is shared by Linux secret hosts when the manual archive client is enabled.
 {{ range glob (joinPath .chezmoi.sourceDir "dot_config/private_restic/private_credentials/encrypted_private_*.age") -}}
 {{ $target := trimSuffix ".age" (trimPrefix "encrypted_private_" (base .)) -}}
-{{ if ne $target (printf "%s.env" $.chezmoi.hostname) -}}
+{{ $keepHome := and $resticEnabled (eq $target (printf "%s.env" $.chezmoi.hostname)) -}}
+{{ $keepArchive := and $resticArchiveEnabled (eq $target "manual-archives.env") -}}
+{{ if not (or $keepHome $keepArchive) -}}
 .config/restic/credentials/{{ $target }}
 {{ end -}}
 {{ end -}}
 {{ range glob (joinPath .chezmoi.sourceDir "dot_config/private_restic/private_passwords/encrypted_private_*.age") -}}
 {{ $target := trimSuffix ".age" (trimPrefix "encrypted_private_" (base .)) -}}
-{{ if ne $target $.chezmoi.hostname -}}
+{{ $keepHome := and $resticEnabled (eq $target $.chezmoi.hostname) -}}
+{{ $keepArchive := and $resticArchiveEnabled (eq $target "manual-archives") -}}
+{{ if not (or $keepHome $keepArchive) -}}
 .config/restic/passwords/{{ $target }}
 {{ end -}}
 {{ end -}}
 {{ end }}
 
-{{- $resticArchiveEnabled := and (eq .chezmoi.os "linux") (has "secrets" .roles) .restic.archive.enabled }}
 {{ if not $resticArchiveEnabled }}
 # Manual archives are shared by configured Linux secret hosts without a scheduler.
-.config/restic-archive/
 .local/bin/restic-archive
 {{ end }}
 

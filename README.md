@@ -211,7 +211,8 @@ no automatic retention or prune action. Use one private B2 repository at
 machine, or retiring local data. Restrict its application key to that bucket and prefix;
 do not use the account master key or the `cristina` home-backup key.
 
-Put the archive key and endpoint in `~/.config/restic-archive/credentials.env`:
+Put the archive key and endpoint alongside the existing Restic configuration in
+`~/.config/restic/credentials/manual-archives.env`:
 
 ```text
 AWS_ACCESS_KEY_ID=REPLACE_WITH_KEY_ID
@@ -220,23 +221,25 @@ RESTIC_REPOSITORY=s3:https://REPLACE_WITH_ENDPOINT/REPLACE_WITH_BUCKET/restic/ma
 ```
 
 Put a separate generated repository password on one line in
-`~/.config/restic-archive/password`, set both files to mode `600`, and add them to chezmoi
-with encryption. The shared archive credentials are intentionally not named after a host.
+`~/.config/restic/passwords/manual-archives`, set both files to mode `600`, and add them
+to chezmoi with encryption. The shared archive credentials are intentionally not named
+after a host, but use the same `credentials` and `passwords` directories as the host-scoped
+home backup.
 
 ```nu
-^chmod 700 ~/.config/restic-archive
+^chmod 700 ~/.config/restic ~/.config/restic/credentials ~/.config/restic/passwords
 ```
 
 ```nu
-^chmod 600 ~/.config/restic-archive/credentials.env ~/.config/restic-archive/password
+^chmod 600 ~/.config/restic/credentials/manual-archives.env ~/.config/restic/passwords/manual-archives
 ```
 
 ```nu
-chezmoi add --encrypt ~/.config/restic-archive/credentials.env
+chezmoi add --encrypt ~/.config/restic/credentials/manual-archives.env
 ```
 
 ```nu
-chezmoi add --encrypt ~/.config/restic-archive/password
+chezmoi add --encrypt ~/.config/restic/passwords/manual-archives
 ```
 
 Initialize the repository explicitly. Write absolute source paths, one per line, to a

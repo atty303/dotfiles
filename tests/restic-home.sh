@@ -147,13 +147,17 @@ two_host_source="$temporary/two-host-source"
 cp -a "$repository" "$two_host_source"
 touch \
   "$two_host_source/home/dot_config/private_restic/private_credentials/encrypted_private_alex.env.age" \
+  "$two_host_source/home/dot_config/private_restic/private_credentials/encrypted_private_manual-archives.env.age" \
   "$two_host_source/home/dot_config/private_restic/private_credentials/encrypted_private_retired.env.age" \
   "$two_host_source/home/dot_config/private_restic/private_passwords/encrypted_private_alex.age" \
+  "$two_host_source/home/dot_config/private_restic/private_passwords/encrypted_private_manual-archives.age" \
   "$two_host_source/home/dot_config/private_restic/private_passwords/encrypted_private_retired.age"
 second_enabled=$(chezmoi managed --source "$two_host_source" --override-data "$second_data")
 grep -Fxq '.local/bin/restic-home' <<<"$second_enabled"
 grep -Fxq '.config/restic/credentials/alex.env' <<<"$second_enabled"
 grep -Fxq '.config/restic/passwords/alex' <<<"$second_enabled"
+grep -Fxq '.config/restic/credentials/manual-archives.env' <<<"$second_enabled"
+grep -Fxq '.config/restic/passwords/manual-archives' <<<"$second_enabled"
 if grep -Eq '^\.config/restic/(credentials/cristina\.env|passwords/cristina)$' \
   <<<"$second_enabled"; then
   printf 'an enabled host managed another host credential\n' >&2
@@ -167,6 +171,8 @@ fi
 first_enabled=$(chezmoi managed --source "$two_host_source" --override-data "$first_two_data")
 grep -Fxq '.config/restic/credentials/cristina.env' <<<"$first_enabled"
 grep -Fxq '.config/restic/passwords/cristina' <<<"$first_enabled"
+grep -Fxq '.config/restic/credentials/manual-archives.env' <<<"$first_enabled"
+grep -Fxq '.config/restic/passwords/manual-archives' <<<"$first_enabled"
 if grep -Eq '^\.config/restic/(credentials/alex\.env|passwords/alex)$' <<<"$first_enabled"; then
   printf 'the first enabled host managed the second host credential\n' >&2
   exit 1
@@ -177,13 +183,17 @@ chezmoi execute-template --source "$two_host_source" --override-data "$second_da
 foreign_home="$temporary/foreign-home"
 mkdir -p "$foreign_home/.config/restic/credentials" "$foreign_home/.config/restic/passwords"
 touch "$foreign_home/.config/restic/credentials/cristina.env" \
-  "$foreign_home/.config/restic/passwords/cristina"
+  "$foreign_home/.config/restic/credentials/manual-archives.env" \
+  "$foreign_home/.config/restic/passwords/cristina" \
+  "$foreign_home/.config/restic/passwords/manual-archives"
 chezmoi execute-template --source "$repository" --override-data "$second_data" \
   <"$repository/home/.chezmoiscripts/linux/run_onchange_after_restic-disable.sh.tmpl" \
   >"$temporary/restic-foreign-cleanup.sh"
 HOME="$foreign_home" sh "$temporary/restic-foreign-cleanup.sh"
 test ! -e "$foreign_home/.config/restic/credentials/cristina.env"
 test ! -e "$foreign_home/.config/restic/passwords/cristina"
+test -f "$foreign_home/.config/restic/credentials/manual-archives.env"
+test -f "$foreign_home/.config/restic/passwords/manual-archives"
 
 transition_home="$temporary/transition-home"
 transition_bin="$temporary/transition-bin"
@@ -195,12 +205,15 @@ mkdir -p \
   "$transition_bin"
 touch \
   "$transition_home/.local/bin/restic-home" \
+  "$transition_home/.local/bin/restic-archive" \
   "$transition_home/.config/restic/excludes" \
   "$transition_home/.config/restic/credentials/cristina.env" \
+  "$transition_home/.config/restic/credentials/manual-archives.env" \
   "$transition_home/.config/restic/credentials/retired.env" \
   "$transition_home/.config/restic/credentials/.retired" \
   "$transition_home/.config/restic/credentials/retired.env.bak" \
   "$transition_home/.config/restic/passwords/cristina" \
+  "$transition_home/.config/restic/passwords/manual-archives" \
   "$transition_home/.config/restic/passwords/retired" \
   "$transition_home/.config/restic/passwords/.retired" \
   "$transition_home/.config/systemd/user/restic-backup.service" \
@@ -227,13 +240,77 @@ chezmoi execute-template --source "$repository" --override-data "$unknown_data" 
   >"$temporary/restic-disable.sh"
 HOME="$transition_home" PATH="$transition_bin:$PATH" \
   SYSTEMCTL_LOG="$temporary/systemctl.log" sh "$temporary/restic-disable.sh"
-if find "$transition_home" -type f -o -type l | grep -q .; then
-  printf 'disabled host retained restic automation or credentials\n' >&2
+test -f "$transition_home/.local/bin/restic-archive"
+test -f "$transition_home/.config/restic/credentials/manual-archives.env"
+test -f "$transition_home/.config/restic/passwords/manual-archives"
+if find "$transition_home" \( -type f -o -type l \) \
+  ! -path "$transition_home/.local/bin/restic-archive" \
+  ! -path "$transition_home/.config/restic/credentials/manual-archives.env" \
+  ! -path "$transition_home/.config/restic/passwords/manual-archives" | grep -q .; then
+  printf 'disabled home backup retained host-scoped automation or credentials\n' >&2
   exit 1
 fi
 for timer in restic-backup.timer restic-maintenance.timer restic-check.timer; do
   grep -Fq -- "--user disable $timer" "$temporary/systemctl.log"
 done
+
+archive_empty_home="$temporary/archive-empty-home"
+mkdir -p \
+  "$archive_empty_home/.config/restic/credentials" \
+  "$archive_empty_home/.config/restic/passwords"
+HOME="$archive_empty_home" sh "$temporary/restic-disable.sh"
+test -d "$archive_empty_home/.config/restic/credentials"
+test -d "$archive_empty_home/.config/restic/passwords"
+
+nonsecret_home="$temporary/nonsecret-home"
+mkdir -p \
+  "$nonsecret_home/.local/bin" \
+  "$nonsecret_home/.config/restic/credentials" \
+  "$nonsecret_home/.config/restic/passwords"
+touch \
+  "$nonsecret_home/.local/bin/restic-archive" \
+  "$nonsecret_home/.config/restic/credentials/manual-archives.env" \
+  "$nonsecret_home/.config/restic/passwords/manual-archives"
+chezmoi execute-template --source "$repository" --override-data "$nonsecret_data" \
+  <"$repository/home/.chezmoiscripts/linux/run_onchange_after_restic-disable.sh.tmpl" \
+  >"$temporary/restic-nonsecret-disable.sh"
+HOME="$nonsecret_home" sh "$temporary/restic-nonsecret-disable.sh"
+if find "$nonsecret_home" \( -type f -o -type l \) | grep -q .; then
+  printf 'non-secret host retained manual archive credentials or wrapper\n' >&2
+  exit 1
+fi
+
+nonsecret_failure_home="$temporary/nonsecret-failure-home"
+mkdir -p \
+  "$nonsecret_failure_home/.local/bin" \
+  "$nonsecret_failure_home/.config/restic/credentials" \
+  "$nonsecret_failure_home/.config/restic/passwords" \
+  "$nonsecret_failure_home/.config/systemd/user"
+touch \
+  "$nonsecret_failure_home/.local/bin/restic-home" \
+  "$nonsecret_failure_home/.local/bin/restic-archive" \
+  "$nonsecret_failure_home/.config/restic/credentials/cristina.env" \
+  "$nonsecret_failure_home/.config/restic/credentials/manual-archives.env" \
+  "$nonsecret_failure_home/.config/restic/passwords/cristina" \
+  "$nonsecret_failure_home/.config/restic/passwords/manual-archives" \
+  "$nonsecret_failure_home/.config/systemd/user/restic-check.timer"
+cat >"$transition_bin/systemctl" <<'EOF'
+#!/bin/sh
+exit 1
+EOF
+chmod 755 "$transition_bin/systemctl"
+if HOME="$nonsecret_failure_home" PATH="$transition_bin:$PATH" \
+  sh "$temporary/restic-nonsecret-disable.sh" >/dev/null 2>&1; then
+  printf 'non-secret cleanup ignored a user manager failure\n' >&2
+  exit 1
+fi
+test ! -e "$nonsecret_failure_home/.local/bin/restic-archive"
+test ! -e "$nonsecret_failure_home/.config/restic/credentials/manual-archives.env"
+test ! -e "$nonsecret_failure_home/.config/restic/passwords/manual-archives"
+test -f "$nonsecret_failure_home/.local/bin/restic-home"
+test -f "$nonsecret_failure_home/.config/restic/credentials/cristina.env"
+test -f "$nonsecret_failure_home/.config/restic/passwords/cristina"
+test -f "$nonsecret_failure_home/.config/systemd/user/restic-check.timer"
 
 failure_home="$temporary/failure-home"
 cp -a "$transition_home" "$failure_home"
