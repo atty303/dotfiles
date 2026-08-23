@@ -8,6 +8,7 @@ description: 不具合、障害、エラーまたは期待と異なる振る舞�
 ## Scope the investigation
 
 - 期待する結果、実際の症状、再現条件および影響を確定する。
+- ユーザーが指定した原因、故障箇所または修正方法は、明示的に確認済みのcontractではなく検証対象の仮説として扱う。観測された症状と期待状態をfailure oracleとし、指定された説明へ証拠を当てはめない。
 - 修正前に、利用者が失敗と判断した最終状態を成功・失敗のoracleとして固定する。redirect、title、request開始または初期renderなどの途中状態や、異なる条件での成功をoracleの代用にしない。
 - 対象programが観測面を持つ場合は、[program観測契約](../../references/agent-computer-interface-observability.md)を
   すべて読み、再現より先に報告されたrunを探す。run ID、発生時刻、program version、runtime、environmentおよび利用者操作を
@@ -34,5 +35,5 @@ description: 不具合、障害、エラーまたは期待と異なる振る舞�
 - root causeを特定した場合は、破られた不変条件から症状までの因果連鎖を示す。
 - 証拠が足りない場合は断定せず、未確定の候補と必要な追加観測を示す。
 - いずれの場合も、観測証拠、除外した有力仮説、影響範囲、現在の確信度、未確認事項、残存リスクおよび調査を終了または停止した理由を報告する。
-- 修正も依頼されている場合は、原因を取り除く最小の変更面を示し、対象リポジトリの`develop-repository` workflowに引き渡す。
+- 修正も依頼されている場合は、原因を取り除いてfailure oracleを満たす最小の変更面を示す。ユーザー指定の修正方法と異なる場合は、`develop-repository`のsolution framingに従って主要contractへの影響と確認要否を裁定し、同workflowに引き渡す。
   観測面の追加または修復が必要なら、product fixより先に`design-program-observability`を使用するよう明示する。

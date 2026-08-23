@@ -9,7 +9,7 @@ Durableな変更または明示的にレビューを依頼された変更につ�
 
 ## レビュー候補を固定する
 
-- 元の要求、artifact profile、acceptance criteria、比較対象、変更ファイルおよび実行済み検証を確認する。
+- 元の要求を、目的、observableな成功条件、hard constraint、明示または確認済みの技術選択、および検証済みと未検証の前提へ正規化し、artifact profile、比較対象、変更ファイルおよび実行済み検証とともに確認する。生の要求文に含まれる原因仮説または実装案を、そのままacceptance criteriaへ昇格させない。
 - `develop-repository`に従い、trusted control domain、外部由来のdataまたはcode、外部resource、保護対象、および今回実際に越えるtrust boundaryを固定する。明示がなくてもsourceと運用形態から一意に導出できる場合は補い、review結果を変える不明点だけを確認する。
 - 適用される `AGENTS.md` とリポジトリ固有の原典を特定する。
 - main agentが作成した変更と既存のユーザー変更を区別し、レビュー対象を明示する。
@@ -21,7 +21,7 @@ Durableな変更または明示的にレビューを依頼された変更につ�
 
 - 最低1体の読み取り専用subagentを、実装時の会話履歴を継承しないfresh threadとして起動する。履歴の継承範囲を指定できる場合は継承なしを選ぶ。
 - reviewerには次の原材料だけを渡す。
-  - 元のユーザー要求または中立なacceptance criteria
+  - 元のユーザー要求、および目的、observableな成功条件、hard constraint、明示または確認済みの技術選択、検証済みおよび未検証の前提へ正規化した中立なacceptance criteria
   - `spike`または`durable`のartifact profile
   - trusted control domain、外部由来のdataまたはcode、外部resource、保護対象および実際に越えるtrust boundary
   - working directory、比較対象およびレビュー範囲
@@ -46,6 +46,8 @@ reviewerには、日本語でactionableな指摘だけを返させる。各指�
 - 最小限の修正方針
 
 型または静的検査で既に排除される問題、根拠のない推測、単なるスタイル上の好みは除外させる。候補は、artifact profileで保証する明示的なcontract、invariant、security policyまたは適用されるcompatibility requirementへの違反、あるいは確定したcontrol domainとtrust boundaryから到達可能な現在のcorrectness、security、reliability、operational safetyまたはdata integrity上の欠陥に限定する。重要な指摘がない場合は、その旨と未確認の残存リスクを明示させる。
+
+未検証の前提に閉じた実装が目的または成功条件を満たさない場合、および同じ主要contractを保ったまま既存機構、削除、簡略化または前提変更によってmaterialに複雑性を減らせる場合は、solution framingの欠陥として指摘できる。確認済みの技術選択またはtradeoff、成果差が僅かな別案、および好みだけのarchitecture変更は再審議しない。
 
 同一利用者が所有・管理するpersonal computing environmentでは、明示的な相互不信またはisolation contractがない限り、別account、UID、root、process、service、filesystem、local IPC、container、VMまたは書換可能なlocal fileであることだけを攻撃経路にしない。成果物が入力または未検証payloadとして受け入れる、外部主体が内容を制御するdataまたは実行codeはlocalへ保存された後も外部controlとして扱うが、正規の採用手順で固定・検証されtrusted domainのcomponentとして扱うdependencyまたはtoolは、外部由来であることだけではdomain外主体とみなさない。loopbackまたはlocal IPCはcontrol domain外から到達する場合だけtrust boundaryとする。権限差、破壊的操作、partial write、crash、timeout、並行実行またはcleanupは、敵対者を仮定せず、現実的な事故のblast radiusと回復可能性から評価する。
 
