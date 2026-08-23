@@ -228,23 +228,25 @@ targets that already exist in `root/`; they reject directories and never apply a
 Preview, apply, and verify an explicitly selected file:
 
 ```sh
-mise run system:diff -- /etc/sysusers.d/90-atty-dialout.conf
-mise run system:apply -- /etc/sysusers.d/90-atty-dialout.conf
-mise run system:verify -- /etc/sysusers.d/90-atty-dialout.conf
+mise run system:diff -- /etc/udev/rules.d/70-atty-usb-serial.rules
+mise run system:apply -- /etc/udev/rules.d/70-atty-usb-serial.rules
+mise run system:verify -- /etc/udev/rules.d/70-atty-usb-serial.rules
 ```
 
 Only `system:apply` uses `sudo`. It installs the declaration but does not activate the
-subsystem-specific setting. For the serial-device membership declaration, activate it
-once after applying:
+subsystem-specific setting. The USB serial rule grants the active local seat access to
+`ttyACM*` and `ttyUSB*` devices through udev's `uaccess` ACL support. Reload udev after
+applying:
 
 ```sh
-sudo systemd-sysusers /etc/sysusers.d/90-atty-dialout.conf
+sudo udevadm control --reload
 ```
 
-Log out completely and log in again before checking `id atty`; existing sessions retain
-their previous supplementary groups. The declaration is intentionally host-specific:
-apply it only where both the `atty` user and `dialout` group already exist, because an
-`m` sysusers entry can implicitly create a missing user or group.
+Reconnect the USB serial device, then confirm that its ACL grants read/write access to
+the active desktop user's UID. Processes with that UID, including SSH processes or
+background services, can use the ACL while the local seat remains active. The rule does
+not guarantee persistent access for an SSH-only login or a service when no local seat is
+active.
 
 Repository checks are exposed through mise. The main suites are:
 

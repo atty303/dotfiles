@@ -6,12 +6,13 @@ repository="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 temporary="$(mktemp -d)"
 trap 'rm -rf "$temporary"' EXIT
 
-sysusers_source="$repository/root/etc/sysusers.d/90-atty-dialout.conf"
-grep -Fxq 'm atty dialout' "$sysusers_source"
+udev_source="$repository/root/etc/udev/rules.d/70-atty-usb-serial.rules"
+grep -Fxq 'SUBSYSTEM=="tty", KERNEL=="ttyACM[0-9]*|ttyUSB[0-9]*", TAG+="uaccess"' \
+  "$udev_source"
 
 destination="$temporary/destination"
-mkdir -p "$destination/etc/sysusers.d"
-target="$destination/etc/sysusers.d/90-atty-dialout.conf"
+mkdir -p "$destination/etc/udev/rules.d"
+target="$destination/etc/udev/rules.d/70-atty-usb-serial.rules"
 chezmoi_args=(
   --config-format toml
   --config /dev/null
@@ -24,7 +25,7 @@ chezmoi_args=(
 chezmoi "${chezmoi_args[@]}" apply "$target"
 chezmoi "${chezmoi_args[@]}" verify "$target"
 test -z "$(chezmoi "${chezmoi_args[@]}" --use-builtin-diff diff "$target")"
-cmp "$sysusers_source" "$target"
+cmp "$udev_source" "$target"
 
 printf '# drift\n' >>"$target"
 if chezmoi "${chezmoi_args[@]}" verify "$target"; then
@@ -63,27 +64,27 @@ run_system() {
     bash "$repository/scripts/system-chezmoi.sh" "$@"
 }
 
-run_system diff /etc/sysusers.d/90-atty-dialout.conf
+run_system diff /etc/udev/rules.d/70-atty-usb-serial.rules
 grep -Fxq -- '--source' "$temporary/invocation"
 grep -Fxq "$repository/root" "$temporary/invocation"
 grep -Fxq -- '--destination' "$temporary/invocation"
 grep -Fxq / "$temporary/invocation"
 grep -Fxq -- '--use-builtin-diff' "$temporary/invocation"
 grep -Fxq diff "$temporary/invocation"
-grep -Fxq /etc/sysusers.d/90-atty-dialout.conf "$temporary/invocation"
+grep -Fxq /etc/udev/rules.d/70-atty-usb-serial.rules "$temporary/invocation"
 
-run_system apply /etc/sysusers.d/90-atty-dialout.conf
+run_system apply /etc/udev/rules.d/70-atty-usb-serial.rules
 grep -Fxq apply "$temporary/invocation"
-run_system verify /etc/sysusers.d/90-atty-dialout.conf
+run_system verify /etc/udev/rules.d/70-atty-usb-serial.rules
 grep -Fxq verify "$temporary/invocation"
 
 rm -f "$temporary/invocation"
-if FAKE_ROOT_DIRECTORY=/etc/sysusers.d/90-atty-dialout.conf \
-  run_system apply /etc/sysusers.d/90-atty-dialout.conf >"$temporary/rejected" 2>&1; then
+if FAKE_ROOT_DIRECTORY=/etc/udev/rules.d/70-atty-usb-serial.rules \
+  run_system apply /etc/udev/rules.d/70-atty-usb-serial.rules >"$temporary/rejected" 2>&1; then
   printf 'system apply accepted a directory visible only to root\n' >&2
   exit 1
 fi
-grep -Fxq 'system target must not be a directory: /etc/sysusers.d/90-atty-dialout.conf' \
+grep -Fxq 'system target must not be a directory: /etc/udev/rules.d/70-atty-usb-serial.rules' \
   "$temporary/rejected"
 test ! -e "$temporary/invocation"
 
@@ -105,7 +106,7 @@ for collision in "$live_directory" "$live_directory_link"; do
   done
 done
 
-for invalid in etc/sysusers.d/90-atty-dialout.conf / /etc /etc/../etc/passwd; do
+for invalid in etc/udev/rules.d/70-atty-usb-serial.rules / /etc /etc/../etc/passwd; do
   if run_system verify "$invalid" >"$temporary/rejected" 2>&1; then
     printf 'unsafe system target was accepted: %s\n' "$invalid" >&2
     exit 1
@@ -118,6 +119,6 @@ if PATH="$fake_bin:/usr/bin:/bin" FAKE_CHEZMOI_LOG="$temporary/invocation" \
   exit 1
 fi
 
-if command -v systemd-sysusers >/dev/null; then
-  systemd-sysusers --dry-run --root="$destination" >/dev/null 2>&1
+if command -v udevadm >/dev/null && udevadm verify --help >/dev/null 2>&1; then
+  test -z "$(udevadm verify --no-summary "$target" 2>&1)"
 fi
