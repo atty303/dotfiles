@@ -94,6 +94,7 @@ for_window [app_id="gamescope"] {
     resize set height 1440px
 }
 for_window [shell="^xdg_shell$" title="^beatmania IIDX INFINITAS$"] {
+    border none
     resize set width 1920px height 1080px
 }
 for_window [app_id="gamescope" title="Forza Horizon 6"] {
