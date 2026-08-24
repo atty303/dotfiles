@@ -297,10 +297,17 @@ chezmoi diff ~/.config/example/config.toml
 ### System configuration
 
 The `root/` source state holds a small set of Linux system files and is separate from the
-normal HOME source state. System commands require one or more normalized absolute file
-targets that already exist in `root/`; they reject directories and never apply all of `/`.
+normal HOME source state. With no file targets, system commands operate on every managed
+file in `root/`:
 
-Preview, apply, and verify an explicitly selected file:
+```sh
+mise run system:diff
+mise run system:apply
+mise run system:verify
+```
+
+Pass one or more normalized absolute file targets to limit an operation. Targets must
+already exist in `root/`, and directories are rejected:
 
 ```sh
 mise run system:diff -- /etc/udev/rules.d/70-atty-usb-serial.rules

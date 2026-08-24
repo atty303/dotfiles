@@ -103,25 +103,25 @@ description = "Test develop-repository VCS wrappers"
 run = "sh tests/develop-repository-vcs.sh"
 
 [tasks."test:system-config"]
-description = "Test target-limited system configuration management"
+description = "Test all-file and target-limited system configuration management"
 run = "bash tests/system-config.sh"
 
 [tasks."system:diff"]
-description = "Preview explicitly named system configuration files"
+description = "Preview all or explicitly named system configuration files"
 run = '''
 #!/usr/bin/env bash
 exec bash scripts/system-chezmoi.sh diff "$@"
 '''
 
 [tasks."system:apply"]
-description = "Apply explicitly named system configuration files with sudo"
+description = "Apply all or explicitly named system configuration files with sudo"
 run = '''
 #!/usr/bin/env bash
 exec bash scripts/system-chezmoi.sh apply "$@"
 '''
 
 [tasks."system:verify"]
-description = "Verify explicitly named system configuration files"
+description = "Verify all or explicitly named system configuration files"
 run = '''
 #!/usr/bin/env bash
 exec bash scripts/system-chezmoi.sh verify "$@"

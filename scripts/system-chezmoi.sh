@@ -6,11 +6,11 @@ repository="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 source_directory="$repository/root"
 
 usage() {
-  printf 'usage: %s <diff|apply|verify> /absolute/file [...]\n' "${0##*/}" >&2
+  printf 'usage: %s <diff|apply|verify> [/absolute/file ...]\n' "${0##*/}" >&2
   exit 2
 }
 
-if (($# < 2)); then
+if (($# < 1)); then
   usage
 fi
 
@@ -22,23 +22,70 @@ case "$operation" in
   *) usage ;;
 esac
 
+chezmoi_bin="$(command -v chezmoi)"
+chezmoi_common_args=(
+  --config-format toml
+  --config /dev/null
+  --source "$source_directory"
+  --destination /
+  --no-pager
+  --no-tty
+)
+
+managed_targets="$(
+  "$chezmoi_bin" "${chezmoi_common_args[@]}" managed \
+    --include=files,symlinks --path-style absolute
+)"
+managed_symlink_targets="$(
+  "$chezmoi_bin" "${chezmoi_common_args[@]}" managed \
+    --include=symlinks --path-style absolute
+)"
+
 targets=()
+declare -A managed_target_set=()
+declare -A managed_symlink_target_set=()
+if [[ -n $managed_targets ]]; then
+  while IFS= read -r target; do
+    managed_target_set["$target"]=1
+    if (($# == 0)); then
+      targets+=("$target")
+    fi
+  done <<<"$managed_targets"
+fi
+if [[ -n $managed_symlink_targets ]]; then
+  while IFS= read -r target; do
+    managed_symlink_target_set["$target"]=1
+  done <<<"$managed_symlink_targets"
+fi
+
 for target in "$@"; do
   if [[ $target != /* || $target == / || $target == *//* || $target == */../* || $target == */.. || $target == *'/./'* || $target == */. ]]; then
     printf 'system target must be a normalized absolute file path: %s\n' "$target" >&2
     exit 2
   fi
-  if [[ -d $target ]]; then
-    printf 'system target must not be a directory: %s\n' "$target" >&2
-    exit 2
-  fi
-
-  source_path="$source_directory$target"
-  if [[ ! -f $source_path && ! -L $source_path ]]; then
+  if [[ ! ${managed_target_set["$target"]+managed} ]]; then
     printf 'system target is not a managed file: %s\n' "$target" >&2
     exit 2
   fi
   targets+=("$target")
+done
+
+if ((${#targets[@]} == 0)); then
+  printf 'system source contains no managed files: %s\n' "$source_directory" >&2
+  exit 2
+fi
+
+target_specs=()
+for target in "${targets[@]}"; do
+  target_type="file"
+  if [[ ${managed_symlink_target_set["$target"]+managed} ]]; then
+    target_type="symlink"
+  fi
+  if [[ -d $target && ($target_type != symlink || ! -L $target) ]]; then
+    printf 'system target must not be a directory: %s\n' "$target" >&2
+    exit 2
+  fi
+  target_specs+=("$target_type" "$target")
 done
 
 if [[ $operation == apply ]]; then
@@ -51,15 +98,9 @@ else
   persistent_state="$state_directory/chezmoistate.boltdb"
 fi
 
-chezmoi_bin="$(command -v chezmoi)"
 chezmoi_args=(
-  --config-format toml
-  --config /dev/null
-  --source "$source_directory"
-  --destination /
+  "${chezmoi_common_args[@]}"
   --persistent-state "$persistent_state"
-  --no-pager
-  --no-tty
 )
 
 if [[ $operation == diff ]]; then
@@ -68,10 +109,12 @@ fi
 chezmoi_args+=("$operation" "${targets[@]}")
 
 if [[ $operation == apply ]]; then
-  sudo -- sh -c '
+  exec sudo -- sh -c '
     state_directory=$1
     persistent_state=$2
-    shift 2
+    target_spec_count=$3
+    shift 3
+    umask 022
 
     if test -L "$state_directory"; then
       printf "system state directory must not be a symlink: %s\n" "$state_directory" >&2
@@ -95,13 +138,25 @@ if [[ $operation == apply ]]; then
       chmod 0600 "$persistent_state"
     fi
 
-    for target do
+    while test "$target_spec_count" -ge 2; do
+      target_type=$1
+      target=$2
+      shift 2
+      target_spec_count=$((target_spec_count - 2))
       if test -d "$target"; then
-        printf "system target must not be a directory: %s\n" "$target" >&2
-        exit 2
+        if test "$target_type" != symlink || test ! -L "$target"; then
+          printf "system target must not be a directory: %s\n" "$target" >&2
+          exit 2
+        fi
       fi
+      parent=${target%/*}
+      if test -z "$parent"; then
+        parent=/
+      fi
+      mkdir -p -- "$parent"
     done
-  ' system-chezmoi "$root_state_directory" "$persistent_state" "${targets[@]}"
-  exec sudo -- "$chezmoi_bin" "${chezmoi_args[@]}"
+    exec "$@"
+  ' system-chezmoi "$root_state_directory" "$persistent_state" \
+    "${#target_specs[@]}" "${target_specs[@]}" "$chezmoi_bin" "${chezmoi_args[@]}"
 fi
 exec "$chezmoi_bin" "${chezmoi_args[@]}"
