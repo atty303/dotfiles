@@ -89,7 +89,6 @@ for arg do
       *)
         printf '%s\n' \
           /etc/udev/rules.d/70-atty-usb-serial.rules \
-          /usr/local/share/wayland-sessions/scroll-uwsm-local.desktop \
           /usr/local/share/wayland-sessions/scroll-uwsm.desktop
         if [ -n "${FAKE_MANAGED_FILE_TARGET:-}" ]; then
           printf '%s\n' "$FAKE_MANAGED_FILE_TARGET"
@@ -163,15 +162,12 @@ grep -Fxq verify "$temporary/invocation"
 
 run_system diff
 grep -Fxq /etc/udev/rules.d/70-atty-usb-serial.rules "$temporary/invocation"
-grep -Fxq /usr/local/share/wayland-sessions/scroll-uwsm-local.desktop "$temporary/invocation"
 grep -Fxq /usr/local/share/wayland-sessions/scroll-uwsm.desktop "$temporary/invocation"
 run_system apply
 grep -Fxq /etc/udev/rules.d/70-atty-usb-serial.rules "$temporary/invocation"
-grep -Fxq /usr/local/share/wayland-sessions/scroll-uwsm-local.desktop "$temporary/invocation"
 grep -Fxq /usr/local/share/wayland-sessions/scroll-uwsm.desktop "$temporary/invocation"
 run_system verify
 grep -Fxq /etc/udev/rules.d/70-atty-usb-serial.rules "$temporary/invocation"
-grep -Fxq /usr/local/share/wayland-sessions/scroll-uwsm-local.desktop "$temporary/invocation"
 grep -Fxq /usr/local/share/wayland-sessions/scroll-uwsm.desktop "$temporary/invocation"
 
 fake_symlink_directory="$temporary/fake-symlink-directory"
