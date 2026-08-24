@@ -97,14 +97,22 @@ On Linux or macOS, use a checkout of this repository:
 ./install.sh
 ```
 
-The default is fully non-interactive. `development` and `secrets` are always selected;
-macOS also selects `desktop`, while Linux selects it only when a `.desktop` session
-definition exists under `/usr/share/wayland-sessions` or `/usr/share/xsessions`.
-Select a different combination interactively with:
+In an interactive terminal, the installer presents the known roles as a multiple-choice
+list. In a non-interactive environment, `development` and `secrets` are selected
+automatically; macOS also selects `desktop`, while Linux selects it only when a `.desktop`
+session definition exists under `/usr/share/wayland-sessions` or `/usr/share/xsessions`.
+The explicit form remains available when invoking the installer through an environment
+whose terminal detection is unreliable:
 
 ```sh
 ./install.sh --prompt-roles
 ```
+
+On an existing installation, the roles currently stored in the chezmoi config are
+preselected. On a first bootstrap, the wrapper's platform defaults are preselected
+instead. Running `chezmoi init` directly also reuses existing roles, with `development`
+and `secrets` as the first-run defaults (`desktop` is also selected by default on macOS
+and Windows).
 
 On Windows 11 24H2 or later:
 
@@ -120,8 +128,8 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 Use `./install.ps1 --prompt-roles` to replace the Windows defaults (`development`,
-`desktop`, and `secrets`). Enter `-` at the role prompt for a valid baseline-only configuration. Both
-wrappers pass any other arguments through to `chezmoi init`. `work` is reserved for
+`desktop`, and `secrets`). Clear every selection for a valid baseline-only configuration.
+Both wrappers pass any other arguments through to `chezmoi init`. `work` is reserved for
 future policy exclusions on managed work devices; it currently adds no settings. Account-backed
 applications such as Atuin and 1Password still require their normal login and sync.
 Disable `secrets` when their encrypted bootstrap artifacts should not be managed.

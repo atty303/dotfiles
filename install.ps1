@@ -23,24 +23,27 @@ if (-not $chezmoi) {
 }
 
 $roles = 'development,desktop,secrets'
+$roleArguments = @(
+    '--no-tty'
+    '--promptMultichoice'
+    "Roles=$($roles.Replace(',', '/'))"
+)
+$previousRoleDefaults = $env:CHEZMOI_ROLE_DEFAULTS
 if ($promptRoles) {
-    $selection = Read-Host "Roles (development,desktop,gaming,secrets,work) [$roles]"
-    if ($selection -eq '-') {
-        $roles = ''
-    } elseif ($selection) {
-        $roles = $selection
-    }
+    $env:CHEZMOI_ROLE_DEFAULTS = $roles
+    $roleArguments = @()
 }
 
 $source = $PSScriptRoot
 Push-Location $HOME
 try {
-    & $chezmoiPath init --apply --verbose --no-tty `
-        --promptString "Roles=$roles" `
-        "--source=$source" @ChezmoiArguments
+    & $chezmoiPath init --apply --verbose @roleArguments "--source=$source" @ChezmoiArguments
     $chezmoiExitCode = $LASTEXITCODE
 } finally {
     Pop-Location
+    if ($promptRoles) {
+        $env:CHEZMOI_ROLE_DEFAULTS = $previousRoleDefaults
+    }
 }
 if ($chezmoiExitCode -ne 0) {
     exit $chezmoiExitCode

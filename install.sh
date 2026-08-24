@@ -7,6 +7,9 @@ if [ "${1-}" = "--prompt-roles" ]; then
   prompt_roles=true
   shift
 fi
+if [ -t 0 ] && [ -t 2 ]; then
+  prompt_roles=true
+fi
 
 if ! chezmoi="$(command -v chezmoi)"; then
   bin_dir="${HOME}/.local/bin"
@@ -36,20 +39,16 @@ case "$(uname -s)" in
     ;;
 esac
 
-if [ "$prompt_roles" = true ]; then
-  printf 'Roles (development,desktop,gaming,secrets,work) [%s]: ' "$roles" >&2
-  IFS= read -r selected_roles
-  if [ "$selected_roles" = "-" ]; then
-    roles=
-  elif [ -n "$selected_roles" ]; then
-    roles=$selected_roles
-  fi
-fi
-
 # Keep commands launched by chezmoi independent of project-local configuration.
 cd "$HOME"
 
-# exec: replace current process with chezmoi init
+if [ "$prompt_roles" = true ]; then
+  CHEZMOI_ROLE_DEFAULTS=$roles
+  export CHEZMOI_ROLE_DEFAULTS
+  exec "$chezmoi" init --apply --verbose "--source=$script_dir" "$@"
+fi
+
+role_values=$(printf '%s\n' "$roles" | tr ',' '/')
 exec "$chezmoi" init --apply --verbose --no-tty \
-  --promptString "Roles=$roles" \
+  --promptMultichoice "Roles=$role_values" \
   "--source=$script_dir" "$@"

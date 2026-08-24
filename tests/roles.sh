@@ -5,16 +5,29 @@ set -euo pipefail
 repository="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 temporary="$(mktemp -d)"
 trap 'rm -rf "$temporary"' EXIT
+empty_config="$temporary/empty.toml"
+touch "$empty_config"
 
 render_config() {
   local roles=${1-}
   chezmoi execute-template --init --source "$repository" \
-    --promptString "Roles=$roles" <"$repository/home/.chezmoi.toml.tmpl"
+    --promptMultichoice "Roles=$roles" <"$repository/home/.chezmoi.toml.tmpl"
 }
 
-grep -Fq 'roles = ["development", "desktop", "secrets"]' < <(render_config development,desktop,secrets)
-grep -Fq 'roles = []' < <(render_config '')
-for roles in unknown development,development desktop,work,work; do
+grep -Fq 'roles = ["development", "desktop", "secrets"]' < <(render_config development/desktop/secrets)
+grep -Fq 'roles = ["development", "secrets"]' < <(
+  chezmoi execute-template --init --config "$empty_config" --config-format toml \
+    --source "$repository" <"$repository/home/.chezmoi.toml.tmpl"
+)
+grep -Fq 'roles = ["desktop", "gaming"]' < <(
+  CHEZMOI_ROLE_DEFAULTS=development,secrets chezmoi execute-template --init --source "$repository" \
+    --override-data '{"roles":["desktop","gaming"]}' <"$repository/home/.chezmoi.toml.tmpl"
+)
+grep -Fq 'roles = []' < <(
+  chezmoi execute-template --init --source "$repository" \
+    --override-data '{"roles":[]}' <"$repository/home/.chezmoi.toml.tmpl"
+)
+for roles in unknown development/development desktop/work/work; do
   if render_config "$roles" >"$temporary/rejected" 2>&1; then
     printf 'invalid roles were accepted: %s\n' "$roles" >&2
     exit 1
@@ -27,6 +40,9 @@ cat >"$fake_bin/chezmoi" <<'EOF'
 #!/bin/sh
 if [ -n "${FAKE_CWD_LOG:-}" ]; then
   pwd >"$FAKE_CWD_LOG"
+fi
+if [ -n "${FAKE_ROLE_DEFAULTS_LOG:-}" ]; then
+  printf '%s\n' "${CHEZMOI_ROLE_DEFAULTS:-}" >"$FAKE_ROLE_DEFAULTS_LOG"
 fi
 printf '%s\n' "$@" >"$FAKE_LOG"
 exit "${FAKE_CHEZMOI_STATUS:-0}"
@@ -70,27 +86,28 @@ log="$temporary/installer-cwd.log"
 log="$temporary/linux-headless.log"
 FAKE_UNAME=Linux CODESPACES=true REMOTE_CONTAINERS_IPC=test \
   XDG_CURRENT_DESKTOP=Test WAYLAND_DISPLAY=wayland-0 run_install "$log" --depth 1
-grep -Fxq 'Roles=development,secrets' "$log"
+grep -Fxq 'Roles=development/secrets' "$log"
 grep -Fxq -- '--depth' "$log"
 grep -Fxq '1' "$log"
 
 log="$temporary/linux-desktop.log"
 FAKE_UNAME=Linux FAKE_DESKTOP_SESSION_DEFINITION=true run_install "$log"
-grep -Fxq 'Roles=development,desktop,secrets' "$log"
+grep -Fxq 'Roles=development/desktop/secrets' "$log"
 
 log="$temporary/macos.log"
 FAKE_UNAME=Darwin run_install "$log"
-grep -Fxq 'Roles=development,desktop,secrets' "$log"
+grep -Fxq 'Roles=development/desktop/secrets' "$log"
 
 log="$temporary/prompt.log"
-printf 'gaming,work\n' | FAKE_UNAME=Linux FAKE_LOG="$log" PATH="$fake_bin:/usr/bin:/bin" \
+defaults_log="$temporary/prompt-defaults.log"
+FAKE_UNAME=Linux FAKE_DESKTOP_SESSION_DEFINITION=true FAKE_LOG="$log" \
+  FAKE_ROLE_DEFAULTS_LOG="$defaults_log" PATH="$fake_bin:/usr/bin:/bin" \
   /bin/sh "$repository/install.sh" --prompt-roles
-grep -Fxq 'Roles=gaming,work' "$log"
-
-log="$temporary/prompt-baseline.log"
-printf '%s\n' - | FAKE_UNAME=Linux FAKE_LOG="$log" PATH="$fake_bin:/usr/bin:/bin" \
-  /bin/sh "$repository/install.sh" --prompt-roles
-grep -Fxq 'Roles=' "$log"
+grep -Fxq 'development,desktop,secrets' "$defaults_log"
+if grep -Fxq -- '--no-tty' "$log" || grep -Fq -- '--promptMultichoice' "$log"; then
+  printf 'interactive role selection was suppressed by installer arguments\n' >&2
+  exit 1
+fi
 
 desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"bazzite","idLike":"fedora"}}}'
 fedora_desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"fedora","idLike":""}}}'
@@ -199,11 +216,14 @@ set -e
 [[ $result -eq 37 ]]
 
 expected_ps_roles="\$roles = 'development,desktop,secrets'"
-expected_ps_prompt='--promptString "Roles='"\$roles"'"'
+expected_ps_prompt="'--promptMultichoice'"
+expected_ps_role_values="\$roles.Replace(',', '/')"
 expected_ps_home="Push-Location \$HOME"
 grep -Fq "$expected_ps_roles" "$repository/install.ps1"
 grep -Fq -- "$expected_ps_prompt" "$repository/install.ps1"
+grep -Fq -- "$expected_ps_role_values" "$repository/install.ps1"
 grep -Fq "$expected_ps_home" "$repository/install.ps1"
+grep -Fq '[ -t 0 ] && [ -t 2 ]' "$repository/install.sh"
 if command -v pwsh >/dev/null 2>&1; then
   pwsh -NoLogo -NoProfile -Command \
     "[void][System.Management.Automation.Language.Parser]::ParseFile('$repository/install.ps1',[ref]\$null,[ref]\$null)"

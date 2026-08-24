@@ -6,11 +6,18 @@
 {{- $wsl := (and (eq .chezmoi.os "linux") (.chezmoi.kernel.osrelease | lower | contains "microsoft")) -}}
 
 {{- $knownRoles := list "development" "desktop" "gaming" "secrets" "work" -}}
-{{- $rolesInput := promptString "Roles" -}}
-{{- $roles := list -}}
-{{- if $rolesInput -}}
-{{-   $roles = splitList "," $rolesInput -}}
+{{- $defaultRoles := list "development" "secrets" -}}
+{{- if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "windows") -}}
+{{-   $defaultRoles = list "development" "desktop" "secrets" -}}
 {{- end -}}
+{{- $installerDefaultRoles := env "CHEZMOI_ROLE_DEFAULTS" -}}
+{{- if $installerDefaultRoles -}}
+{{-   $defaultRoles = splitList "," $installerDefaultRoles -}}
+{{- end -}}
+{{- if hasKey . "roles" -}}
+{{-   $defaultRoles = .roles -}}
+{{- end -}}
+{{- $roles := promptMultichoice "Roles" $knownRoles $defaultRoles -}}
 {{- if ne (len $roles) (len (uniq $roles)) -}}
 {{-   fail "roles must not contain duplicates" -}}
 {{- end -}}
