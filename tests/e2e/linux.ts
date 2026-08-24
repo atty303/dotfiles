@@ -505,12 +505,10 @@ done`,
         `set -euo pipefail
 containers="$(distrobox list --no-color)"
 state_dir=${config.home}/.local/state/chezmoi/distrobox
-for name in dms noctalia scroll; do
+for name in noctalia scroll; do
   grep -Eq "(^|[[:space:]|])$name([[:space:]|]|$)" <<<"$containers"
 done
-for name in dms noctalia; do
-  test -s "$state_dir/$name.applied"
-done
+test -s "$state_dir/noctalia.applied"
 test ! -e "$state_dir/scroll.applied"
 pending="$(<"$state_dir/scroll.pending")"
 test -n "$pending"

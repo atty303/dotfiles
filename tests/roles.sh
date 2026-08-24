@@ -135,10 +135,13 @@ chezmoi execute-template --source "$repository" --override-data "$desktop_data" 
   <"$repository/home/.chezmoiscripts/linux/run_after_distrobox.sh.tmpl" >"$desktop_distrobox"
 chezmoi execute-template --source "$repository" --override-data "$baseline_data" \
   <"$repository/home/.chezmoiscripts/linux/run_after_distrobox.sh.tmpl" >"$baseline_distrobox"
-grep -Fq '  "dms"' "$desktop_distrobox"
 grep -Fq '  "noctalia"' "$desktop_distrobox"
 grep -Fq '  "scroll"' "$desktop_distrobox"
-if grep -Eq '  "(dms|noctalia|scroll)"' "$baseline_distrobox"; then
+if grep -Fq '  "dms"' "$desktop_distrobox"; then
+  printf 'desktop render selected DMS for Distrobox management\n' >&2
+  exit 1
+fi
+if grep -Eq '  "(noctalia|scroll)"' "$baseline_distrobox"; then
   printf 'baseline render selected a desktop Distrobox\n' >&2
   exit 1
 fi
