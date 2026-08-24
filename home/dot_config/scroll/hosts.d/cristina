@@ -93,6 +93,9 @@ for_window [app_id="gamescope"] {
     resize set width 2560px
     resize set height 1440px
 }
+for_window [title="^beatmania IIDX INFINITAS$"] {
+    resize set width 1920px height 1080px
+}
 for_window [app_id="gamescope" title="Forza Horizon 6"] {
     move container to output $out_tv
     set_size v 1
