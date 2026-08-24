@@ -43,12 +43,6 @@ branch = "stable"
 
 [[flatpak.apps]]
 roles = ["desktop"]
-id = "com.feaneron.Boatswain"
-remote = "flathub"
-branch = "stable"
-
-[[flatpak.apps]]
-roles = ["desktop"]
 id = "com.github.Matoking.protontricks"
 remote = "flathub"
 branch = "stable"
@@ -73,12 +67,6 @@ branch = "stable"
 
 [[flatpak.apps]]
 roles = ["desktop"]
-id = "com.slack.Slack"
-remote = "flathub"
-branch = "stable"
-
-[[flatpak.apps]]
-roles = ["desktop"]
 id = "com.vysp3r.ProtonPlus"
 remote = "flathub"
 branch = "stable"
@@ -91,21 +79,9 @@ branch = "stable"
 
 [[flatpak.apps]]
 roles = ["desktop"]
-id = "com.diy_fever.DIYLayoutCreator"
-remote = "flathub"
-branch = "stable"
-
-[[flatpak.apps]]
-roles = ["desktop"]
 id = "com.nvidia.geforcenow"
 remote = "GeForceNOW"
 branch = "master"
-
-[[flatpak.apps]]
-roles = ["desktop"]
-id = "com.orcaslicer.OrcaSlicer"
-remote = "flathub"
-branch = "stable"
 
 [[flatpak.apps]]
 roles = ["desktop"]
@@ -115,37 +91,7 @@ branch = "stable"
 
 [[flatpak.apps]]
 roles = ["desktop"]
-id = "com.usebottles.bottles"
-remote = "flathub"
-branch = "stable"
-
-[[flatpak.apps]]
-roles = ["desktop"]
-id = "io.github.Faugus.faugus-launcher"
-remote = "flathub"
-branch = "stable"
-
-[[flatpak.apps]]
-roles = ["desktop"]
-id = "io.github.astralvixen.geforce-infinity"
-remote = "flathub"
-branch = "stable"
-
-[[flatpak.apps]]
-roles = ["desktop"]
 id = "io.github.berarma.Oversteer"
-remote = "flathub"
-branch = "stable"
-
-[[flatpak.apps]]
-roles = ["desktop"]
-id = "io.github.dimtpap.coppwr"
-remote = "flathub"
-branch = "stable"
-
-[[flatpak.apps]]
-roles = ["desktop"]
-id = "io.github.dyegoaurelio.simple-wireplumber-gui"
 remote = "flathub"
 branch = "stable"
 
@@ -170,18 +116,6 @@ branch = "stable"
 [[flatpak.apps]]
 roles = ["desktop"]
 id = "org.fedoraproject.MediaWriter"
-remote = "flathub"
-branch = "stable"
-
-[[flatpak.apps]]
-roles = ["desktop"]
-id = "org.kicad.KiCad"
-remote = "flathub"
-branch = "stable"
-
-[[flatpak.apps]]
-roles = ["desktop"]
-id = "org.rncbc.qpwgraph"
 remote = "flathub"
 branch = "stable"
 
