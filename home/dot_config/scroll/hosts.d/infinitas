@@ -1,0 +1,40 @@
+# Output roles
+set $out_game HDMI-A-2
+set $out_dashboard DP-1
+
+output $out_game {
+    resolution 3840x2160@120Hz
+    position 0,0
+    scale 1.5
+    subpixel rgb
+    layout_type horizontal
+    layout_default_width 1
+    layout_default_height 1
+}
+
+output $out_dashboard {
+    resolution 1920x1080@60Hz
+    position 320,1440
+    scale 1
+    subpixel rgb
+    layout_type horizontal
+    layout_default_width 0.5
+    layout_default_height 1
+}
+
+workspace game output $out_game
+workspace dashboard output $out_dashboard
+
+workspace --no-auto-back-and-forth game
+
+for_window [class="^steam_app_infinitas$"] {
+    move container to workspace game
+}
+
+for_window [app_id="com.obsproject.Studio"] {
+    move container to workspace dashboard
+}
+
+for_window [app_id="^com\\.chatterino\\.chatterino$"] {
+    move container to workspace dashboard
+}
