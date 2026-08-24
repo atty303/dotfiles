@@ -1,0 +1,89 @@
+# vim: ft=swayconfig
+
+# Variables
+# =========
+
+# Logo key. Use Mod1 for Alt. Mod3 is Hyper (CapsLock).
+set $mod Super
+
+# Home row direction keys, like vim
+set $left h
+set $down j
+set $up k
+set $right l
+
+# Your preferred terminal emulator
+set $term uwsm app -- ghostty
+# Your preferred application launcher
+set $menu uwsm app -- vicinae toggle
+
+set $lua_scripts /home/atty/.config/scroll/scripts
+
+# Startup
+# =======
+exec uwsm finalize SWAYSOCK I3SOCK SCROLLSOCK XCURSOR_SIZE XCURSOR_THEME
+# exec uwsm app -- vicinae server
+# exec $term
+
+# Config only commands
+# ====================
+animations {
+    enabled yes
+}
+bar {
+    font "Noto Sans 14"
+    mode hide
+    tray_output none
+    colors {
+        background #00000000
+    }
+}
+default_orientation auto
+cursor_shake_magnify yes
+layout_widths [0.16666666 0.33333333 0.5 0.666666667 1.0]
+layout_heights [0.33333333 0.5 0.666666667 1.0]
+swaybg_command -
+
+# Config or runtime commands
+# ==========================
+client.focused #15439e #4b4b4b #e0e0e0 #2e9ef4 #15439e
+client.focused_inactive #595959 #3b3b3b #e0e0e0 #2e9ef4 #595959
+client.unfocused #595959 #1b1b1b #e0e0e0 #2e9ef4 #595959
+default_border pixel 2
+default_decoration border_radius 8 shadow on shadow_dynamic on
+default_floating_border normal
+# focus_follows_mouse no
+focus_on_window_activation focus
+focus_wrapping stay
+font "Noto Sans 12"
+# fullscreen_on_request layout
+titlebar_border_radius 8
+gaps inner 4
+gaps outer 0
+# xdg_activation_force true
+
+# Input configuration
+input type:keyboard {
+    xkb_layout "us"
+    xkb_options "caps:hyper"
+    repeat_delay 300
+    repeat_rate 30
+}
+input type:pointer {
+    accel_profile adaptive
+    pointer_accel -0.8
+}
+# seat
+
+# xwayland_output_scale true
+
+# Idle inhibit for fullscreen windows
+for_window [all] inhibit_idle fullscreen
+
+for_window [class="^steam_app_infinitas$"] {
+    fullscreen application enable
+    fullscreen disable
+    floating disable
+    resize set width 1920px height 1080px
+}
+lua $lua_scripts/infinitas_fullscreen.lua
