@@ -12,16 +12,16 @@ url = "https://github.com/sharkdp/vivid/releases/download/v0.11.1/vivid-v0.11.1-
 checksum = "sha256:99bf6438b3403bc9255a83363fe5ed49a0f8bd86377a561420836af14dc8e9ee"
 
 [lock.platforms.linux-x64]
-url = "https://github.com/sharkdp/vivid/releases/download/v0.11.1/vivid-v0.11.1-x86_64-unknown-linux-musl.tar.gz"
-checksum = "sha256:f1a80a39c75ceae43c4187f302e66c0a45d941ed1479456a0d5ddef665663181"
+url = "https://github.com/sharkdp/vivid/releases/download/v0.11.1/vivid-v0.11.1-x86_64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:7060e45ba1fc5b25d521704e65d2e5d92c1b219c06b7183ec120a87e1fc376d7"
 
 [lock.platforms.linux-x64-musl]
 url = "https://github.com/sharkdp/vivid/releases/download/v0.11.1/vivid-v0.11.1-x86_64-unknown-linux-musl.tar.gz"
 checksum = "sha256:f1a80a39c75ceae43c4187f302e66c0a45d941ed1479456a0d5ddef665663181"
 
 [lock.platforms.macos-arm64]
-url = "https://github.com/sharkdp/vivid/releases/download/v0.11.1/vivid-v0.11.1-x86_64-apple-darwin.tar.gz"
-checksum = "sha256:b10548ea09e54d3015fb348466d0c33356106e52e8848545dc5b40fbe57b5547"
+url = "https://github.com/sharkdp/vivid/releases/download/v0.11.1/vivid-v0.11.1-aarch64-apple-darwin.tar.gz"
+checksum = "sha256:82b23caf7c2fd0adeead0df197c76d5d997c57887a6265e7e63e729daec18570"
 
 [lock.platforms.macos-x64]
 url = "https://github.com/sharkdp/vivid/releases/download/v0.11.1/vivid-v0.11.1-x86_64-apple-darwin.tar.gz"
