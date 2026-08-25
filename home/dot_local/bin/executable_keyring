@@ -1,8 +1,0 @@
-#!/usr/bin/env -S mise tool-stub
-
-tool = "github:open-source-cooperative/keyring-rs"
-version = "4.1.4"
-
-[lock]
-
-[lock.platforms]
