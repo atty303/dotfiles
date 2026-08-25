@@ -1,7 +1,156 @@
+[audio]
+enable_sounds = true
+
+[bar.default]
+center = []
+end = [ "privacy", "group:g3", "group:g4", "bluetooth", "battery", "group:g1" ]
+margin_ends = 50
+scale = 1.5000000149011612
+start = [ "group:g5", "spacer_2", "tray", "spacer_3", "workspaces", "group:g2" ]
+thickness = 60
+
+    [bar.default.monitor.DP-1]
+    position = "left"
+    scale = 0.95000000670552254
+    thickness = 30
+
+    [[bar.default.capsule_group]]
+    accordion = false
+    accordion_direction = "end"
+    enabled = true
+    fill = "surface"
+    foreground = "secondary"
+    id = "g1"
+    members = [ "weather", "date", "clock" ]
+    opacity = 1.0
+    padding = 6.0
+
+    [[bar.default.capsule_group]]
+    accordion = false
+    accordion_direction = "end"
+    border = "surface_variant"
+    enabled = true
+    fill = "surface"
+    id = "g2"
+    members = [ "active_window", "taskbar" ]
+    opacity = 1.0
+    padding = 6.0
+
+    [[bar.default.capsule_group]]
+    accordion = false
+    accordion_direction = "end"
+    enabled = false
+    fill = "surface"
+    id = "g3"
+    members = [ "cpu", "ram" ]
+    opacity = 1.0
+    padding = 6.0
+
+    [[bar.default.capsule_group]]
+    accordion = false
+    accordion_direction = "end"
+    enabled = true
+    fill = "surface"
+    id = "g4"
+    members = [ "media", "audio_visualizer", "volume" ]
+    opacity = 1.0
+    padding = 6.0
+
+    [[bar.default.capsule_group]]
+    accordion = false
+    accordion_direction = "end"
+    border = ""
+    enabled = true
+    fill = "surface"
+    foreground = "secondary"
+    id = "g5"
+    members = [ "launcher", "screenshot", "clipboard", "notifications" ]
+    opacity = 1.0
+    padding = 6.0
+    widget_spacing = 12
+
+[dock]
+enabled = true
+launcher_position = "start"
+monitors = [ "DP-2", "DP-3" ]
+show_dots = true
+
+[location]
+auto_locate = true
+
+[notification]
+history_retention_hours = 12
+
+[osd.kinds]
+keyboard_layout = false
+
 [shell]
+external_ip_enabled = true
 launch_apps_as_systemd_services = false
-launch_apps_custom_command = "host-exec $CMD"
+launch_apps_custom_command = "host-exec uwsm app -- $CMD"
+screen_time_enabled = true
+settings_show_advanced = false
 polkit_agent = false
+
+[theme]
+builtin = "Catppuccin"
+
+    [theme.templates]
+    builtin_ids = [ "scroll" ]
+
+[wallpaper]
+enabled = false
 
 [lockscreen]
 enabled = false
+
+[widget.active_window]
+enabled = false
+
+[widget.audio_visualizer]
+enabled = false
+
+[widget.battery]
+device = "/org/freedesktop/UPower/devices/keyboard_dev_F1_11_7D_86_DD_E4"
+enabled = false
+
+[widget.bluetooth]
+enabled = false
+
+[widget.clock]
+format = "{:%H:%M:%S}"
+
+[widget.cpu]
+show_value = false
+
+[widget.date]
+format = "{:%m/%d %a}"
+vertical_format = "{:%m %d %a}"
+
+[widget.media]
+album_art_only = true
+enabled = false
+hide_when_no_media = true
+
+[widget.ram]
+show_value = false
+stat = "ram_pct"
+
+[widget.spacer_2]
+type = "spacer"
+
+[widget.spacer_3]
+type = "spacer"
+
+[widget.taskbar]
+only_active_workspace = true
+
+[widget.weather]
+enabled = false
+show_condition = false
+
+[widget.workspaces]
+empty_color = "tertiary"
+focused_color = "secondary"
+occupied_color = "tertiary"
+style = "focus_hint"
