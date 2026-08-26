@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This is a cross-platform chezmoi dotfiles repository. `.chezmoiroot` points to `home/`, so files there map to the user's home directory using chezmoi naming rules: `dot_config/` becomes `~/.config/`, `private_dot_ssh/` receives private permissions, and `executable_*` files are installed as executables. OS-specific lifecycle scripts live in `home/.chezmoiscripts/{linux,darwin,windows}/`. Distrobox manifests are installed from `home/dot_config/distrobox/assemble/`, `root/` describes desired system-level image contents, and `install.sh` bootstraps chezmoi. Files ending in `.tmpl` are Go templates; `.age` files are encrypted secrets.
+This is a cross-platform chezmoi dotfiles repository. `.chezmoiroot` points to `home/`, so files there map to the user's home directory using chezmoi naming rules: `dot_config/` becomes `~/.config/`, `private_dot_ssh/` receives private permissions, and `executable_*` files are installed as executables. OS-specific lifecycle scripts live in `home/.chezmoiscripts/{linux,darwin,windows}/`. Distrobox manifests are installed from `home/dot_config/distrobox/assemble/`, and `root/` describes desired system-level image contents. Files ending in `.tmpl` are Go templates; `.age` files are encrypted secrets.
 
 `root/` is a separate chezmoi source state for system-level files and is not part of the normal HOME source or bootstrap. When working on a corresponding system file, inspect the live file as the current operational state and update `root/` when the requested desired state should change. System tasks operate on every managed file in `root/` when no target is provided. For an explicitly requested live apply of a file being changed, use `mise run system:diff -- <absolute-file>`, `mise run system:apply -- <absolute-file>`, and `mise run system:verify -- <absolute-file>`, then confirm the diff is empty. Explicit targets must be normalized absolute file paths that already exist in `root/`; never use an ad hoc copy or install, pass a directory, or use `/` as a target. Do not introduce a custom-image delivery path without an explicit decision.
 
@@ -15,9 +15,21 @@ This is a cross-platform chezmoi dotfiles repository. `.chezmoiroot` points to `
 - `mise run test:e2e:linux`: run the standard chezmoi E2E test on Fedora 44 and the Ubuntu 24.04 desktop/headless devcontainers.
 - `mise run test:e2e:linux:bazzite`: run the slow privileged Bazzite E2E test locally.
 - `mise run test:e2e`: run the standard Linux E2E on Linux or the local Tart E2E on macOS. Linux hosts do not run macOS E2E remotely.
-- `./install.sh`: bootstrap and apply this checkout on a new machine.
+- `./install.sh`: bootstrap and apply an already-present checkout in a CDE or staged-source test environment.
 
 There is no compilation step. Validate on the relevant operating system, especially after changing `.chezmoiscripts` or platform-conditional templates.
+
+## Bootstrap Entry Points
+
+- Bootstrap a new physical Linux or macOS machine through chezmoi's standard remote entrypoint:
+  `sh -c "$(curl -fsLS https://get.chezmoi.io)" -- init --apply atty303`.
+- Reserve `install.sh` and `install.ps1` for environments where the source checkout is already
+  present, including CDEs and staged-source E2E tests. They may detect and inject convenient
+  default roles, but must not contain configuration or installation behavior required by the
+  standard remote `chezmoi init` path.
+- Keep bootstrap tests bound to the checked-out or staged local source so unpushed changes are
+  testable. Do not make them fetch `atty303/dotfiles` or otherwise require a push before they can
+  pass.
 
 ## Chezmoi Source Workflow
 

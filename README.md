@@ -91,28 +91,29 @@ passphrase used to decrypt the committed identity. The first apply stores that i
 at `~/.config/chezmoi/age/identity.txt`, so later applies do not require it again.
 These commands are for the repository owner.
 
-On Linux or macOS, use a checkout of this repository:
+On a new physical Linux or macOS machine, use chezmoi's standard remote bootstrap entrypoint:
+
+```sh
+sh -c "$(curl -fsLS https://get.chezmoi.io)" -- init --apply atty303
+```
+
+Chezmoi fetches `atty303/dotfiles`, presents the known roles as a multiple-choice list, and
+applies the selected state. Linux initially selects `development` and `secrets`; select
+`desktop` or `gaming` explicitly when the machine needs them. Existing roles from the
+chezmoi config remain preselected on later initialization.
+
+The repository-local wrappers are for environments that already have a checkout, such as
+CDEs and the staged-source E2E tests. They use that checkout as the source instead of
+fetching the published repository:
 
 ```sh
 ./install.sh
 ```
 
-In an interactive terminal, the installer presents the known roles as a multiple-choice
-list. In a non-interactive environment, `development` and `secrets` are selected
-automatically; macOS also selects `desktop`, while Linux selects it only when a `.desktop`
-session definition exists under `/usr/share/wayland-sessions` or `/usr/share/xsessions`.
-The explicit form remains available when invoking the installer through an environment
-whose terminal detection is unreliable:
-
-```sh
-./install.sh --prompt-roles
-```
-
-On an existing installation, the roles currently stored in the chezmoi config are
-preselected. On a first bootstrap, the wrapper's platform defaults are preselected
-instead. Running `chezmoi init` directly also reuses existing roles, with `development`
-and `secrets` as the first-run defaults (`desktop` is also selected by default on macOS
-and Windows).
+In an interactive terminal, the wrapper presents the same role picker. In a non-interactive
+environment, it supplies platform defaults: `development` and `secrets`, plus `desktop` on
+macOS or when Linux has an installed desktop-session definition. Use
+`./install.sh --prompt-roles` only when an environment's terminal detection is unreliable.
 
 On Windows 11 24H2 or later:
 
@@ -134,8 +135,9 @@ future policy exclusions on managed work devices; it currently adds no settings.
 applications such as Atuin and 1Password still require their normal login and sync.
 Disable `secrets` when their encrypted bootstrap artifacts should not be managed.
 
-After this roles redesign, existing installations must run the wrapper once again (with
-`--prompt-roles` when the defaults are not appropriate) to regenerate the chezmoi config.
+After this roles redesign, existing installations must run `chezmoi init` again to
+regenerate the chezmoi config. A local checkout may instead use the corresponding wrapper,
+with `--prompt-roles` when its defaults are not appropriate.
 
 ## Home backups
 
