@@ -94,13 +94,14 @@ These commands are for the repository owner.
 On a new physical Linux or macOS machine, use chezmoi's standard remote bootstrap entrypoint:
 
 ```sh
-sh -c "$(curl -fsLS https://get.chezmoi.io)" -- init --apply atty303
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply atty303
 ```
 
-Chezmoi fetches `atty303/dotfiles`, presents the known roles as a multiple-choice list, and
-applies the selected state. Linux initially selects `development` and `secrets`; select
-`desktop` or `gaming` explicitly when the machine needs them. Existing roles from the
-chezmoi config remain preselected on later initialization.
+The explicit `-b` keeps the chezmoi binary in `~/.local/bin`, matching the PATH managed by
+this repository. Chezmoi fetches `atty303/dotfiles`, presents the known roles as a
+multiple-choice list, and applies the selected state. Linux initially selects `development`
+and `secrets`; select `desktop` or `gaming` explicitly when the machine needs them. Existing
+roles from the chezmoi config remain preselected on later initialization.
 
 The repository-local wrappers are for environments that already have a checkout, such as
 CDEs and the staged-source E2E tests. They use that checkout as the source instead of

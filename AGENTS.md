@@ -22,7 +22,9 @@ There is no compilation step. Validate on the relevant operating system, especia
 ## Bootstrap Entry Points
 
 - Bootstrap a new physical Linux or macOS machine through chezmoi's standard remote entrypoint:
-  `sh -c "$(curl -fsLS https://get.chezmoi.io)" -- init --apply atty303`.
+  `sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init --apply atty303`.
+  Keep the explicit bindir so the persistent binary is installed in the repository-managed
+  `~/.local/bin`.
 - Reserve `install.sh` and `install.ps1` for environments where the source checkout is already
   present, including CDEs and staged-source E2E tests. They may detect and inject convenient
   default roles, but must not contain configuration or installation behavior required by the
