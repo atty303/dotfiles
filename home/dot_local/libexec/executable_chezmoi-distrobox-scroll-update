@@ -368,7 +368,7 @@ prepare_locked() {
   write_transaction old-renamed "$desired" "$had_old"
 
   log "creating candidate Scroll container"
-  if distrobox assemble create --file "$manifest" --name scroll; then
+  if distrobox assemble create --file "$manifest" --name scroll 9>&-; then
     create_status=0
   else
     create_status=$?

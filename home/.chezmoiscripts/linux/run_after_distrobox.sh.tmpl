@@ -81,6 +81,10 @@ if ! command -v distrobox >/dev/null 2>&1; then
   exit 0
 fi
 
+{{ if $scrollSelected -}}
+systemd-tmpfiles --user --create x11-unix.conf
+{{- end }}
+
 {{ if $systemdSelected -}}
 systemctl --user daemon-reload
 {{- end }}

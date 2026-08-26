@@ -5,12 +5,23 @@ set -euo pipefail
 repository="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 helper="$repository/home/dot_local/libexec/executable_chezmoi-distrobox-scroll-update"
 test_root="$(mktemp -d)"
-trap 'rm -rf "$test_root"' EXIT
+
+cleanup() {
+  for pid_file in "$test_root/inherited-lock.pid" "$test_root/blocking-create.pid" \
+    "$test_root/helper.pid"; do
+    [[ ! -s "$pid_file" ]] || kill "$(<"$pid_file")" 2>/dev/null || true
+  done
+  rm -rf "$test_root"
+}
+trap cleanup EXIT
 
 export HOME="$test_root/home"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_STATE_HOME="$HOME/.local/state"
 export FAKE_CONTAINER_DIR="$test_root/containers"
+export FAKE_LOCK_HOLDER_PID_FILE="$test_root/inherited-lock.pid"
+export FAKE_BLOCKING_CREATE_PID_FILE="$test_root/blocking-create.pid"
+export FAKE_BLOCKING_CREATE_READY_FILE="$test_root/blocking-create.ready"
 export PATH="$test_root/bin:$PATH"
 
 mkdir -p "$test_root/bin" "$FAKE_CONTAINER_DIR" "$HOME/.local/bin" \
@@ -60,6 +71,15 @@ case "${1:-} ${2:-}" in
     done
     if [[ "${FAKE_DISTROBOX_FAIL_CREATE:-0}" == 1 ]]; then
       exit 42
+    fi
+    if [[ "${FAKE_DISTROBOX_INHERIT_LOCK:-0}" == 1 ]]; then
+      sleep 30 &
+      printf '%s\n' "$!" >"$FAKE_LOCK_HOLDER_PID_FILE"
+    fi
+    if [[ "${FAKE_DISTROBOX_BLOCK_CREATE:-0}" == 1 ]]; then
+      printf '%s\n' "$$" >"$FAKE_BLOCKING_CREATE_PID_FILE"
+      : >"$FAKE_BLOCKING_CREATE_READY_FILE"
+      sleep 1
     fi
     ;;
   "rm --force")
@@ -328,5 +348,46 @@ printf 'digest-8\n' >"$state_dir/scroll.pending"
 bash "$helper" prepare
 assert_file_value "$state_dir/scroll.transaction" $'prepared\ndigest-8\nyes'
 bash "$helper" rollback
+
+# Container descendants cannot retain the lock after the helper exits.
+reset_old_container
+rm -f "$FAKE_CONTAINER_DIR/scroll"
+export FAKE_DISTROBOX_INHERIT_LOCK=1
+bash "$helper" apply digest-9
+unset FAKE_DISTROBOX_INHERIT_LOCK
+if ! timeout 2 bash "$helper" apply digest-9; then
+  printf 'a container descendant retained the Scroll update lock\n' >&2
+  exit 1
+fi
+
+# A signal to the public helper PID keeps the lock until rollback completes.
+reset_old_container
+printf 'digest-10\n' >"$state_dir/scroll.pending"
+export FAKE_DISTROBOX_BLOCK_CREATE=1
+bash "$helper" prepare &
+helper_pid=$!
+printf '%s\n' "$helper_pid" >"$test_root/helper.pid"
+for _ in {1..200}; do
+  [[ ! -e "$FAKE_BLOCKING_CREATE_READY_FILE" ]] || break
+  sleep 0.01
+done
+[[ -e "$FAKE_BLOCKING_CREATE_READY_FILE" ]]
+kill -TERM "$helper_pid"
+if flock --nonblock "$state_dir/scroll.lock" true; then
+  printf 'the Scroll update lock was released before signal rollback\n' >&2
+  exit 1
+fi
+set +e
+wait "$helper_pid"
+helper_status=$?
+set -e
+unset FAKE_DISTROBOX_BLOCK_CREATE
+rm -f "$test_root/helper.pid"
+[[ "$helper_status" == 143 ]]
+flock --nonblock "$state_dir/scroll.lock" true
+assert_file_value "$FAKE_CONTAINER_DIR/scroll" old-container
+assert_file_value "$HOME/.local/bin/scroll" old-scroll
+assert_file_value "$state_dir/scroll.failed" digest-10
+assert_missing "$state_dir/scroll.transaction"
 
 printf 'distrobox Scroll update tests passed\n'

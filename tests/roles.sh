@@ -152,8 +152,15 @@ chezmoi execute-template --source "$repository" --override-data "$desktop_data" 
   <"$repository/home/.chezmoiscripts/linux/run_after_distrobox.sh.tmpl" >"$desktop_distrobox"
 chezmoi execute-template --source "$repository" --override-data "$baseline_data" \
   <"$repository/home/.chezmoiscripts/linux/run_after_distrobox.sh.tmpl" >"$baseline_distrobox"
+bash -n "$desktop_distrobox"
+bash -n "$baseline_distrobox"
 grep -Fq '  "noctalia"' "$desktop_distrobox"
 grep -Fq '  "scroll"' "$desktop_distrobox"
+grep -Fxq 'systemd-tmpfiles --user --create x11-unix.conf' "$desktop_distrobox"
+if grep -Fq 'systemd-tmpfiles --user --create x11-unix.conf' "$baseline_distrobox"; then
+  printf 'baseline render applied Scroll runtime tmpfiles\n' >&2
+  exit 1
+fi
 if grep -Fq '  "dms"' "$desktop_distrobox"; then
   printf 'desktop render selected DMS for Distrobox management\n' >&2
   exit 1

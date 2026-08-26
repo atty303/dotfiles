@@ -278,16 +278,13 @@ async function runLinuxTarget(
         ]).signal(signal),
       );
       await execute(
-        "prepare desktop runtime directory",
+        "verify fresh desktop runtime directory is absent",
         podman(config, [
           "exec",
           containerName,
-          "install",
-          "-d",
-          "-o",
-          config.user,
-          "-g",
-          config.user,
+          "test",
+          "!",
+          "-e",
           "/run/user/1000/X11-unix",
         ]).signal(signal),
       );
@@ -505,6 +502,7 @@ done`,
         `set -euo pipefail
 containers="$(distrobox list --no-color)"
 state_dir=${config.home}/.local/state/chezmoi/distrobox
+test -d /run/user/1000/X11-unix
 for name in noctalia scroll; do
   grep -Eq "(^|[[:space:]|])$name([[:space:]|]|$)" <<<"$containers"
 done
