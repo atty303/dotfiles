@@ -43,6 +43,12 @@ branch = "stable"
 
 [[flatpak.apps]]
 roles = ["desktop"]
+id = "com.chatterino.chatterino"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+roles = ["desktop"]
 id = "com.github.Matoking.protontricks"
 remote = "flathub"
 branch = "stable"
