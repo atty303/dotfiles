@@ -275,7 +275,7 @@ expect_failure() {
   [[ "$status" -eq "$expected_status" ]]
 }
 
-desktop_data='{"roles":["desktop"]}'
+desktop_data='{"roles":["desktop"],"appimages":{"apps":[{"id":"screenpipe","roles":["desktop"],"arches":["amd64"],"state":"present","desktop_id":"screenpipe.desktop","download_url":"https://screenpipe.com/api/download?platform=linux","update_manager":"StaticFileUpdater","update_options":{"url":"https://screenpipe.com/api/download?platform=linux"},"host_preload_libraries":["libwayland-client.so.0"]}]}}'
 present_script="$temporary/present.sh"
 render "$desktop_data" "$present_script"
 
@@ -497,43 +497,20 @@ fi
 
 isolated_config="$temporary/nonexistent-chezmoi-config.toml"
 source_test_home="$temporary/source-home"
-managed_autostart="$source_test_home/.config/autostart/screenpipe-chezmoi.desktop"
 legacy_autostart="$source_test_home/.config/autostart/screenpipe.desktop"
+managed_autostart="$source_test_home/.config/autostart/screenpipe-chezmoi.desktop"
 managed_preload="$source_test_home/.local/lib/appimage-host/screenpipe/libwayland-client.so.0"
-mkdir -p "$(dirname "$managed_autostart")" "$(dirname "$managed_preload")"
-resolved_preload="$(
-  HOME="$source_test_home" chezmoi --config "$isolated_config" --source "$repository" \
-    --destination "$source_test_home" cat --override-data "$desktop_data" "$managed_preload"
-)"
-[[ -f "$resolved_preload" ]]
-
-apply_conditional_sources() {
-  local data="${1:?override data is required}"
-
-  HOME="$source_test_home" chezmoi --config "$isolated_config" --source "$repository" \
-    --destination "$source_test_home" apply --override-data "$data" \
-    "$(dirname "$managed_autostart")" "$(dirname "$managed_preload")"
-}
-
-printf '[Desktop Entry]\nType=Application\nVersion=1.0\nName=screenpipe\nComment=screenpipe startup script managed by chezmoi\nExec=env LD_PRELOAD=%s %s/AppImages/screenpipe.appimage --autostart\nStartupNotify=false\nTerminal=false\n' \
-  "$managed_preload" "$source_test_home" >"$managed_autostart"
+mkdir -p "$(dirname "$legacy_autostart")" "$(dirname "$managed_preload")"
 printf 'legacy screenpipe autostart\n' >"$legacy_autostart"
-apply_conditional_sources "$desktop_data"
-[[ ! -e "$managed_autostart" && -L "$managed_preload" && ! -e "$legacy_autostart" ]]
-
-for disabled_data in \
-  '{"roles":[]}' \
-  '{"roles":["desktop"],"appimages":{"apps":[{"id":"screenpipe","roles":["desktop"],"arches":["amd64"],"state":"absent"}]}}' \
-  '{"roles":["desktop"],"appimages":{"apps":[{"id":"screenpipe","roles":["desktop"],"arches":["arm64"],"state":"present"}]}}'
-do
-  apply_conditional_sources "$desktop_data"
-  [[ ! -e "$managed_autostart" && -L "$managed_preload" ]]
-  apply_conditional_sources "$disabled_data"
-  if [[ -e "$managed_autostart" || -L "$managed_preload" ]]; then
-    printf 'Conditional screenpipe sources survived an inapplicable transition: %s\n' \
-      "$disabled_data" >&2
-    exit 1
-  fi
-done
+printf 'managed screenpipe autostart\n' >"$managed_autostart"
+ln -s "$host_library" "$managed_preload"
+HOME="$source_test_home" chezmoi --config "$isolated_config" --source "$repository" \
+  --destination "$source_test_home" apply \
+  --override-data '{"roles":["desktop"],"appimages":{"apps":[]}}' \
+  "$(dirname "$legacy_autostart")" "$(dirname "$managed_preload")"
+if [[ -e "$legacy_autostart" || -e "$managed_autostart" || -L "$managed_preload" ]]; then
+  printf 'Screenpipe migration targets survived cleanup\n' >&2
+  exit 1
+fi
 
 printf 'Gear Lever AppImage lifecycle tests passed\n'

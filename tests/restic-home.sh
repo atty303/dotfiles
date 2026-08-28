@@ -17,7 +17,6 @@ mkdir -p \
   "$config_dir/passwords" \
   "$test_home/Documents" \
   "$test_home/.cache" \
-  "$test_home/.screenpipe" \
   "$test_home/.local/share/Steam/userdata" \
   "$test_home/.local/share/Steam/steamapps/common" \
   "$test_home/.local/share/Steam/steamapps/compatdata" \
@@ -49,7 +48,6 @@ chmod 600 "$config_dir/credentials/$host.env" "$config_dir/passwords/$host"
 
 printf '%s\n' keep >"$test_home/Documents/keep"
 printf '%s\n' ignore >"$test_home/.cache/ignored"
-printf '%s\n' ignore >"$test_home/.screenpipe/recording"
 printf '%s\n' keep >"$test_home/.local/share/Steam/userdata/save"
 printf '%s\n' ignore >"$test_home/.local/share/Steam/steamapps/common/game"
 printf '%s\n' keep >"$test_home/.local/share/Steam/steamapps/compatdata/prefix"
@@ -75,7 +73,6 @@ for included in \
 done
 for excluded in \
   "$test_home/.cache/ignored" \
-  "$test_home/.screenpipe/recording" \
   "$test_home/.local/share/Steam/steamapps/common/game" \
   "$test_home/.local/share/containers/storage/volumes/anonymous/_data/cache" \
   "$test_home/Games/Heroic/game" \

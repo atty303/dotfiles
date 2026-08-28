@@ -4,16 +4,8 @@ entries = [
   { manifest = "scroll.ini", name = "scroll" },
 ]
 
-[[appimages.apps]]
-id = "screenpipe"
-roles = ["desktop"]
-arches = ["amd64"]
-state = "present"
-desktop_id = "screenpipe.desktop"
-download_url = "https://screenpipe.com/api/download?platform=linux"
-update_manager = "StaticFileUpdater"
-update_options = { url = "https://screenpipe.com/api/download?platform=linux" }
-host_preload_libraries = ["libwayland-client.so.0"]
+[appimages]
+apps = []
 
 [[chrome_web_apps.apps]]
 key = "x"
