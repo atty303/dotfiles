@@ -218,6 +218,45 @@ checksum = "sha256:32c28a6ec024ddfd59482334f0225f6e6c5202fdb3a5fdc74f3c987a1fd08
 url = "https://github.com/jdx/hk/releases/download/v1.54.1/hk-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/jdx/hk/releases/assets/505018165"
 
+[[tools.restic]]
+version = "0.19.1"
+backend = "aqua:restic/restic"
+
+[tools.restic."platforms.linux-arm64"]
+checksum = "sha256:a5f64aaab53d51e311fa3829124c5b703f2d14cf187d8640b6be3b2b49376465"
+url = "https://github.com/restic/restic/releases/download/v0.19.1/restic_0.19.1_linux_arm64.bz2"
+url_api = "https://api.github.com/repos/restic/restic/releases/assets/466999588"
+
+[tools.restic."platforms.linux-arm64-musl"]
+checksum = "sha256:a5f64aaab53d51e311fa3829124c5b703f2d14cf187d8640b6be3b2b49376465"
+url = "https://github.com/restic/restic/releases/download/v0.19.1/restic_0.19.1_linux_arm64.bz2"
+url_api = "https://api.github.com/repos/restic/restic/releases/assets/466999588"
+
+[tools.restic."platforms.linux-x64"]
+checksum = "sha256:f415415624dcc452f2a02b8c33641791a8c6d6d3b65bbb3543fcf9a25151585c"
+url = "https://github.com/restic/restic/releases/download/v0.19.1/restic_0.19.1_linux_amd64.bz2"
+url_api = "https://api.github.com/repos/restic/restic/releases/assets/466999719"
+
+[tools.restic."platforms.linux-x64-musl"]
+checksum = "sha256:f415415624dcc452f2a02b8c33641791a8c6d6d3b65bbb3543fcf9a25151585c"
+url = "https://github.com/restic/restic/releases/download/v0.19.1/restic_0.19.1_linux_amd64.bz2"
+url_api = "https://api.github.com/repos/restic/restic/releases/assets/466999719"
+
+[tools.restic."platforms.macos-arm64"]
+checksum = "sha256:7be0a144ccc377880f294204aa271d76e4b79554b42a751151d425ce6ebac143"
+url = "https://github.com/restic/restic/releases/download/v0.19.1/restic_0.19.1_darwin_arm64.bz2"
+url_api = "https://api.github.com/repos/restic/restic/releases/assets/467000314"
+
+[tools.restic."platforms.macos-x64"]
+checksum = "sha256:c38d579622cf602f665234c5a8c315030b6cf70656028fe6dc29a786b60e5f35"
+url = "https://github.com/restic/restic/releases/download/v0.19.1/restic_0.19.1_darwin_amd64.bz2"
+url_api = "https://api.github.com/repos/restic/restic/releases/assets/467000400"
+
+[tools.restic."platforms.windows-x64"]
+checksum = "sha256:da948ad707ed690426473aaba2046cd61f8f90f6f0e7dab6be0d5796531de67d"
+url = "https://github.com/restic/restic/releases/download/v0.19.1/restic_0.19.1_windows_amd64.zip"
+url_api = "https://api.github.com/repos/restic/restic/releases/assets/466998668"
+
 [[tools.shellcheck]]
 version = "0.11.0"
 backend = "aqua:koalaman/shellcheck"

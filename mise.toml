@@ -6,6 +6,7 @@ actionlint = "1.7.12"
 chezmoi = "2.72.0"
 deno = "2.9.3"
 hk = "1.54.1"
+restic = "0.19.1"
 shellcheck = "0.11.0"
 taplo = "0.10.0"
 "aqua:openai/tart" = { version = "2.35.0", os = ["macos/arm64"] }
