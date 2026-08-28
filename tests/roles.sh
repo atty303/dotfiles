@@ -6,7 +6,9 @@ repository="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 temporary="$(mktemp -d)"
 trap 'rm -rf "$temporary"' EXIT
 empty_config="$temporary/empty.toml"
+managed_config="$temporary/managed.toml"
 touch "$empty_config"
+printf 'encryption = "age"\n' >"$managed_config"
 
 render_config() {
   local roles=${1-}
@@ -114,17 +116,21 @@ fedora_desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"fedora",
 ubuntu_desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"ubuntu","idLike":"debian"}}}'
 baseline_data='{"roles":[],"chezmoi":{"osRelease":{"id":"bazzite","idLike":"fedora"}}}'
 secrets_data='{"roles":["secrets"]}'
-desktop_managed="$(chezmoi managed --source "$repository" --override-data "$desktop_data")"
-baseline_managed="$(chezmoi managed --source "$repository" --override-data "$baseline_data")"
+desktop_managed="$(chezmoi --config "$managed_config" managed --source "$repository" \
+  --override-data "$desktop_data")"
+baseline_managed="$(chezmoi --config "$managed_config" managed --source "$repository" \
+  --override-data "$baseline_data")"
 grep -Fxq '.config/chrome-web-apps/web-apps.json' <<<"$desktop_managed"
 grep -Fxq '.local/bin/open-in-default-browser' <<<"$desktop_managed"
 grep -Fxq '.local/share/applications/open-in-default-browser.desktop' <<<"$desktop_managed"
 grep -Fxq '.local/bin/chatgpt' <<<"$desktop_managed"
 grep -Fxq '.local/libexec/chatgpt-update' <<<"$desktop_managed"
 grep -Fxq '.local/share/applications/chatgpt.desktop' <<<"$desktop_managed"
-fedora_desktop_managed="$(chezmoi managed --source "$repository" --override-data "$fedora_desktop_data")"
+fedora_desktop_managed="$(chezmoi --config "$managed_config" managed --source "$repository" \
+  --override-data "$fedora_desktop_data")"
 grep -Fxq '.local/bin/chatgpt' <<<"$fedora_desktop_managed"
-ubuntu_desktop_managed="$(chezmoi managed --source "$repository" --override-data "$ubuntu_desktop_data")"
+ubuntu_desktop_managed="$(chezmoi --config "$managed_config" managed --source "$repository" \
+  --override-data "$ubuntu_desktop_data")"
 if grep -Eq '^\.local/(bin/chatgpt|libexec/chatgpt-update|share/applications/chatgpt\.desktop|share/chatgpt/)' <<<"$ubuntu_desktop_managed"; then
   printf 'Ubuntu desktop render managed Fedora ChatGPT integration\n' >&2
   exit 1
@@ -191,14 +197,16 @@ fi
 grep -Fq 'Valve.Steam' "$gaming_winget"
 
 for data in "$baseline_data" "$desktop_data"; do
-  managed="$(chezmoi managed --source "$repository" --override-data "$data")"
+  managed="$(chezmoi --config "$managed_config" managed --source "$repository" \
+    --override-data "$data")"
   grep -Fxq '.config/atuin/config.toml' <<<"$managed"
   if grep -Eq '^(\.wakatime\.cfg|\.local/share/atuin/key)$' <<<"$managed"; then
     printf 'non-secrets role rendered encrypted bootstrap artifacts\n' >&2
     exit 1
   fi
 done
-secrets_managed="$(chezmoi managed --source "$repository" --override-data "$secrets_data")"
+secrets_managed="$(chezmoi --config "$managed_config" managed --source "$repository" \
+  --override-data "$secrets_data")"
 grep -Fxq '.wakatime.cfg' <<<"$secrets_managed"
 grep -Fxq '.local/share/atuin/key' <<<"$secrets_managed"
 
