@@ -154,7 +154,7 @@ $env.config.menus ++= [{
 }]
 $env.config.keybindings ++= [
   {
-    name: completion_menu
+    name: atty_completion_menu_tab
     modifier: none
     keycode: Tab
     mode: [emacs vi_insert]
@@ -176,9 +176,9 @@ $env.config.keybindings ++= [
     ]
   }
   # alacritty on windows, Control-h sends Control+Backspace
-  { name: user, modifier: control, keycode: Backspace, mode: [emacs], event: { edit: Backspace } },
-  { name: user, modifier: alt, keycode: char_b, mode: [emacs], event: { edit: MoveBigWordLeft } }
-  { name: user, modifier: alt, keycode: char_d, mode: [emacs], event: { edit: CutBigWordRight } }
-  { name: user, modifier: alt, keycode: char_h, mode: [emacs], event: { edit: CutBigWordLeft } }
+  { name: atty_control_backspace, modifier: control, keycode: Backspace, mode: [emacs], event: { edit: Backspace } },
+  { name: atty_alt_move_big_word_left, modifier: alt, keycode: char_b, mode: [emacs], event: { edit: MoveBigWordLeft } }
+  { name: atty_alt_cut_big_word_right, modifier: alt, keycode: char_d, mode: [emacs], event: { edit: CutBigWordRight } }
+  { name: atty_alt_cut_big_word_left, modifier: alt, keycode: char_h, mode: [emacs], event: { edit: CutBigWordLeft } }
   { name: help, modifier: alt, keycode: char_?, mode: [emacs], event: { send: executehostcommand, cmd: "temporary-prompt" } }
 ]
