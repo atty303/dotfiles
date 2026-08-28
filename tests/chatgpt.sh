@@ -139,7 +139,9 @@ fi
 desktop="$temporary/chatgpt.desktop"
 chezmoi cat --source "$repository" --override-data '{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"bazzite","idLike":"fedora"}}}' \
   ~/.local/share/applications/chatgpt.desktop >"$desktop"
-desktop-file-validate "$desktop"
+if command -v desktop-file-validate >/dev/null 2>&1; then
+  desktop-file-validate "$desktop"
+fi
 grep -Fxq 'MimeType=x-scheme-handler/codex;' "$desktop"
 if grep -Eq 'text/csv|officedocument|ms-excel|tab-separated' "$desktop"; then
   printf 'ChatGPT desktop entry registered document MIME types\n' >&2
