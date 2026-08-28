@@ -8,7 +8,9 @@ trap 'rm -rf "$temporary"' EXIT
 
 test_home="$temporary/home"
 config_dir="$test_home/.config/restic"
+chezmoi_config="$temporary/chezmoi.toml"
 host=cristina
+printf 'encryption = "age"\n' >"$chezmoi_config"
 mkdir -p \
   "$test_home/.local/bin" \
   "$config_dir/credentials" \
@@ -129,14 +131,16 @@ unknown_data='{"roles":["secrets"],"chezmoi":{"hostname":"unknown","os":"linux"}
 second_data='{"roles":["secrets"],"restic":{"hosts":{"alex":{"enabled":true,"backup_calendar":"*-*-* 03:00:00","maintenance_calendar":"Sun *-*-* 05:00:00","check_calendar":"*-*-01 07:00:00"}}},"chezmoi":{"hostname":"alex","os":"linux","homeDir":"/home/alex"}}'
 first_two_data='{"roles":["secrets"],"restic":{"hosts":{"alex":{"enabled":true,"backup_calendar":"*-*-* 03:00:00","maintenance_calendar":"Sun *-*-* 05:00:00","check_calendar":"*-*-01 07:00:00"}}},"chezmoi":{"hostname":"cristina","os":"linux","homeDir":"/home/atty"}}'
 for disabled_data in "$nonsecret_data" "$unknown_data"; do
-  if chezmoi managed --source "$repository" --override-data "$disabled_data" |
+  if chezmoi --config "$chezmoi_config" managed --source "$repository" \
+    --override-data "$disabled_data" |
     grep -Eq '^\.local/bin/restic-home$|^\.config/systemd/user/restic-'; then
     printf 'disabled host or role managed restic automation\n' >&2
     exit 1
   fi
 done
 
-enabled=$(chezmoi managed --source "$repository" --override-data "$data")
+enabled=$(chezmoi --config "$chezmoi_config" managed --source "$repository" \
+  --override-data "$data")
 grep -Fxq '.local/bin/restic-home' <<<"$enabled"
 grep -Fxq '.config/systemd/user/restic-backup.timer' <<<"$enabled"
 if grep -Fq '.config/systemd/user/timers.target.wants/restic-' <<<"$enabled"; then
@@ -152,7 +156,8 @@ touch \
   "$two_host_source/home/dot_config/private_restic/private_passwords/encrypted_private_alex.age" \
   "$two_host_source/home/dot_config/private_restic/private_passwords/encrypted_private_manual-archives.age" \
   "$two_host_source/home/dot_config/private_restic/private_passwords/encrypted_private_retired.age"
-second_enabled=$(chezmoi managed --source "$two_host_source" --override-data "$second_data")
+second_enabled=$(chezmoi --config "$chezmoi_config" managed --source "$two_host_source" \
+  --override-data "$second_data")
 grep -Fxq '.local/bin/restic-home' <<<"$second_enabled"
 grep -Fxq '.config/restic/credentials/alex.env' <<<"$second_enabled"
 grep -Fxq '.config/restic/passwords/alex' <<<"$second_enabled"
@@ -168,7 +173,8 @@ if grep -Eq '^\.config/restic/(credentials/retired\.env|passwords/retired)$' \
   printf 'an enabled host managed an unregistered host credential\n' >&2
   exit 1
 fi
-first_enabled=$(chezmoi managed --source "$two_host_source" --override-data "$first_two_data")
+first_enabled=$(chezmoi --config "$chezmoi_config" managed --source "$two_host_source" \
+  --override-data "$first_two_data")
 grep -Fxq '.config/restic/credentials/cristina.env' <<<"$first_enabled"
 grep -Fxq '.config/restic/passwords/cristina' <<<"$first_enabled"
 grep -Fxq '.config/restic/credentials/manual-archives.env' <<<"$first_enabled"
