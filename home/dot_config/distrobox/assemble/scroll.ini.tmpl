@@ -8,7 +8,7 @@ pull=true
 volume=/run/dbus/system_bus_socket:/run/dbus/system_bus_socket
 volume=/run/user/1000/X11-unix:/tmp/.X11-unix
 # https://github.com/89luca89/distrobox/issues/1961
-additional_flags="--userns keep-id:size=65534 --annotation run.oci.keep_original_groups=0"
+additional_flags="--userns keep-id:size=65534 --annotation run.oci.keep_original_groups=0 --env SHELL=/bin/bash"
 exported_bins="/usr/bin/scroll /usr/bin/scrollmsg /usr/bin/scrollnag /usr/bin/scrollbar"
 # TODO: /usr/share/man, /usr/share/wayland-sessions, /usr/share/icons, /usr/share/bash-completions
 #additional_packages="base-devel"

@@ -54,6 +54,12 @@ for manifest in "$temporary/noctalia-success.ini" "$temporary/scroll-success.ini
   grep -Fqx 'nvidia=true' "$manifest"
 done
 
+for manifest in "$temporary"/scroll-*.ini; do
+  grep -Fqx \
+    'additional_flags="--userns keep-id:size=65534 --annotation run.oci.keep_original_groups=0 --env SHELL=/bin/bash"' \
+    "$manifest"
+done
+
 grep -Fxq '[noctalia]' "$temporary/noctalia-success.ini"
 grep -Fxq '[scroll]' "$temporary/scroll-success.ini"
 if grep -Eq '^\[(noctalia|scroll)-nvidia\]$' "$temporary"/*.ini; then
@@ -71,6 +77,9 @@ if command -v distrobox >/dev/null 2>&1; then
     --file "$temporary/noctalia-missing.ini" --name noctalia 2>/dev/null)"
   nvidia_dry_run="$(distrobox assemble create --dry-run \
     --file "$temporary/noctalia-success.ini" --name noctalia 2>/dev/null)"
+  scroll_nushell_dry_run="$(SHELL=/home/test/.local/bin/nu \
+    distrobox assemble create --dry-run \
+    --file "$temporary/scroll-missing.ini" --name scroll 2>/dev/null)"
   grep -Fq -- '--name "noctalia"' <<<"$normal_dry_run"
   grep -Fq -- '--name "noctalia"' <<<"$nvidia_dry_run"
   if grep -Fq -- '--nvidia "1"' <<<"$normal_dry_run"; then
@@ -78,6 +87,12 @@ if command -v distrobox >/dev/null 2>&1; then
     exit 1
   fi
   grep -Fq -- '--nvidia "1"' <<<"$nvidia_dry_run"
+
+  inherited_shell_line="$(grep -Fn -- '--env "SHELL=nu"' \
+    <<<"$scroll_nushell_dry_run" | cut -d: -f1)"
+  override_shell_line="$(grep -Fn -- '--env SHELL=/bin/bash' \
+    <<<"$scroll_nushell_dry_run" | cut -d: -f1)"
+  ((override_shell_line > inherited_shell_line))
 fi
 
 printf 'Distrobox NVIDIA rendering tests passed\n'
