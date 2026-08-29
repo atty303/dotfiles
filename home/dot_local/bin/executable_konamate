@@ -1,24 +1,24 @@
 #!/usr/bin/env -S mise tool-stub
 
 tool = "github:atty303/konamate"
-version = "3.0.1"
+version = "3.0.2"
 
 [lock]
 
 [lock.platforms]
 
 [lock.platforms.linux-arm64]
-url = "https://github.com/atty303/konamate/releases/download/v3.0.1/konamate-aarch64-unknown-linux-gnu"
-checksum = "sha256:d57afb23eb32c6e3afb0943ca2c0cef01c043dfe8e6517ca03cf5602e1ca5cb7"
+url = "https://github.com/atty303/konamate/releases/download/v3.0.2/konamate-aarch64-unknown-linux-gnu"
+checksum = "sha256:26446e3accc902e12d286fb6966eadc8ee429819c301319fbb5af3fc23ef3255"
 
 [lock.platforms.linux-arm64-musl]
-url = "https://github.com/atty303/konamate/releases/download/v3.0.1/konamate-aarch64-unknown-linux-gnu"
-checksum = "sha256:d57afb23eb32c6e3afb0943ca2c0cef01c043dfe8e6517ca03cf5602e1ca5cb7"
+url = "https://github.com/atty303/konamate/releases/download/v3.0.2/konamate-aarch64-unknown-linux-gnu"
+checksum = "sha256:26446e3accc902e12d286fb6966eadc8ee429819c301319fbb5af3fc23ef3255"
 
 [lock.platforms.linux-x64]
-url = "https://github.com/atty303/konamate/releases/download/v3.0.1/konamate-x86_64-unknown-linux-gnu"
-checksum = "sha256:1c8ede2f0844eac398d71799e87221db1d6281e0ee617235b898e5ed33e64c60"
+url = "https://github.com/atty303/konamate/releases/download/v3.0.2/konamate-x86_64-unknown-linux-gnu"
+checksum = "sha256:7bb6783937fb2f4919a06fdf839c8a680ae3060c766baa68a17d9cdc88eb35e9"
 
 [lock.platforms.linux-x64-musl]
-url = "https://github.com/atty303/konamate/releases/download/v3.0.1/konamate-x86_64-unknown-linux-gnu"
-checksum = "sha256:1c8ede2f0844eac398d71799e87221db1d6281e0ee617235b898e5ed33e64c60"
+url = "https://github.com/atty303/konamate/releases/download/v3.0.2/konamate-x86_64-unknown-linux-gnu"
+checksum = "sha256:7bb6783937fb2f4919a06fdf839c8a680ae3060c766baa68a17d9cdc88eb35e9"
