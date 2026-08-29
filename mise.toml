@@ -63,6 +63,7 @@ mise run test:e2e
 [tasks."test:distrobox"]
 description = "Test Distrobox lifecycle updates"
 run = """
+bash tests/distrobox-nvidia.sh
 bash tests/distrobox-scroll-update.sh
 bash tests/distrobox-service-restart.sh
 """

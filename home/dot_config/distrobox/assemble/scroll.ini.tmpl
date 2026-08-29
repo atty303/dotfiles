@@ -1,8 +1,10 @@
+{{- $nvidia := eq (includeTemplate "distrobox-nvidia-enabled" . | trim) "true" -}}
 [scroll]
 # Temporary snapshot carrying swaywm/sway#9255 and #9256 until they are resolved upstream.
 image=ghcr.io/atty303/arch-scroll:scroll-1.12.21-atty.4-b4ae014e
 pull=true
-# Need this to work with logind
+{{ if $nvidia }}nvidia=true
+{{ end }}# Need this to work with logind
 volume=/run/dbus/system_bus_socket:/run/dbus/system_bus_socket
 volume=/run/user/1000/X11-unix:/tmp/.X11-unix
 # https://github.com/89luca89/distrobox/issues/1961
@@ -22,7 +24,3 @@ exported_bins="/usr/bin/scroll /usr/bin/scrollmsg /usr/bin/scrollnag /usr/bin/sc
 init_hooks=ln -sf /usr/bin/host-exec /usr/local/bin/uwsm;
 init_hooks=ln -sf /usr/bin/host-exec /usr/local/bin/vicinae;
 start_now=true
-
-[scroll-nvidia]
-include=scroll
-nvidia=true

@@ -47,11 +47,13 @@ run_case() {
   local expected_status="${4:?expected status is required}"
   local expect_applied="${5:?applied expectation is required}"
   local expected="${6:?expected log is required}"
+  local expected_digest
   local case_dir="$temporary/$name"
   local log="$case_dir/commands.log"
   local status
 
   mkdir -p "$case_dir/home/.local/libexec" "$case_dir/state" "$case_dir/config/distrobox/assemble"
+  : >"$case_dir/config/distrobox/assemble/dms.ini"
   cp "$fake_bin/scroll-helper" "$case_dir/home/.local/libexec/chezmoi-distrobox-scroll-update"
   set +e
   FAKE_LOG="$log" \
@@ -68,6 +70,8 @@ run_case() {
   [[ "$status" == "$expected_status" ]]
   if [[ "$expect_applied" == yes ]]; then
     [[ -s "$case_dir/state/chezmoi/distrobox/shell.applied" ]]
+    expected_digest="$(printf '%s\n' shell | sha256sum | cut -d ' ' -f 1)"
+    [[ "$(<"$case_dir/state/chezmoi/distrobox/shell.applied")" == "$expected_digest" ]]
   else
     [[ ! -e "$case_dir/state/chezmoi/distrobox/shell.applied" ]]
   fi

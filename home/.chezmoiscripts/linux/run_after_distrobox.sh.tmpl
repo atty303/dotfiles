@@ -90,10 +90,14 @@ systemctl --user daemon-reload
 {{- end }}
 
 {{ range $entry := $entries -}}
-{{- $manifestPath := joinPath $.chezmoi.sourceDir "dot_config" "distrobox" "assemble" $entry.manifest -}}
-{{- $manifestContent := include $manifestPath -}}
-{{- $desired := sha256sum (printf "%s\n%s" $entry.name $manifestContent) }}
-desired={{ $desired | quote }}
+manifest="${XDG_CONFIG_HOME:-$HOME/.config}/distrobox/assemble/{{ $entry.manifest }}"
+desired="$(
+  {
+    printf '%s\n' {{ $entry.name | quote }}
+    cat "$manifest"
+  } | sha256sum
+)"
+desired="${desired%% *}"
 {{- if eq $entry.name "scroll" }}
 "$scroll_helper" apply "$desired"
 {{- else }}
@@ -108,7 +112,7 @@ if [[ "$applied" != "$desired" ]]; then
   fi
 {{- end }}
   distrobox assemble create --replace \
-    --file "${XDG_CONFIG_HOME:-$HOME/.config}/distrobox/assemble/{{ $entry.manifest }}" \
+    --file "$manifest" \
     --name {{ $entry.name | quote }}
 {{- if hasKey $entry "service" }}
   if [[ "$service_was_active" == yes ]]; then

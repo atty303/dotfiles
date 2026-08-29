@@ -1,0 +1,1 @@
+{{ output "/bin/sh" "-c" "nvidia-smi -L >/dev/null 2>&1 && printf true || printf false" }}

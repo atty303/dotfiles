@@ -1,7 +1,9 @@
+{{- $nvidia := eq (includeTemplate "distrobox-nvidia-enabled" . | trim) "true" -}}
 [noctalia]
 image=ghcr.io/atty303/arch-noctalia:noctalia-git-94e49bac
 pull=true
-volume=/run/dbus/system_bus_socket:/run/dbus/system_bus_socket
+{{ if $nvidia }}nvidia=true
+{{ end }}volume=/run/dbus/system_bus_socket:/run/dbus/system_bus_socket
 volume=/usr/share/applications:/usr/local/share/applications
 volume=/usr/share/icons:/usr/local/share/icons
 volume=/var/lib/flatpak:/var/lib/flatpak
@@ -11,7 +13,3 @@ init_hooks=ln -sf /usr/bin/host-exec /usr/local/bin/uwsm
 init_hooks=ln -sf /usr/bin/host-exec /usr/local/bin/ghostty
 init_hooks=ln -sf /usr/bin/host-exec /usr/local/bin/systemctl
 init_hooks=ln -sf /usr/bin/host-exec /usr/local/bin/loginctl
-
-[noctalia-nvidia]
-include=noctalia
-nvidia=true
