@@ -31,7 +31,7 @@ AppData/
 {{- end }}
 {{- $resticArchiveEnabled := and (eq .chezmoi.os "linux") (has "secrets" .roles) .restic.archive.enabled }}
 {{ if not $resticEnabled }}
-# Host-scoped restic configuration is only rendered for configured Linux secret hosts.
+# Home backup automation is only rendered for configured Linux secret hosts.
 {{ if not $resticArchiveEnabled }}
 .config/restic/
 {{ else }}
@@ -50,24 +50,9 @@ AppData/
 .config/systemd/user/timers.target.wants/restic-maintenance.timer
 {{ end }}
 {{ if or $resticEnabled $resticArchiveEnabled }}
-# Never decrypt another host's repository credentials onto this host. The manual archive
-# credential is shared by Linux secret hosts when the manual archive client is enabled.
-{{ range glob (joinPath .chezmoi.sourceDir "dot_config/private_restic/private_credentials/encrypted_private_*.age") -}}
-{{ $target := trimSuffix ".age" (trimPrefix "encrypted_private_" (base .)) -}}
-{{ $keepHome := and $resticEnabled (eq $target (printf "%s.env" $.chezmoi.hostname)) -}}
-{{ $keepArchive := and $resticArchiveEnabled (eq $target "manual-archives.env") -}}
-{{ if not (or $keepHome $keepArchive) -}}
-.config/restic/credentials/{{ $target }}
-{{ end -}}
-{{ end -}}
-{{ range glob (joinPath .chezmoi.sourceDir "dot_config/private_restic/private_passwords/encrypted_private_*.age") -}}
-{{ $target := trimSuffix ".age" (trimPrefix "encrypted_private_" (base .)) -}}
-{{ $keepHome := and $resticEnabled (eq $target $.chezmoi.hostname) -}}
-{{ $keepArchive := and $resticArchiveEnabled (eq $target "manual-archives") -}}
-{{ if not (or $keepHome $keepArchive) -}}
-.config/restic/passwords/{{ $target }}
-{{ end -}}
-{{ end -}}
+# Legacy per-repository secrets are replaced by the shared b2.env configuration.
+.config/restic/credentials/
+.config/restic/passwords/
 {{ end }}
 
 {{ if not $resticArchiveEnabled }}

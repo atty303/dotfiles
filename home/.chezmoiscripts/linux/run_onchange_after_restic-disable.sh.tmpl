@@ -7,43 +7,13 @@ set -eu
 {{-   $resticEnabled = (index .restic.hosts .chezmoi.hostname).enabled }}
 {{- end }}
 {{- $resticArchiveEnabled := and (has "secrets" .roles) .restic.archive.enabled }}
-keep_credentials=
-keep_password=
-keep_archive_credentials=
-keep_archive_password=
-{{ if $resticEnabled -}}
-keep_credentials="$HOME/.config/restic/credentials/{{ .chezmoi.hostname }}.env"
-keep_password="$HOME/.config/restic/passwords/{{ .chezmoi.hostname }}"
-{{ end -}}
-{{ if $resticArchiveEnabled -}}
-keep_archive_credentials="$HOME/.config/restic/credentials/manual-archives.env"
-keep_archive_password="$HOME/.config/restic/passwords/manual-archives"
-{{ end -}}
-cleanup_restic_secrets() {
-  for secret in \
-    "$HOME/.config/restic/credentials/"* \
-    "$HOME/.config/restic/credentials/".[!.]* \
-    "$HOME/.config/restic/credentials/"..?*; do
-    [ -e "$secret" ] || [ -L "$secret" ] || continue
-    if [ "$secret" != "$keep_credentials" ] && [ "$secret" != "$keep_archive_credentials" ]; then
-      rm -rf "$secret"
-    fi
-  done
-  for secret in \
-    "$HOME/.config/restic/passwords/"* \
-    "$HOME/.config/restic/passwords/".[!.]* \
-    "$HOME/.config/restic/passwords/"..?*; do
-    [ -e "$secret" ] || [ -L "$secret" ] || continue
-    if [ "$secret" != "$keep_password" ] && [ "$secret" != "$keep_archive_password" ]; then
-      rm -rf "$secret"
-    fi
-  done
+cleanup_legacy_restic_secrets() {
+  rm -rf \
+    "$HOME/.config/restic/credentials" \
+    "$HOME/.config/restic/passwords"
 }
 {{ if not $resticArchiveEnabled }}
-rm -f \
-  "$HOME/.local/bin/restic-archive" \
-  "$HOME/.config/restic/credentials/manual-archives.env" \
-  "$HOME/.config/restic/passwords/manual-archives"
+rm -f "$HOME/.local/bin/restic-archive"
 {{ end }}
 {{ if not $resticEnabled }}
 restic_artifacts=false
@@ -134,7 +104,7 @@ elif [ "$restic_artifacts" = true ]; then
   exit 1
 fi
 
-cleanup_restic_secrets
+cleanup_legacy_restic_secrets
 rm -f \
   "$HOME/.local/bin/restic-home" \
   "$HOME/.config/restic/excludes" \
@@ -149,22 +119,14 @@ rm -f \
   "$HOME/.config/systemd/user/timers.target.wants/restic-check.timer" \
   "$HOME/.config/systemd/user/timers.target.wants/restic-maintenance.timer"
 rmdir "$HOME/.config/systemd/user/timers.target.wants" 2>/dev/null || true
-{{ if not $resticArchiveEnabled -}}
-rmdir \
-  "$HOME/.config/restic/credentials" \
-  "$HOME/.config/restic/passwords" \
-  "$HOME/.config/restic" 2>/dev/null || true
-{{ end -}}
 
 if [ "$manager_available" = true ]; then
   systemctl --user daemon-reload >/dev/null
 fi
 {{ else }}
-cleanup_restic_secrets
+cleanup_legacy_restic_secrets
 {{ end }}
-{{ if not $resticArchiveEnabled }}
-rmdir \
-  "$HOME/.config/restic/credentials" \
-  "$HOME/.config/restic/passwords" \
-  "$HOME/.config/restic" 2>/dev/null || true
+{{ if and (not $resticEnabled) (not $resticArchiveEnabled) }}
+rm -f "$HOME/.config/restic/b2.env"
+rmdir "$HOME/.config/restic" 2>/dev/null || true
 {{ end }}

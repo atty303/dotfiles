@@ -142,42 +142,39 @@ with `--prompt-roles` when its defaults are not appropriate.
 
 ## Home backups
 
-The Linux host `cristina` has a host-scoped restic configuration for daily encrypted
-home-directory backups. It is rendered only when the `secrets` role is selected and the
-current hostname has an enabled entry in `home/.chezmoidata/restic.toml`. Other hosts and
-operating systems do not manage the wrapper, credentials, or timers until they receive an
-explicit host entry and native scheduler integration.
+Linux hosts can receive host-scoped daily encrypted home-directory backups. The home
+wrapper and timers are rendered only when the `secrets` role is selected and the current
+`.chezmoi.hostname` has an enabled entry in `home/.chezmoidata/restic.toml`. That entry
+controls enablement and scheduling; the hostname itself is the input to the home repository
+ID rule. Other hosts and operating systems do not manage home backup automation until they
+receive an explicit host entry and native scheduler integration.
 
 Create a private Backblaze B2 bucket without Object Lock, configure its lifecycle to keep
 only the latest version of each object, and create a standard Read and Write application
-key restricted to both that bucket and the `restic/cristina/` prefix. Do not use the
-account master key. Put these exact unquoted assignments in
-`~/.config/restic/credentials/cristina.env`:
+key restricted to that bucket and its `restic/` prefix. Do not use the account master key.
+Put these exact unquoted assignments in `~/.config/restic/b2.env`:
 
 ```text
 AWS_ACCESS_KEY_ID=REPLACE_WITH_KEY_ID
 AWS_SECRET_ACCESS_KEY=REPLACE_WITH_APPLICATION_KEY
-RESTIC_REPOSITORY=s3:https://REPLACE_WITH_ENDPOINT/REPLACE_WITH_BUCKET/restic/cristina
+RESTIC_REPOSITORY_BASE=s3:https://REPLACE_WITH_ENDPOINT/REPLACE_WITH_BUCKET/restic
+RESTIC_PASSWORD=REPLACE_WITH_SHARED_REPOSITORY_PASSWORD
 ```
 
-Put a generated restic repository password on one line in
-`~/.config/restic/passwords/cristina`, then restrict and encrypt both files into the
-chezmoi source state:
+The home wrapper appends its rendered hostname to the repository base. The manual archive
+wrapper uses the same configuration and appends `manual-archives`. Restrict and encrypt the
+shared file into the chezmoi source state:
 
 ```nu
-^chmod 700 ~/.config/restic ~/.config/restic/credentials ~/.config/restic/passwords
-```
-
-```nu
-^chmod 600 ~/.config/restic/credentials/cristina.env ~/.config/restic/passwords/cristina
+^chmod 700 ~/.config/restic
 ```
 
 ```nu
-chezmoi add --encrypt ~/.config/restic/credentials/cristina.env
+^chmod 600 ~/.config/restic/b2.env
 ```
 
 ```nu
-chezmoi add --encrypt ~/.config/restic/passwords/cristina
+chezmoi add --encrypt ~/.config/restic/b2.env
 ```
 
 Apply the credentials, wrapper, exclude file, services, and timer unit files as explicit
@@ -215,43 +212,13 @@ timers and removes the host-scoped credentials and automation files.
 
 ## Manual archives
 
-Linux hosts with the `secrets` role also manage `restic-archive`, a shared manual archive
-client that is independent of the host-scoped home repository. It has no timer and exposes
-no automatic retention or prune action. Use one private B2 repository at
-`restic/manual-archives/` for one-shot preservation before reusing media, reinstalling a
-machine, or retiring local data. Restrict its application key to that bucket and prefix;
-do not use the account master key or the `cristina` home-backup key.
-
-Put the archive key and endpoint alongside the existing Restic configuration in
-`~/.config/restic/credentials/manual-archives.env`:
-
-```text
-AWS_ACCESS_KEY_ID=REPLACE_WITH_KEY_ID
-AWS_SECRET_ACCESS_KEY=REPLACE_WITH_APPLICATION_KEY
-RESTIC_REPOSITORY=s3:https://REPLACE_WITH_ENDPOINT/REPLACE_WITH_BUCKET/restic/manual-archives
-```
-
-Put a separate generated repository password on one line in
-`~/.config/restic/passwords/manual-archives`, set both files to mode `600`, and add them
-to chezmoi with encryption. The shared archive credentials are intentionally not named
-after a host, but use the same `credentials` and `passwords` directories as the host-scoped
-home backup.
-
-```nu
-^chmod 700 ~/.config/restic ~/.config/restic/credentials ~/.config/restic/passwords
-```
-
-```nu
-^chmod 600 ~/.config/restic/credentials/manual-archives.env ~/.config/restic/passwords/manual-archives
-```
-
-```nu
-chezmoi add --encrypt ~/.config/restic/credentials/manual-archives.env
-```
-
-```nu
-chezmoi add --encrypt ~/.config/restic/passwords/manual-archives
-```
+Linux hosts with the `secrets` role also manage `restic-archive`, a manual archive client
+that is independent of the host-scoped home repository. It has no timer and exposes no
+automatic retention or prune action. It uses the shared `~/.config/restic/b2.env`
+configuration described above and appends the fixed repository ID `manual-archives`.
+The shared B2 application key therefore needs access to both hostname-derived home prefixes
+and `restic/manual-archives/`; do not use the account master key. The shared configuration
+is retained while either home backup or the manual archive client is enabled.
 
 Initialize the repository explicitly. Write absolute source paths, one per line, to a
 private manifest. `ARCHIVE_ID` identifies the source and must use lowercase letters,

@@ -11,8 +11,7 @@ config_dir="$test_home/.config/restic"
 state_dir="$test_home/.local/state/restic-archive"
 mkdir -p \
   "$test_home/.local/bin" \
-  "$config_dir/credentials" \
-  "$config_dir/passwords" \
+  "$config_dir" \
   "$temporary/source/cache"
 
 data=$(printf '{"roles":["secrets"],"chezmoi":{"hostname":"cristina","os":"linux","homeDir":"%s"}}' \
@@ -26,15 +25,13 @@ shellcheck "$test_home/.local/bin/restic-archive"
 restic_bin=$(mise exec restic@0.19.1 -- which restic)
 ln -s "$restic_bin" "$test_home/.local/bin/restic"
 export XDG_STATE_HOME="$test_home/.local/state"
-cat >"$config_dir/credentials/manual-archives.env" <<EOF
+cat >"$config_dir/b2.env" <<EOF
 AWS_ACCESS_KEY_ID=fixture-access
 AWS_SECRET_ACCESS_KEY=fixture-secret
-RESTIC_REPOSITORY=$temporary/restic-repository
+RESTIC_REPOSITORY_BASE=$temporary/restic-repository
+RESTIC_PASSWORD=fixture-password
 EOF
-printf '%s\n' fixture-password >"$config_dir/passwords/manual-archives"
-chmod 600 \
-  "$config_dir/credentials/manual-archives.env" \
-  "$config_dir/passwords/manual-archives"
+chmod 600 "$config_dir/b2.env"
 
 printf '%s\n' keep >"$temporary/source/keep"
 printf 'Signature: 8a477f597d28d172789f06886806bc55\n' \
@@ -210,7 +207,7 @@ chmod 700 "$state_dir/runs"
 cmp "$temporary/rename-on.stdout" "$temporary/rename-off.stdout"
 cmp "$temporary/rename-on.stderr" "$temporary/rename-off.stderr"
 
-chmod 644 "$config_dir/credentials/manual-archives.env"
+chmod 644 "$config_dir/b2.env"
 if HOME="$test_home" "$test_home/.local/bin/restic-archive" snapshots \
   >/dev/null 2>&1; then
   printf 'restic-archive accepted an insecure credential file\n' >&2
