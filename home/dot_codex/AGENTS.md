@@ -10,6 +10,10 @@
 
 - deploy、release、data migrationの実行およびcloud resourceの変更は、ユーザーから明示的に依頼または承認された場合だけ行う。
 
+## Temporary Resources
+
+- タスクのためにagent自身が作成した一時file、directoryおよびその他の一時resourceは、再利用、handoffまたは診断証拠として保持する必要が明示されていない限り、成功・失敗を問わずタスク完了前に削除する。作成時にcleanup対象とownershipを特定し、既存resource、利用者が提供したresource、または対象を特定できない広い一時領域を削除しない。安全にcleanupできない場合は、残した対象と理由を完了報告に含める。
+
 ## Task Interpretation
 
 - ユーザーの指示を、目的とobservableな成功条件、hard constraint、明示された手段、および未検証の前提へ分けて解釈する。ユーザーを目的、許可、外部影響および受け入れ可能な結果の最終決定者とするが、提示された原因、実装案または手順が常に正確または最適とは仮定しない。
