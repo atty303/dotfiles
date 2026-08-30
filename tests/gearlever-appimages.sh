@@ -507,7 +507,7 @@ ln -s "$host_library" "$managed_preload"
 HOME="$source_test_home" chezmoi --config "$isolated_config" --source "$repository" \
   --destination "$source_test_home" apply \
   --override-data '{"roles":["desktop"],"appimages":{"apps":[]}}' \
-  "$(dirname "$legacy_autostart")" "$(dirname "$managed_preload")"
+  "$legacy_autostart" "$managed_autostart" "$managed_preload"
 if [[ -e "$legacy_autostart" || -e "$managed_autostart" || -L "$managed_preload" ]]; then
   printf 'Screenpipe migration targets survived cleanup\n' >&2
   exit 1
