@@ -14,6 +14,11 @@ run  = "open --hovered"
 desc = "Preview hovered file"
 
 [[mgr.prepend_keymap]]
+on   = "<A-d>"
+run  = "shell --orphan -- blobdrop %s"
+desc = "Drag selected files"
+
+[[mgr.prepend_keymap]]
 on   = "T"
 run  = "plugin toggle-pane max-preview"
 desc = "Maximize or restore the preview pane"
