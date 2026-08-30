@@ -8,7 +8,7 @@ keep_weekly = 5
 keep_monthly = 12
 keep_yearly = 3
 check_read_data_subset = "5%"
-randomized_delay = "1h"
+randomized_delay = "5m"
 
 [restic.archive]
 enabled = true
