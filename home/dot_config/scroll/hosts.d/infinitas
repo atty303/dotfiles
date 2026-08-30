@@ -1,5 +1,5 @@
 # Output roles
-set $out_game HDMI-A-2
+set $out_game HDMI-A-1
 set $out_dashboard DP-3
 
 output $out_game {
