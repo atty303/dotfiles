@@ -17,3 +17,15 @@ enabled = true
 backup_calendar = "*-*-* 03:00:00"
 maintenance_calendar = "Sun *-*-* 05:00:00"
 check_calendar = "*-*-01 07:00:00"
+
+[restic.hosts.sdvx]
+enabled = true
+backup_calendar = "*-*-* 03:00:00"
+maintenance_calendar = "Sun *-*-* 05:00:00"
+check_calendar = "*-*-01 07:00:00"
+
+[restic.hosts.infinitas]
+enabled = true
+backup_calendar = "*-*-* 03:00:00"
+maintenance_calendar = "Sun *-*-* 05:00:00"
+check_calendar = "*-*-01 07:00:00"
