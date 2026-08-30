@@ -1,0 +1,10 @@
+#!/usr/bin/env -S mise tool-stub
+
+version = "2.1"
+bin = "usr/bin/blobdrop"
+
+[platforms.linux-x64]
+url = "https://github.com/vimpostor/blobdrop/releases/download/v2.1/blobdrop-2.1-x86_64-archlinux.pkg.tar.zst"
+bin = "usr/bin/blobdrop"
+checksum = "sha256:59e81ea9b72533c3ff548fb9bfd5c072134f3aacfde82298f86a41229e13c6ba"
+size = 141580 # 138.3 KiB
