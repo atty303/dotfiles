@@ -2,7 +2,12 @@
 
 set -euo pipefail
 
+{{- $resticEnabled := false }}
+{{- if and (has "secrets" .roles) (hasKey .restic.hosts .chezmoi.hostname) }}
+{{-   $resticEnabled = (index .restic.hosts .chezmoi.hostname).enabled }}
+{{- end }}
 readonly host={{ .chezmoi.hostname | quote }}
+readonly host_enabled={{ $resticEnabled }}
 readonly repository_id="$host"
 readonly config_dir="${RESTIC_HOME_CONFIG_DIR:-$HOME/.config/restic}"
 readonly configuration_file="$config_dir/b2.env"
@@ -10,6 +15,19 @@ readonly exclude_file="$config_dir/excludes"
 readonly restic_bin="${RESTIC_HOME_RESTIC_BIN:-$HOME/.local/bin/restic}"
 
 {{ includeTemplate "restic-load-configuration.bash" . }}
+{{ includeTemplate "restic-home-add-host.bash" . }}
+
+if [[ ${1-} == add-host ]]; then
+  shift
+  (($# == 0)) || { printf 'usage: restic-home add-host\n' >&2; exit 2; }
+  restic_home_add_host_command
+  exit $?
+fi
+
+if [[ $host_enabled != true ]]; then
+  printf 'restic home backup is not enabled for host %s; run restic-home add-host\n' "$host" >&2
+  exit 1
+fi
 
 load_restic_configuration "$repository_id"
 
@@ -61,7 +79,7 @@ case ${1-} in
       --read-data-subset={{ .restic.defaults.check_read_data_subset | quote }} "$@"
     ;;
   '')
-    printf 'usage: restic-home {init|backup|maintenance|check|RESTIC_COMMAND...}\n' >&2
+    printf 'usage: restic-home {add-host|init|backup|maintenance|check|RESTIC_COMMAND...}\n' >&2
     exit 2
     ;;
   *)

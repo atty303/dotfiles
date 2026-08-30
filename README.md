@@ -143,11 +143,12 @@ with `--prompt-roles` when its defaults are not appropriate.
 ## Home backups
 
 Linux hosts can receive host-scoped daily encrypted home-directory backups. The home
-wrapper and timers are rendered only when the `secrets` role is selected and the current
-`.chezmoi.hostname` has an enabled entry in `home/.chezmoidata/restic.toml`. That entry
-controls enablement and scheduling; the hostname itself is the input to the home repository
-ID rule. Other hosts and operating systems do not manage home backup automation until they
-receive an explicit host entry and native scheduler integration.
+wrapper is rendered on Linux whenever the `secrets` role is selected, so an unregistered
+machine can run `restic-home add-host`. Repository commands and timers remain unavailable
+until the current `.chezmoi.hostname` has an enabled entry in
+`home/.chezmoidata/restic.toml`. That entry controls enablement and scheduling; the hostname
+itself is the input to the home repository ID rule. Other operating systems do not manage
+home backup automation until they receive native scheduler integration.
 
 Create a private Backblaze B2 bucket without Object Lock, configure its lifecycle to keep
 only the latest version of each object, and create a standard Read and Write application
@@ -177,33 +178,22 @@ shared file into the chezmoi source state:
 chezmoi add --encrypt ~/.config/restic/b2.env
 ```
 
-Apply the credentials, wrapper, exclude file, services, and timer unit files as explicit
-targets. Timer enablement is intentionally not part of the chezmoi source state, so a fresh
-bootstrap cannot schedule maintenance before its repository has been verified. Initialize
-the repository, create the first snapshot, run a check, and restore a representative file
-to a temporary directory before enabling automatic execution:
+On a new Linux secret host, run the interactive onboarding command. It adds only the current
+`.chezmoi.hostname`, prompts with editable schedule defaults, applies explicit targets,
+initializes or adopts the repository, creates the first snapshot, checks and restores it,
+and enables the timers only after every verification succeeds:
 
 ```nu
-restic-home init
+restic-home add-host
 ```
 
-```nu
-restic-home backup
-```
-
-```nu
-restic-home check
-```
-
-After the restore comparison succeeds, explicitly enable and start the timers:
-
-```nu
-systemctl --user daemon-reload
-```
-
-```nu
-systemctl --user enable --now restic-backup.timer restic-maintenance.timer restic-check.timer
-```
+The command leaves `home/.chezmoidata/restic.toml` modified but does not commit or push it.
+If onboarding stops after source update, repository initialization, backup, check, restore,
+or timer activation, rerun the same command to resume. Existing repositories require an
+explicit adoption confirmation. Diagnostic records are kept under
+`~/.local/state/restic-home/add-host-runs`; set `RESTIC_HOME_ADD_HOST_RECORDING=off` to opt
+out. They contain stage and status metadata, never credentials, repository URLs, snapshot
+contents, or child-command output.
 
 Backup, retention, and integrity failures remain visible as failed user units in the
 journal and also trigger a desktop notification. If the host entry is disabled, the host

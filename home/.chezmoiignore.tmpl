@@ -25,8 +25,9 @@ AppData/
 .local/share/atuin/key
 {{ end }}
 
+{{- $resticCliEnabled := and (eq .chezmoi.os "linux") (has "secrets" .roles) }}
 {{- $resticEnabled := false }}
-{{- if and (eq .chezmoi.os "linux") (has "secrets" .roles) (hasKey .restic.hosts .chezmoi.hostname) }}
+{{- if and $resticCliEnabled (hasKey .restic.hosts .chezmoi.hostname) }}
 {{-   $resticEnabled = (index .restic.hosts .chezmoi.hostname).enabled }}
 {{- end }}
 {{- $resticArchiveEnabled := and (eq .chezmoi.os "linux") (has "secrets" .roles) .restic.archive.enabled }}
@@ -37,7 +38,6 @@ AppData/
 {{ else }}
 .config/restic/excludes
 {{ end }}
-.local/bin/restic-home
 .config/systemd/user/restic-backup.service
 .config/systemd/user/restic-backup.timer
 .config/systemd/user/restic-check.service
@@ -48,6 +48,9 @@ AppData/
 .config/systemd/user/timers.target.wants/restic-backup.timer
 .config/systemd/user/timers.target.wants/restic-check.timer
 .config/systemd/user/timers.target.wants/restic-maintenance.timer
+{{ end }}
+{{ if not $resticCliEnabled }}
+.local/bin/restic-home
 {{ end }}
 {{ if or $resticEnabled $resticArchiveEnabled }}
 # Legacy per-repository secrets are replaced by the shared b2.env configuration.

@@ -5,6 +5,8 @@ set -euo pipefail
 repository="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 temporary="$(mktemp -d)"
 trap 'rm -rf "$temporary"' EXIT
+export RESTIC_CACHE_DIR="$temporary/restic-cache"
+mkdir -p "$RESTIC_CACHE_DIR"
 
 test_home="$temporary/home"
 config_dir="$test_home/.config/restic"

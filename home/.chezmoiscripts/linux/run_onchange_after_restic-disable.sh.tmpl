@@ -2,8 +2,9 @@
 
 set -eu
 
+{{- $resticCliEnabled := has "secrets" .roles }}
 {{- $resticEnabled := false }}
-{{- if and (has "secrets" .roles) (hasKey .restic.hosts .chezmoi.hostname) }}
+{{- if and $resticCliEnabled (hasKey .restic.hosts .chezmoi.hostname) }}
 {{-   $resticEnabled = (index .restic.hosts .chezmoi.hostname).enabled }}
 {{- end }}
 {{- $resticArchiveEnabled := and (has "secrets" .roles) .restic.archive.enabled }}
@@ -18,7 +19,6 @@ rm -f "$HOME/.local/bin/restic-archive"
 {{ if not $resticEnabled }}
 restic_artifacts=false
 for path in \
-  "$HOME/.local/bin/restic-home" \
   "$HOME/.config/restic/excludes" \
   "$HOME/.config/systemd/user/restic-backup.service" \
   "$HOME/.config/systemd/user/restic-backup.timer" \
@@ -106,7 +106,6 @@ fi
 
 cleanup_legacy_restic_secrets
 rm -f \
-  "$HOME/.local/bin/restic-home" \
   "$HOME/.config/restic/excludes" \
   "$HOME/.config/systemd/user/restic-backup.service" \
   "$HOME/.config/systemd/user/restic-backup.timer" \
@@ -125,6 +124,9 @@ if [ "$manager_available" = true ]; then
 fi
 {{ else }}
 cleanup_legacy_restic_secrets
+{{ end }}
+{{ if not $resticCliEnabled }}
+rm -f "$HOME/.local/bin/restic-home"
 {{ end }}
 {{ if and (not $resticEnabled) (not $resticArchiveEnabled) }}
 rm -f "$HOME/.config/restic/b2.env"
