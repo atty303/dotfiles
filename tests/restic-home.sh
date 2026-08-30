@@ -575,6 +575,11 @@ case ${1-} in
   execute-template)
     template=${2-}
     source_file="$FAKE_SOURCE_DIR/.chezmoidata/restic.toml"
+    if [[ ${FAKE_RENDER_FAIL:-false} == true && \
+      $template == *'if and (hasKey .restic.hosts .chezmoi.hostname)'* ]]; then
+      printf 'false\n'
+      exit 0
+    fi
     if [[ $template == *'hasKey .restic.hosts .chezmoi.hostname'* ]]; then
       if grep -Fq '[restic.hosts."new-host"]' "$source_file"; then
         if [[ $template == *'.enabled'* ]]; then
@@ -683,9 +688,31 @@ exec /usr/bin/rm "$@"
 EOF
 chmod 755 "$onboarding_bin/rm"
 
+cat >"$onboarding_bin/ln" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+source_file=${@: -2:1}
+destination=${@: -1}
+if [[ ${FAKE_FALLBACK_SOURCE_REAPPEAR:-false} == true && \
+  $source_file == *.candidate.* && $destination == */restic.toml ]]; then
+  printf '# fallback source reappeared\n' >"$destination"
+  exit 1
+fi
+exec /usr/bin/ln "$@"
+EOF
+chmod 755 "$onboarding_bin/ln"
+
 cat >"$onboarding_bin/mv" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+if [[ ${1-} == --help ]]; then
+  if [[ ${FAKE_MV_NO_EXCHANGE:-false} == true ]]; then
+    printf 'Usage: mv [OPTION] SOURCE DEST\n'
+  else
+    printf '      --exchange exchange source and destination\n'
+  fi
+  exit 0
+fi
 destination=${!#}
 if [[ ${FAKE_FINAL_RECORD_MOVE_FAIL:-false} == true && \
   ( $destination == *.success || $destination == *.failure ) ]]; then
@@ -694,6 +721,24 @@ fi
 if [[ ${FAKE_SOURCE_AFTER_COMPARE_CONFLICT:-false} == true && ${1-} == --exchange ]]; then
   source_file=${!#}
   printf '# concurrent change after compare\n' >>"$source_file"
+fi
+if [[ ${1-} == --exchange ]]; then
+  source_file=${@: -2:1}
+  destination_file=${@: -1}
+  swap_file="$source_file.swap.$$"
+  /usr/bin/mv -- "$source_file" "$swap_file"
+  /usr/bin/mv -- "$destination_file" "$source_file"
+  /usr/bin/mv -- "$swap_file" "$destination_file"
+  exit 0
+fi
+source_file=${@: -2:1}
+if [[ ${FAKE_FALLBACK_PUBLISH_CONFLICT:-false} == true && \
+  $source_file == */restic.toml && $destination == *.displaced.* ]]; then
+  printf '# fallback publish conflict\n' >>"$source_file"
+fi
+if [[ ${FAKE_FALLBACK_ROLLBACK_CONFLICT:-false} == true && \
+  $source_file == */restic.toml && $destination == *.rollback.* ]]; then
+  printf '# fallback rollback conflict\n' >>"$source_file"
 fi
 exec /usr/bin/mv "$@"
 EOF
@@ -781,6 +826,81 @@ if grep -Eq 'fixture-secret|RESTIC_REPOSITORY|snapshot for new-host|fixture excl
   printf 'add-host diagnostic record exposed non-allowlisted content\n' >&2
   exit 1
 fi
+
+fallback_source="$temporary/onboarding-fallback-source"
+fallback_state="$temporary/onboarding-fallback-state"
+mkdir -p "$fallback_source/.chezmoidata" "$fallback_state"
+cp "$repository/home/.chezmoidata/restic.toml" "$fallback_source/.chezmoidata/restic.toml"
+rm -f "$timer_marker"
+run_onboarding "$fallback_source" "$fallback_state" "$temporary/onboarding-fallback.out" \
+  FAKE_MV_NO_EXCHANGE=true
+grep -Fq '[restic.hosts."new-host"]' "$fallback_source/.chezmoidata/restic.toml"
+test -e "$timer_marker"
+
+fallback_conflict_source="$temporary/onboarding-fallback-conflict-source"
+fallback_conflict_state="$temporary/onboarding-fallback-conflict-state"
+mkdir -p "$fallback_conflict_source/.chezmoidata" "$fallback_conflict_state"
+cp "$repository/home/.chezmoidata/restic.toml" \
+  "$fallback_conflict_source/.chezmoidata/restic.toml"
+rm -f "$timer_marker"
+if run_onboarding "$fallback_conflict_source" "$fallback_conflict_state" \
+  "$temporary/onboarding-fallback-conflict.out" \
+  FAKE_MV_NO_EXCHANGE=true FAKE_FALLBACK_PUBLISH_CONFLICT=true; then
+  printf 'fallback source publication overwrote a concurrent update\n' >&2
+  exit 1
+fi
+grep -Fxq '# fallback publish conflict' \
+  "$fallback_conflict_source/.chezmoidata/restic.toml"
+if grep -Fq '[restic.hosts."new-host"]' \
+  "$fallback_conflict_source/.chezmoidata/restic.toml"; then
+  printf 'fallback publication conflict retained the candidate host entry\n' >&2
+  exit 1
+fi
+fallback_conflict_record=$(find \
+  "$fallback_conflict_state/restic-home/add-host-runs" -name '*.failure' -print -quit)
+grep -Fxq 'error_type=source_conflict' "$fallback_conflict_record"
+
+fallback_reappear_source="$temporary/onboarding-fallback-reappear-source"
+fallback_reappear_state="$temporary/onboarding-fallback-reappear-state"
+mkdir -p "$fallback_reappear_source/.chezmoidata" "$fallback_reappear_state"
+cp "$repository/home/.chezmoidata/restic.toml" \
+  "$fallback_reappear_source/.chezmoidata/restic.toml"
+if run_onboarding "$fallback_reappear_source" "$fallback_reappear_state" \
+  "$temporary/onboarding-fallback-reappear.out" \
+  FAKE_MV_NO_EXCHANGE=true FAKE_FALLBACK_SOURCE_REAPPEAR=true; then
+  printf 'fallback source reappearance was overwritten\n' >&2
+  exit 1
+fi
+grep -Fxq '# fallback source reappeared' \
+  "$fallback_reappear_source/.chezmoidata/restic.toml"
+fallback_displaced=$(find "$fallback_reappear_source/.chezmoidata" \
+  -name '.restic.toml.displaced.*' -print -quit)
+grep -Fq '[restic.defaults]' "$fallback_displaced"
+if grep -Fq '[restic.hosts."new-host"]' "$fallback_displaced"; then
+  printf 'fallback displaced recovery file contains the candidate host entry\n' >&2
+  exit 1
+fi
+fallback_reappear_record=$(find \
+  "$fallback_reappear_state/restic-home/add-host-runs" -name '*.failure' -print -quit)
+grep -Fxq 'error_type=source_conflict' "$fallback_reappear_record"
+
+fallback_rollback_source="$temporary/onboarding-fallback-rollback-source"
+fallback_rollback_state="$temporary/onboarding-fallback-rollback-state"
+mkdir -p "$fallback_rollback_source/.chezmoidata" "$fallback_rollback_state"
+cp "$repository/home/.chezmoidata/restic.toml" \
+  "$fallback_rollback_source/.chezmoidata/restic.toml"
+if run_onboarding "$fallback_rollback_source" "$fallback_rollback_state" \
+  "$temporary/onboarding-fallback-rollback.out" \
+  FAKE_MV_NO_EXCHANGE=true FAKE_RENDER_FAIL=true \
+  FAKE_FALLBACK_ROLLBACK_CONFLICT=true; then
+  printf 'fallback source rollback overwrote a concurrent update\n' >&2
+  exit 1
+fi
+grep -Fxq '# fallback rollback conflict' \
+  "$fallback_rollback_source/.chezmoidata/restic.toml"
+fallback_rollback_record=$(find \
+  "$fallback_rollback_state/restic-home/add-host-runs" -name '*.failure' -print -quit)
+grep -Fxq 'error_type=source_conflict' "$fallback_rollback_record"
 
 rm -f "$timer_marker"
 : >"$onboarding_log"

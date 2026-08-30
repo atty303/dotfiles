@@ -219,9 +219,43 @@ add_host_restore_exchanged_source() {
   return 1
 }
 
+add_host_restore_replaced_source() {
+  local source_file=$1 displaced_file=$2 prepared_file=$3 error_type=$4 message=$5
+  local source_dir rollback_file
+  source_dir=$(dirname -- "$source_file")
+  rollback_file=$(mktemp "$source_dir/.restic.toml.rollback.XXXXXX")
+  add_host_temp_files+=("$rollback_file")
+  rm -f -- "$rollback_file"
+  if ! mv -- "$source_file" "$rollback_file"; then
+    add_host_preserve_temp_file "$displaced_file"
+    add_host_fail source_recovery_required \
+      "restic.toml could not be inspected for rollback; original content was preserved at $displaced_file"
+    return 1
+  fi
+  if ! cmp -s -- "$prepared_file" "$rollback_file"; then
+    if ln -- "$rollback_file" "$source_file"; then
+      rm -f -- "$rollback_file"
+    else
+      add_host_preserve_temp_file "$rollback_file"
+    fi
+    add_host_fail source_conflict \
+      'restic.toml changed before rollback; the concurrent content was retained'
+    return 1
+  fi
+  if ! ln -- "$displaced_file" "$source_file"; then
+    add_host_preserve_temp_file "$displaced_file"
+    add_host_fail source_recovery_required \
+      "restic.toml could not be restored without overwriting a concurrent update; original content was preserved at $displaced_file"
+    return 1
+  fi
+  rm -f -- "$rollback_file" "$displaced_file"
+  add_host_fail "$error_type" "$message"
+  return 1
+}
+
 add_host_append_source() {
   local source_file=$1 backup_calendar=$2 maintenance_calendar=$3 check_calendar=$4
-  local source_dir original candidate prepared rendered_enabled
+  local source_dir original candidate prepared displaced rendered_enabled exchange_supported=false
   source_dir=$(dirname -- "$source_file")
   exec 9<"$source_dir"
   flock -n 9 ||
@@ -239,18 +273,51 @@ add_host_append_source() {
     add_host_fail source_conflict 'restic.toml changed while restic-home add-host was running'
   chmod --reference="$source_file" "$candidate"
   cp -p -- "$candidate" "$prepared"
-  mv --exchange --no-copy -- "$candidate" "$source_file" ||
-    add_host_fail source_update_failed 'restic.toml does not support atomic candidate exchange'
-  if ! cmp -s -- "$original" "$candidate"; then
-    add_host_restore_exchanged_source "$source_file" "$candidate" "$prepared" \
-      source_conflict 'restic.toml changed while restic-home add-host was running'
-    return 1
+  if mv --help 2>/dev/null | grep -q -- '--exchange'; then
+    exchange_supported=true
+    mv --exchange --no-copy -- "$candidate" "$source_file" ||
+      add_host_fail source_update_failed 'restic.toml does not support atomic candidate exchange'
+    if ! cmp -s -- "$original" "$candidate"; then
+      add_host_restore_exchanged_source "$source_file" "$candidate" "$prepared" \
+        source_conflict 'restic.toml changed while restic-home add-host was running'
+      return 1
+    fi
+  else
+    displaced=$(mktemp "$source_dir/.restic.toml.displaced.XXXXXX")
+    add_host_temp_files+=("$displaced")
+    rm -f -- "$displaced"
+    mv -- "$source_file" "$displaced" ||
+      add_host_fail source_update_failed 'restic.toml could not be displaced for atomic publication'
+    if ! cmp -s -- "$original" "$displaced"; then
+      if ln -- "$displaced" "$source_file"; then
+        rm -f -- "$displaced"
+      else
+        add_host_preserve_temp_file "$displaced"
+      fi
+      add_host_fail source_conflict 'restic.toml changed while restic-home add-host was running'
+      return 1
+    fi
+    if ! ln -- "$candidate" "$source_file"; then
+      add_host_preserve_temp_file "$displaced"
+      add_host_fail source_conflict \
+        "restic.toml reappeared during candidate publication; concurrent content was retained and original content was preserved at $displaced"
+      return 1
+    fi
+    rm -f -- "$candidate"
   fi
   if ! rendered_enabled=$(add_host_template_value '[[ if and (hasKey .restic.hosts .chezmoi.hostname) (index .restic.hosts .chezmoi.hostname).enabled ]]true[[ else ]]false[[ end ]]') ||
     [[ $rendered_enabled != true ]]; then
-    add_host_restore_exchanged_source "$source_file" "$candidate" "$prepared" \
-      source_update_failed 'new restic host entry could not be rendered; restored restic.toml'
+    if [[ $exchange_supported == true ]]; then
+      add_host_restore_exchanged_source "$source_file" "$candidate" "$prepared" \
+        source_update_failed 'new restic host entry could not be rendered; restored restic.toml'
+    else
+      add_host_restore_replaced_source "$source_file" "$displaced" "$prepared" \
+        source_update_failed 'new restic host entry could not be rendered; restored restic.toml'
+    fi
     return 1
+  fi
+  if [[ -n ${displaced:-} ]]; then
+    rm -f -- "$displaced"
   fi
   rm -f -- "$original" "$candidate" "$prepared"
   flock -u 9
@@ -398,7 +465,7 @@ restic_home_add_host() {
 
   [[ $(uname -s) == Linux ]] || add_host_fail unsupported_platform 'restic-home add-host is supported only on Linux'
   [[ -t 0 && -t 1 ]] || add_host_fail tty_required 'restic-home add-host requires an interactive terminal'
-  for command_name in chezmoi gum taplo systemd-analyze systemctl cmp flock mktemp; do
+  for command_name in chezmoi gum taplo systemd-analyze systemctl cmp flock ln mktemp; do
     add_host_require_command "$command_name"
   done
 
