@@ -1,0 +1,31 @@
+{
+  "env": {
+    "WINEPREFIX": "/home/atty/Games/konamate/sdvx",
+    "GAMEID": "umu-sdvx",
+    "PROTONPATH": "GE-Proton11-6-konaste",
+    "OBS_VKCAPTURE": "1",
+    "PIPEASIO_NUMBER_INPUTS": "0",
+    "PIPEASIO_NUMBER_OUTPUTS": "2",
+    "PIPEASIO_CONNECT_TO_HARDWARE": "on",
+    "PIPEASIO_FIXED_BUFFERSIZE": "on",
+    "PIPEASIO_PREFERRED_BUFFERSIZE": "64",
+    "PIPEASIO_FOLLOW_DEVICE_CLOCK": "off",
+    "PIPEASIO_SAMPLE_RATE": "44100",
+    "PIPEASIO_RT_PRIORITY": "off",
+    "PIPEASIO_CLIENT_NAME": "SDVX-PipeASIO",
+    "DXVK_CONFIG": "d3d9.presentInterval=1"
+  },
+  "profiles": {
+    "launcher": {
+      "command": "umu-run %r\\launcher\\modules\\launcher.exe %u"
+    },
+    "game": {
+      "command": "mangohud umu-run %r\\game\\modules\\sv6c.exe -t %t"
+    },
+    "gamescope": {
+      "command": "gamescope --backend wayland -W 2160 -H 3840 -w 1080 -h 1920 -r 120 -S auto --rt -f --mangoapp -- umu-run %r\\game\\modules\\sv6c.exe -t %t"
+    }
+  },
+  "registry": [],
+  "runProfile": "launcher"
+}

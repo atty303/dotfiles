@@ -1,21 +1,22 @@
 # Output roles
-set $out_game HDMI-A-2
-set $out_dashboard DP-3
+set $out_game HDMI-A-1
+set $out_dashboard DP-1
 
 output $out_game {
     resolution 3840x2160@120Hz
     position 0,0
+    transform 90
     scale 1.5
     subpixel rgb
     allow_tearing yes
-    layout_type horizontal
+    layout_type vertical
     layout_default_width 1
     layout_default_height 1
 }
 
 output $out_dashboard {
     resolution 1920x1080@60Hz
-    position 320,1440
+    position 0,2560
     scale 1
     subpixel rgb
     layout_type horizontal
@@ -26,13 +27,13 @@ output $out_dashboard {
 workspace game output $out_game
 workspace dashboard output $out_dashboard
 
-workspace --no-auto-back-and-forth game
+#workspace --no-auto-back-and-forth game
 
-for_window [class="^steam_app_infinitas$"] {
+for_window [class="^steam_app_sdvx$"] {
     border none
     move container to workspace game
 }
-for_window [shell="^xdg_shell$" title="^beatmania IIDX INFINITAS$"] {
+for_window [shell="^xdg_shell$" title="^SOUND VOLTEX EXCEED GEAR$"] {
     border none
     move container to workspace game
     fullscreen enable

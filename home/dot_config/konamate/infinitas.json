@@ -1,0 +1,47 @@
+{
+  "env": {
+    "WINEPREFIX": "/home/atty/Games/konamate/infinitas",
+    "GAMEID": "umu-infinitas",
+    "PROTONPATH": "GE-Proton11-6-konaste",
+    "OBS_VKCAPTURE": "1",
+    "PIPEASIO_NUMBER_INPUTS": "2",
+    "PIPEASIO_NUMBER_OUTPUTS": "2",
+    "PIPEASIO_CONNECT_TO_HARDWARE": "on",
+    "PIPEASIO_FIXED_BUFFERSIZE": "on",
+    "PIPEASIO_PREFERRED_BUFFERSIZE": "64",
+    "PIPEASIO_FOLLOW_DEVICE_CLOCK": "off",
+    "PIPEASIO_SAMPLE_RATE": "44100",
+    "PIPEASIO_RT_PRIORITY": "off",
+    "PIPEASIO_CLIENT_NAME": "INFINITAS-PipeASIO",
+    "DXVK_CONFIG": "d3d9.presentInterval=1",
+    "RADV_DEBUG": "nodcc"
+  },
+  "profiles": {
+    "launcher": {
+      "command": "umu-run %r\\launcher\\modules\\bm2dx_launcher.exe %u"
+    },
+    "game": {
+      "command": "umu-run %r\\game\\app\\bm2dx.exe -t %t"
+    },
+    "gamescope": {
+      "command": "gamescope --backend wayland -W 3840 -H 2160 -w 1920 -h 1080 -r 120 -S auto --rt -f -- env -u RADV_DEBUG umu-run %r\\game\\app\\bm2dx.exe --asio -t %t"
+    }
+  },
+  "registry": [
+    {
+      "action": "set",
+      "key": "HKLM\\Software\\ASIO\\XONAR SOUND CARD(64)",
+      "name": "CLSID",
+      "type": "string",
+      "value": "{2D3CA9E2-1193-4C5D-B5FD-38798F3DC074}"
+    },
+    {
+      "action": "set",
+      "key": "HKLM\\Software\\ASIO\\XONAR SOUND CARD(64)",
+      "name": "Description",
+      "type": "string",
+      "value": "XONAR SOUND CARD(64)"
+    }
+  ],
+  "runProfile": "launcher"
+}
