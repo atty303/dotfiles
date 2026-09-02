@@ -1,0 +1,4 @@
+interface:
+  display_name: "設計を徹底的に深掘り"
+  short_description: "一問ずつ掘り下げて設計判断をストレステストする"
+  default_prompt: "$dig を使って、このプランを共通理解に達するまで徹底的に深掘りしてください。"
