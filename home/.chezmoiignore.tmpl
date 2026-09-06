@@ -15,6 +15,10 @@ Library/
 AppData/
 {{ end }}
 
+{{ if ne .chezmoi.hostname "gitadora" }}
+.config/wireplumber/wireplumber.conf.d/51-um790pro-audio.conf
+{{ end }}
+
 # ignored target
 .ssh/SSH_AUTH_SOCK
 .ssh/agent-local
