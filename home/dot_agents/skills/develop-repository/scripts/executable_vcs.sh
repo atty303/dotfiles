@@ -5,10 +5,18 @@ coauthor='Co-authored-by: Codex <codex@openai.com>'
 fetch_status=not_requested
 fetch_result=0
 status_file=
+staged_paths_file=
+selected_staged_paths_file=
 
 cleanup() {
     if [ -n "$status_file" ]; then
         rm -f -- "$status_file"
+    fi
+    if [ -n "$staged_paths_file" ]; then
+        rm -f -- "$staged_paths_file"
+    fi
+    if [ -n "$selected_staged_paths_file" ]; then
+        rm -f -- "$selected_staged_paths_file"
     fi
 }
 
@@ -179,6 +187,26 @@ snapshot() {
     esac
 }
 
+reject_unselected_staged_paths() {
+    staged_paths_file=$(mktemp "${TMPDIR:-/tmp}/vcs-staged.XXXXXX")
+    selected_staged_paths_file=$(mktemp "${TMPDIR:-/tmp}/vcs-selected-staged.XXXXXX")
+    git diff --cached --no-renames --name-only -z >"$staged_paths_file"
+    git diff --cached --no-renames --name-only -z -- "$@" >"$selected_staged_paths_file"
+
+    if cmp -s "$staged_paths_file" "$selected_staged_paths_file"; then
+        rm -f -- "$staged_paths_file" "$selected_staged_paths_file"
+        staged_paths_file=
+        selected_staged_paths_file=
+        return
+    fi
+
+    echo 'refusing path-limited commit: index contains staged changes outside the requested paths' >&2
+    printf 'requested path: %s\n' "$@" >&2
+    echo 'staged changes:' >&2
+    git diff --cached --name-status >&2
+    return 1
+}
+
 commit_change() {
     message=$1
     selection=$2
@@ -197,6 +225,7 @@ commit_change() {
             git commit -m "$full_message"
             ;;
         git:paths)
+            reject_unselected_staged_paths "$@"
             git add -- "$@"
             git commit --only -m "$full_message" -- "$@"
             ;;

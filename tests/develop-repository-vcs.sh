@@ -61,6 +61,7 @@ init_git_repo() {
     git init -q "$path"
     git -C "$path" config user.name Test
     git -C "$path" config user.email test@example.com
+    git -C "$path" config commit.gpgsign false
     printf 'base\n' >"$path/tracked.txt"
     git -C "$path" add tracked.txt
     git -C "$path" commit -qm base
@@ -106,13 +107,46 @@ assert_contains "$git_no_staged_snapshot" 'untracked.txt'
 git -C "$git_repo" add staged.txt
 
 printf 'selected\n' >"$git_repo/selected.txt"
+guard_head_before=$(git -C "$git_repo" rev-parse HEAD)
+guard_index_before=$(git -C "$git_repo" write-tree)
+set +e
+(cd "$git_repo" && sh "$vcs_script" commit -m 'test: reject unrelated staged path' -- selected.txt) >"$test_root/git-path-rejection.txt" 2>&1
+guard_status=$?
+set -e
+[ "$guard_status" -ne 0 ] || fail 'Git path commit accepted an unrelated staged path'
+[ "$guard_head_before" = "$(git -C "$git_repo" rev-parse HEAD)" ] || fail 'rejected Git path commit changed HEAD'
+[ "$guard_index_before" = "$(git -C "$git_repo" write-tree)" ] || fail 'rejected Git path commit changed the index'
+assert_contains "$test_root/git-path-rejection.txt" 'index contains staged changes outside the requested paths'
+assert_contains "$test_root/git-path-rejection.txt" 'staged.txt'
+
+git -C "$git_repo" reset -q HEAD -- staged.txt
 (cd "$git_repo" && sh "$vcs_script" commit -m 'test: selected git path' -- selected.txt)
 git -C "$git_repo" diff-tree --no-commit-id --name-only -r HEAD >"$test_root/git-commit-paths.txt"
 [ "$(cat "$test_root/git-commit-paths.txt")" = 'selected.txt' ] || fail 'Git path commit included unrelated files'
 git -C "$git_repo" diff --cached --name-only >"$test_root/git-staged.txt"
-assert_contains "$test_root/git-staged.txt" 'staged.txt'
+[ ! -s "$test_root/git-staged.txt" ] || fail 'Git path commit left unexpected staged changes'
 git -C "$git_repo" log -1 --format=%B >"$test_root/git-message.txt"
 assert_contains "$test_root/git-message.txt" 'Co-authored-by: Codex <codex@openai.com>'
+
+mkdir -p "$git_repo/old"
+printf 'rename\n' >"$git_repo/old/name.txt"
+git -C "$git_repo" add old/name.txt
+git -C "$git_repo" commit -qm 'test: add rename source'
+mkdir -p "$git_repo/new"
+git -C "$git_repo" mv old/name.txt new/name.txt
+rename_head_before=$(git -C "$git_repo" rev-parse HEAD)
+rename_index_before=$(git -C "$git_repo" write-tree)
+set +e
+(cd "$git_repo" && sh "$vcs_script" commit -m 'test: reject partial rename selection' -- new) >"$test_root/git-rename-rejection.txt" 2>&1
+rename_status=$?
+set -e
+[ "$rename_status" -ne 0 ] || fail 'Git path commit accepted only the destination of a staged rename'
+[ "$rename_head_before" = "$(git -C "$git_repo" rev-parse HEAD)" ] || fail 'rejected partial rename commit changed HEAD'
+[ "$rename_index_before" = "$(git -C "$git_repo" write-tree)" ] || fail 'rejected partial rename commit changed the index'
+assert_contains "$test_root/git-rename-rejection.txt" 'old/name.txt'
+assert_contains "$test_root/git-rename-rejection.txt" 'new/name.txt'
+(cd "$git_repo" && sh "$vcs_script" commit -m 'test: accept complete rename selection' -- old new)
+git -C "$git_repo" diff --cached --quiet || fail 'complete rename commit left staged changes'
 
 git -C "$git_repo" branch private
 (cd "$git_repo" && sh "$push_script" origin main)
