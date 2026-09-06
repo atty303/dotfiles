@@ -1,0 +1,27 @@
+# Output roles
+set $out_game HDMI-A-1
+
+output $out_game {
+    resolution 2560x1440@59.951Hz
+    position 0,0
+    scale 1
+    subpixel rgb
+    allow_tearing yes
+    layout_type horizontal
+    layout_default_width 1
+    layout_default_height 1
+}
+
+workspace game output $out_game
+
+workspace --no-auto-back-and-forth game
+
+for_window [class="^steam_app_gitadora$"] {
+    border none
+    move container to workspace game
+}
+for_window [shell="^xdg_shell$" title="^GITADORA$"] {
+    border none
+    move container to workspace game
+    fullscreen enable
+}
