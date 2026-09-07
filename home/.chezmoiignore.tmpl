@@ -23,6 +23,7 @@ AppData/
 # Optional encrypted bootstrap artifacts.
 .wakatime.cfg
 .local/share/atuin/key
+.var/app/com.obsproject.Studio/config/obs-studio/basic/profiles/Twitch_1920x1080_6Mbps_VAAPI/service.json
 {{ end }}
 
 {{- $resticCliEnabled := and (eq .chezmoi.os "linux") (has "secrets" .roles) }}
@@ -123,6 +124,7 @@ src/
 .local/share/fonts/
 {{ if or (ne .chezmoi.os "linux") (not (has "desktop" .roles)) }}
 .var/app/io.mpv.Mpv/
+.var/app/com.obsproject.Studio/
 {{ end }}
 {{ if not (has "desktop" .roles) }}
 .config/chrome-web-apps/
