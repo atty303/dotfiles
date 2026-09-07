@@ -68,6 +68,7 @@ command = "gamescope --backend wayland -W 3840 -H 2160 -w 1920 -h 1080 -r 120 -S
 [[profiles.infinitas.entries.gamescope.registry]]
 action = "delete"
 key = 'HKCU\Software\Wine\Explorer\Desktops'
+name = "Default"
 
 [[profiles.infinitas.entries.gamescope.registry]]
 action = "delete"
