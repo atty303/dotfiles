@@ -4,6 +4,9 @@ set -eu
 coauthor='Co-authored-by: Codex <codex@openai.com>'
 fetch_status=not_requested
 fetch_result=0
+notes_fetch_status=not_requested
+notes_fetch_result=0
+notes_error=
 status_file=
 staged_paths_file=
 selected_staged_paths_file=
@@ -18,6 +21,9 @@ cleanup() {
     if [ -n "$selected_staged_paths_file" ]; then
         rm -f -- "$selected_staged_paths_file"
     fi
+    if [ -n "$notes_error" ]; then
+        rm -f -- "$notes_error"
+    fi
 }
 
 trap cleanup EXIT HUP INT TERM
@@ -27,6 +33,8 @@ usage() {
 usage:
   vcs.sh snapshot [--fetch [REMOTE]]
   vcs.sh commit -m MESSAGE (--all | -- PATH...)
+  vcs.sh notes show [REVISION]
+  vcs.sh notes add -m MESSAGE [REVISION]
 EOF
     exit 64
 }
@@ -44,6 +52,108 @@ detect_vcs() {
 
 jj_snapshot() {
     jj --config snapshot.auto-update-stale=false "$@"
+}
+
+notes_git() {
+    if ! command -v git >/dev/null 2>&1; then
+        echo 'Git notes operations require the system git executable' >&2
+        return 127
+    fi
+    case $vcs in
+        jj)
+            git --git-dir="$(jj_snapshot git root)" "$@"
+            ;;
+        git)
+            git "$@"
+            ;;
+    esac
+}
+
+resolve_notes_revision() {
+    requested_revision=${1-}
+    case $vcs in
+        jj)
+            if [ -z "$requested_revision" ]; then
+                requested_revision=@
+            fi
+            resolved_revision=$(jj_snapshot log --no-graph -r "$requested_revision" -T 'commit_id ++ "\n"')
+            [ "$(printf '%s\n' "$resolved_revision" | sed '/^$/d' | wc -l)" -eq 1 ] || {
+                echo "Git note target must resolve to exactly one commit: $requested_revision" >&2
+                return 1
+            }
+            printf '%s\n' "$resolved_revision"
+            ;;
+        git)
+            if [ -z "$requested_revision" ]; then
+                requested_revision=HEAD
+            fi
+            git rev-parse --verify "$requested_revision^{commit}"
+            ;;
+    esac
+}
+
+resolve_notes_remote() {
+    requested_remote=$1
+    if [ -n "$requested_remote" ]; then
+        printf '%s\n' "$requested_remote"
+        return
+    fi
+
+    case $vcs in
+        jj)
+            notes_git remote | awk 'NR == 1 { name = $0 } END { if (NR == 1) print name }'
+            ;;
+        git)
+            if current_branch=$(git symbolic-ref --quiet --short HEAD 2>/dev/null) \
+                && configured_remote=$(git config --get "branch.$current_branch.remote" 2>/dev/null) \
+                && [ "$configured_remote" != . ]; then
+                printf '%s\n' "$configured_remote"
+            else
+                git remote | awk 'NR == 1 { name = $0 } END { if (NR == 1) print name }'
+            fi
+            ;;
+    esac
+}
+
+fetch_notes() {
+    requested_remote=$1
+    if ! command -v git >/dev/null 2>&1; then
+        notes_fetch_status=unavailable
+        notes_fetch_result=2
+        return
+    fi
+    notes_remote=$(resolve_notes_remote "$requested_remote")
+    if [ -z "$notes_remote" ]; then
+        notes_fetch_status=unresolved
+        return
+    fi
+
+    notes_tracking_ref="refs/notes/remotes/$notes_remote/commits"
+    notes_error=$(mktemp "${TMPDIR:-/tmp}/vcs-notes-fetch.XXXXXX")
+    if notes_git fetch "$notes_remote" "+refs/notes/commits:$notes_tracking_ref" 2>"$notes_error"; then
+        if notes_git show-ref --verify --quiet refs/notes/commits; then
+            if notes_git notes --ref=commits merge "$notes_tracking_ref" >>"$notes_error" 2>&1; then
+                notes_fetch_status=succeeded
+            else
+                notes_git notes --ref=commits merge --abort >/dev/null 2>&1 || :
+                notes_fetch_status=conflict
+                notes_fetch_result=2
+                cat "$notes_error" >&2
+            fi
+        else
+            notes_git update-ref refs/notes/commits "$(notes_git rev-parse "$notes_tracking_ref")"
+            notes_fetch_status=succeeded
+        fi
+    elif grep -Fq "couldn't find remote ref refs/notes/commits" "$notes_error"; then
+        notes_git update-ref -d "$notes_tracking_ref" >/dev/null 2>&1 || :
+        notes_fetch_status=absent
+    else
+        notes_fetch_status=failed
+        notes_fetch_result=2
+        cat "$notes_error" >&2
+    fi
+    rm -f -- "$notes_error"
+    notes_error=
 }
 
 fetch_remote() {
@@ -69,6 +179,15 @@ fetch_remote() {
 snapshot() {
     requested_remote=${1-}
     echo "vcs=$vcs"
+    echo "notes_fetch_status=$notes_fetch_status"
+    case $notes_fetch_status in
+        conflict)
+            echo 'notes_next_action=resolve the conflicting note for the same commit without replacing either side implicitly'
+            ;;
+        unavailable)
+            echo 'notes_next_action=install or expose the system git executable required by the Git notes workflow'
+            ;;
+    esac
     case $vcs in
         jj)
             echo "root=$(jj root)"
@@ -187,6 +306,27 @@ snapshot() {
     esac
 }
 
+notes_command() {
+    action=$1
+    shift
+    case $action in
+        show)
+            [ "$#" -le 1 ] || usage
+            revision=$(resolve_notes_revision "${1-}")
+            notes_git notes --ref=commits show "$revision"
+            ;;
+        add)
+            [ "${1-}" = -m ] || usage
+            [ "$#" -ge 2 ] && [ "$#" -le 3 ] || usage
+            message=$2
+            [ -n "$message" ] || usage
+            revision=$(resolve_notes_revision "${3-}")
+            notes_git notes --ref=commits add -m "$message" "$revision"
+            ;;
+        *) usage ;;
+    esac
+}
+
 reject_unselected_staged_paths() {
     staged_paths_file=$(mktemp "${TMPDIR:-/tmp}/vcs-staged.XXXXXX")
     selected_staged_paths_file=$(mktemp "${TMPDIR:-/tmp}/vcs-selected-staged.XXXXXX")
@@ -242,8 +382,13 @@ case ${1-} in
             --fetch)
                 shift
                 [ "$#" -le 1 ] || usage
+                if [ "$vcs" = jj ] && ! command -v git >/dev/null 2>&1; then
+                    notes_fetch_status=unavailable
+                    notes_fetch_result=2
+                fi
                 if fetch_remote "${1-}"; then
                     fetch_status=succeeded
+                    fetch_notes "${1-}"
                 else
                     fetch_status=failed
                     fetch_result=2
@@ -256,7 +401,10 @@ case ${1-} in
         if [ "$snapshot_result" -ne 0 ]; then
             exit "$snapshot_result"
         fi
-        exit "$fetch_result"
+        if [ "$fetch_result" -ne 0 ]; then
+            exit "$fetch_result"
+        fi
+        exit "$notes_fetch_result"
         ;;
     commit)
         shift
@@ -277,6 +425,11 @@ case ${1-} in
                 ;;
             *) usage ;;
         esac
+        ;;
+    notes)
+        shift
+        [ "$#" -ge 1 ] || usage
+        notes_command "$@"
         ;;
     *) usage ;;
 esac

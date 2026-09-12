@@ -16,6 +16,12 @@ description: 現在タスクまたは複数sessionとmemoryからcandidate learn
 - 失敗履歴や一時的な環境情報をそのまま残さず、適用条件、正しい手順および禁止事項へ一般化する。
 - 候補を提示する前に振り返り手順自体への訂正も一度だけ同じ基準で評価し、再帰的な振り返りは行わない。
 
+### Historical Evidence
+
+- Git repositoryのcurrent treeへ、過去の判断、調査、比較、棄却案またはpoint-in-timeの検証結果を履歴保存だけの目的で追加しない。現在も有効な契約、制約、不変条件および再現手順は最も近いsource、test、task、referenceまたは未完了planへ統合する。
+- 作業完了時に、詳細な調査証拠、検証環境または棄却案を将来の再調査防止のためGit noteへ残す価値があるか自律的に評価する。候補があれば、対象commit、目的、内容のoutline、適用範囲および無効化条件を提示し、ユーザーが承認した後だけ標準`refs/notes/commits`へ追加する。候補がなければnoteを提案しない。
+- Commit messageには変更目的、主要な判断理由およびuser-visibleな影響を自足的に残す。Git noteはcommit messageの代替、secretやconfidential contentの保存先、またはrepository inclusion boundaryの迂回路にしない。
+
 ### Validation
 
 candidate learningは次の順序で評価する。

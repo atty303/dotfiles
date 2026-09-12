@@ -30,13 +30,15 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 ### Repository State
 
 - 開発タスクの開始時は、変更前に `<develop-repository-dir>/scripts/vcs.sh snapshot --fetch [REMOTE]` を実行する。リポジトリを変更しない調査、説明および外部serviceの参照だけなら実行しない。
-- VCS判定、fetch、working state、current commitと親、作業線、追跡先、default lineおよびdiff範囲はsnapshot出力をSSOTとし、個別の`git`または`jj` commandで同じ状態を再構成しない。`jj` repoではworking-copy commit、bookmarkおよびtracked remote bookmarkを判断根拠とし、colocated Gitのbranchやdetached HEADを使用しない。
+- VCS判定、fetch、Git notes fetch、working state、current commitと親、作業線、追跡先、default lineおよびdiff範囲はsnapshot出力をSSOTとし、個別の`git`または`jj` commandで同じ状態を再構成しない。`jj` repoではworking-copy commit、bookmarkおよびtracked remote bookmarkを判断根拠とし、colocated Gitのbranchやdetached HEADを使用しない。
 - `fetch_status=failed`ならローカルsnapshotは利用できるが参照情報が古い可能性を明示して作業可否を判断する。`workspace_status=stale`なら自動修復せず、影響を確認してから`jj workspace update-stale`の実行可否を決める。
+- `notes_fetch_status=failed`ならcodeのremote参照とは別に`refs/notes/commits`が古い可能性を明示する。`absent`はremoteに標準notes refがまだない状態であり失敗とみなさない。別commitへ追加されたlocalとremoteのnoteはfetch時にmergeし、同じcommitのnoteが競合した場合は`conflict`としてどちらも暗黙に置換しない。`jj` Git backendを含むnotes操作にはsystem `git`を必要とし、不在時は`unavailable`として停止する。Git notesは履歴の補足面であり、secret、confidential contentまたはrepositoryへ含められないprivacy-sensitive dataを置くprivate sinkとして扱わない。
 - ユーザーが指定した作業線、依頼に対応する既存branch、bookmarkまたは未完了changeがある場合は、その継続を優先する。新しい独立した変更では、repoの運用規約、未統合変更、依頼との関連性およびPR作成要否から、default branch上で直接作業するか、最新のremote default branchを起点にbranch、bookmarkまたはchangeを作るかを判断する。現在の作業線に無関係な変更がある場合は、そこから新しい変更を派生させない。
 - 意図しない作業開始点、古いdefault branch、依頼と無関係なbranchまたはbookmarkなどを検出した場合は、ユーザー変更と公開済み履歴を保持したまま作業開始点を適正化する。scriptはbranch作成、rebase、workspace更新またはbookmark移動を行わない。履歴のrewrite、既存branchまたはbookmarkの移動、未確定変更を伴う切替が必要なら、影響を示して事前確認を求める。
 - commitまたはchangeの確定前に同scriptの `snapshot` を再実行し、working copyまたはcurrent changeの親、branchまたはbookmarkの位置、diffの範囲および既存のユーザー変更との分離が、開始時に選択した作業線と一致することを確認する。長時間の作業やremote default lineの更新が統合判断に影響する場合は `snapshot --fetch [REMOTE]` を使う。default lineが進んだことだけを理由に自動でmerge、rebase、rewriteまたはbookmark移動を行わない。
 - 確定対象を確認後、同scriptの `commit -m MESSAGE -- PATH...` で自分の変更だけを確定する。current change全体が対象であると確認済みの場合だけ `--all` を使う。scriptがGitのstageとcommitまたは`jj commit`を選択し、Codexのco-author trailerを付ける。
-- 明示的にpushを依頼された場合だけ、通常権限で `vcs.sh snapshot --fetch REMOTE` を実行して結果を確認した後、`<develop-repository-dir>/scripts/vcs-push.sh REMOTE BRANCH_OR_BOOKMARK` をsandbox外で実行し、その実行ごとに承認を求める。push scriptの再利用可能な承認prefixは要求しない。`jj`でchange bookmarkを生成する場合は第2引数以降を `--change REVISION` とする。
+- 詳細な調査証拠、検証環境または棄却案を履歴へ残す価値がある場合は、対象commit、目的、内容のoutline、適用範囲および無効化条件を提示し、ユーザーが承認した後だけ `vcs.sh notes add -m MESSAGE [REVISION]` で標準`refs/notes/commits`へ一つのnoteを追加する。`REVISION`はGit revisionまたはexactly one commitへ解決される`jj` revset、bookmarkもしくはchange IDとし、省略時は現在commitを使う。主要な変更理由とuser-visibleな影響はnoteだけに置かずcommit messageを自足させる。既存noteの置換や追記は自動で行わない。
+- 明示的にpushを依頼された場合だけ、通常権限で `vcs.sh snapshot --fetch REMOTE` を実行して結果を確認した後、`<develop-repository-dir>/scripts/vcs-push.sh REMOTE BRANCH_OR_BOOKMARK` をsandbox外で実行し、その実行ごとに承認を求める。承認済みnoteもremoteへ反映する場合はbranch/bookmarkとは別に`vcs-push.sh REMOTE --notes`を実行し、両方を別々に確認する。push scriptの再利用可能な承認prefixは要求しない。`jj`でchange bookmarkを生成する場合は第2引数以降を `--change REVISION` とする。
 
 ### Change Cost
 

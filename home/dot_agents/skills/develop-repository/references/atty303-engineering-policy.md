@@ -16,11 +16,11 @@
 ### Documentation
 
 - READMEは概要、導入および主要操作を中心とし、詳細なreferenceは必要な機能だけ用意する。
-- 内部設計は、コードから分からない判断理由、代替案、制約および不変条件だけを記録する。
-- 設計情報は自然なら関連ソースの近くに置き、複数箇所へ影響する長期的な判断はADRとして独立させる。
-- 採用済みのADRは書き換えず、方針変更時は新しいADRから置き換え関係を示す。
+- Git repositoryのcurrent treeには、その時点で有効なcode、test、設定、契約、制約、実行手順および未完了planだけを置く。過去の実装、判断、比較、棄却案およびpoint-in-timeの検証結果はGit historyに置き、履歴保存だけを目的とする文書、互換処理、codeまたはtestを残さない。
+- 内部設計は、現在も成立し、codeまたはtestから分からない判断理由、外部制約および不変条件だけを記録する。過去の代替案や変更前の構造はcommit messageまたは承認済みGit noteへ置く。
+- 設計情報は最も近いsourceまたは領域別referenceへ置く。現在の設計文書を方針変更時に直接更新または削除し、旧版と置換関係をcurrent tree内へ残さない。
 - ドキュメントの言語は既存の慣習と想定読者に合わせ、判断できない場合は英語を使う。
-- 既存のCHANGELOGやrelease note運用がある場合だけ更新し、新しい履歴管理を自動では導入しない。
+- CHANGELOG、release noteおよびmigration guideは、現在の利用者がupgrade、migrationまたは互換性判断に必要とする明示的なrelease contractがある期間だけcurrent treeへ置き、その責任が終われば削除する。通常の変更履歴はcommit message、Git noteまたは外部release noteが所有する。
 - 実装変更で古くなるドキュメントは、同じ論理変更内で更新または削除し、既知の不整合を残さない。
 
 ### Single Source of Truth
