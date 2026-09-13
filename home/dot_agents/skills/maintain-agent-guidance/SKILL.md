@@ -11,7 +11,7 @@ description: 現在タスクまたは複数sessionとmemoryからcandidate learn
 - current-task auditまたはcross-session auditでcontradictedまたは陳腐化したmemoryを検出しても、生成されたmemory fileを直接編集しない。読み取り専用の候補として報告し、人間が別途明示した場合だけ利用可能なmemory controlで訂正または忘却する。
 - 検証失敗の原因が確定した時点、論理変更の確定前およびタスク完了時をcheckpointとする。実装結果、失敗した操作、成功した操作、ユーザーによる訂正、不要な往復、手動で促された処理および既存規則が実行されなかった事例を対等なcandidate learningとして監査する。
 - 依頼範囲内で修正できる決定的な欠陥は永続化候補へ延期せず、source、test、task、build processまたは実行環境の最も近い原典で通常の開発workflowとして解消する。
-- 依頼範囲内の原典で通常の開発workflowとして解消する決定的な欠陥を除き、永続化候補は保存先にかかわらず自動反映しない。保存先、根拠、理由および具体的な追加・修正文を提示し、承認後に元の成果物とは別の論理変更として確定する。
+- 依頼範囲内の原典で通常の開発workflowとして解消する決定的な欠陥を除き、永続化候補は保存先にかかわらず自動反映しない。保存先、根拠、理由および具体的な追加・修正文を提示し、承認後に元の成果物とは別の論理変更として確定する。この制限は、`Historical Evidence`に従って開発taskの履歴を保存する標準Git noteには適用しない。
 - 最終報告では、checkpointで解消できなかった横断的または非決定的な候補だけを提示する。
 - 失敗履歴や一時的な環境情報をそのまま残さず、適用条件、正しい手順および禁止事項へ一般化する。
 - 候補を提示する前に振り返り手順自体への訂正も一度だけ同じ基準で評価し、再帰的な振り返りは行わない。
@@ -19,8 +19,9 @@ description: 現在タスクまたは複数sessionとmemoryからcandidate learn
 ### Historical Evidence
 
 - Git repositoryのcurrent treeへ、過去の判断、調査、比較、棄却案またはpoint-in-timeの検証結果を履歴保存だけの目的で追加しない。現在も有効な契約、制約、不変条件および再現手順は最も近いsource、test、task、referenceまたは未完了planへ統合する。
-- 作業完了時に、詳細な調査証拠、検証環境または棄却案を将来の再調査防止のためGit noteへ残す価値があるか自律的に評価する。候補があれば、対象commit、目的、内容のoutline、適用範囲および無効化条件を提示し、ユーザーが承認した後だけ標準`refs/notes/commits`へ追加する。候補がなければnoteを提案しない。
-- Commit messageには変更目的、主要な判断理由およびuser-visibleな影響を自足的に残す。Git noteはcommit messageの代替、secretやconfidential contentの保存先、またはrepository inclusion boundaryの迂回路にしない。
+- Commitを一件以上作成したtaskでは、`develop-repository`に従い、最終commitをanchorとしてtask cycleの全thread noteを完了またはblocked handoff前に自動作成する。事前outlineや個別承認は求めない。既存noteは読んで意味を保持し、重複排除した統合本文へ更新する。意味的衝突は自動解決せず、note保存が解消不能ならtaskを完了扱いにしない。Note作成または更新自体がblockerなら、未保存の理由とanchorを報告してblocked handoffする。
+- Commit messageにはユーザー依頼と合意事項の要約、変更目的、主要な判断理由、変更範囲、user-visibleな影響、migrationおよび主要検証を該当する範囲で自足的に残す。Git noteはその代替、secretやconfidential contentの保存先、またはrepository inclusion boundaryの迂回路にしない。
+- 全thread以外の詳細な調査証拠、検証環境または棄却案は、再取得が高コストまたは不可能で、commitの解釈、運用または再検証に重要な場合だけnoteへ追加する。Commitまたはcurrent treeから復元できる情報は追加しない。
 
 ### Validation
 

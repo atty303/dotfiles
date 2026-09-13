@@ -68,6 +68,14 @@ init_git_repo() {
     git -C "$path" branch -M main
 }
 
+mkdir -p "$test_root/no-vcs-tools"
+set +e
+/usr/bin/env PATH="$test_root/no-vcs-tools" /bin/sh "$vcs_script" snapshot >"$test_root/no-git.txt" 2>&1
+no_git_status=$?
+set -e
+[ "$no_git_status" -ne 0 ] || fail 'snapshot succeeded without a VCS executable'
+assert_contains "$test_root/no-git.txt" 'system git executable is unavailable; Git repository detection and notes workflow cannot continue'
+
 git_repo=$test_root/git
 git_remote=$test_root/git-remote.git
 git init -q --bare "$git_remote"
@@ -82,6 +90,7 @@ git_snapshot=$test_root/git-snapshot.txt
 (cd "$git_repo" && sh "$vcs_script" snapshot --fetch origin) >"$git_snapshot" 2>&1
 assert_contains "$git_snapshot" 'vcs=git'
 assert_contains "$git_snapshot" 'fetch_status=succeeded'
+assert_contains "$git_snapshot" 'local_notes_status=absent'
 assert_contains "$git_snapshot" 'current_line=main'
 assert_contains "$git_snapshot" 'head='
 assert_contains "$git_snapshot" 'parent_commit='
@@ -128,6 +137,32 @@ git -C "$git_repo" diff --cached --name-only >"$test_root/git-staged.txt"
 git -C "$git_repo" log -1 --format=%B >"$test_root/git-message.txt"
 assert_contains "$test_root/git-message.txt" 'Co-authored-by: Codex <codex@openai.com>'
 
+printf '\ninitial task transcript  \n\n' >"$test_root/note-initial.txt"
+(cd "$git_repo" && sh "$vcs_script" notes add -F "$test_root/note-initial.txt" HEAD)
+: >"$test_root/git-note-initial.txt"
+initial_note_object=$(cd "$git_repo" && sh "$vcs_script" notes read -F "$test_root/git-note-initial.txt" HEAD)
+cmp -s "$test_root/note-initial.txt" "$test_root/git-note-initial.txt" || fail 'notes add did not preserve the task transcript byte-for-byte'
+(cd "$git_repo" && sh "$vcs_script" notes update --expect "$initial_note_object" -m 'integrated task transcript' HEAD)
+(cd "$git_repo" && sh "$vcs_script" notes show HEAD) >"$test_root/git-note-updated.txt"
+assert_contains "$test_root/git-note-updated.txt" 'integrated task transcript'
+assert_not_contains "$test_root/git-note-updated.txt" 'initial task transcript'
+present_notes_snapshot=$test_root/git-present-notes-snapshot.txt
+(cd "$git_repo" && sh "$vcs_script" snapshot --fetch origin) >"$present_notes_snapshot" 2>&1
+assert_contains "$present_notes_snapshot" 'notes_fetch_status=absent'
+assert_contains "$present_notes_snapshot" 'local_notes_status=present'
+: >"$test_root/git-note-before-concurrent.txt"
+stale_note_object=$(cd "$git_repo" && sh "$vcs_script" notes read -F "$test_root/git-note-before-concurrent.txt" HEAD)
+git -C "$git_repo" notes --ref=commits add -f -m 'concurrent task transcript' HEAD
+set +e
+(cd "$git_repo" && sh "$vcs_script" notes update --expect "$stale_note_object" -m 'must not overwrite concurrent note' HEAD) >"$test_root/git-note-concurrent-update.txt" 2>&1
+concurrent_note_update_status=$?
+(cd "$git_repo" && sh "$vcs_script" notes update --expect 0000000000000000000000000000000000000000 -m 'must not create a note' HEAD^) >"$test_root/git-note-missing-update.txt" 2>&1
+missing_note_update_status=$?
+set -e
+[ "$concurrent_note_update_status" -eq 2 ] || fail 'notes update did not report a concurrent change'
+[ "$(git -C "$git_repo" notes --ref=commits show HEAD)" = 'concurrent task transcript' ] || fail 'notes update overwrote a concurrent change'
+[ "$missing_note_update_status" -ne 0 ] || fail 'notes update created a missing note'
+
 mkdir -p "$git_repo/old"
 printf 'rename\n' >"$git_repo/old/name.txt"
 git -C "$git_repo" add old/name.txt
@@ -150,8 +185,10 @@ git -C "$git_repo" diff --cached --quiet || fail 'complete rename commit left st
 
 git -C "$git_repo" branch private
 (cd "$git_repo" && sh "$push_script" origin main)
+(cd "$git_repo" && sh "$push_script" origin --notes)
 git --git-dir="$git_remote" show-ref >"$test_root/git-remote-refs.txt"
 assert_contains "$test_root/git-remote-refs.txt" 'refs/heads/main'
+assert_contains "$test_root/git-remote-refs.txt" 'refs/notes/commits'
 assert_not_contains "$test_root/git-remote-refs.txt" 'refs/heads/private'
 [ "$(git --git-dir="$git_remote" rev-parse refs/heads/main)" = "$(git -C "$git_repo" rev-parse main)" ] || fail 'push did not update the requested Git branch'
 

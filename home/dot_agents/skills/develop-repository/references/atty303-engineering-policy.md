@@ -17,7 +17,7 @@
 
 - READMEは概要、導入および主要操作を中心とし、詳細なreferenceは必要な機能だけ用意する。
 - Git repositoryのcurrent treeには、その時点で有効なcode、test、設定、契約、制約、実行手順および未完了planだけを置く。過去の実装、判断、比較、棄却案およびpoint-in-timeの検証結果はGit historyに置き、履歴保存だけを目的とする文書、互換処理、codeまたはtestを残さない。
-- 内部設計は、現在も成立し、codeまたはtestから分からない判断理由、外部制約および不変条件だけを記録する。過去の代替案や変更前の構造はcommit messageまたは承認済みGit noteへ置く。
+- 内部設計は、現在も成立し、codeまたはtestから分からない判断理由、外部制約および不変条件だけを記録する。過去の代替案や変更前の構造はcommit messageまたは標準Git noteへ置く。
 - 設計情報は最も近いsourceまたは領域別referenceへ置く。現在の設計文書を方針変更時に直接更新または削除し、旧版と置換関係をcurrent tree内へ残さない。
 - ドキュメントの言語は既存の慣習と想定読者に合わせ、判断できない場合は英語を使う。
 - CHANGELOG、release noteおよびmigration guideは、現在の利用者がupgrade、migrationまたは互換性判断に必要とする明示的なrelease contractがある期間だけcurrent treeへ置き、その責任が終われば削除する。通常の変更履歴はcommit message、Git noteまたは外部release noteが所有する。

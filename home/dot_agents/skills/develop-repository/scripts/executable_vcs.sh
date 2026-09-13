@@ -7,6 +7,7 @@ fetch_result=0
 notes_fetch_status=not_requested
 notes_fetch_result=0
 notes_error=
+notes_temp_ref=
 status_file=
 staged_paths_file=
 selected_staged_paths_file=
@@ -24,6 +25,9 @@ cleanup() {
     if [ -n "$notes_error" ]; then
         rm -f -- "$notes_error"
     fi
+    if [ -n "$notes_temp_ref" ]; then
+        notes_git update-ref -d "$notes_temp_ref" >/dev/null 2>&1 || :
+    fi
 }
 
 trap cleanup EXIT HUP INT TERM
@@ -34,7 +38,9 @@ usage:
   vcs.sh snapshot [--fetch [REMOTE]]
   vcs.sh commit -m MESSAGE (--all | -- PATH...)
   vcs.sh notes show [REVISION]
-  vcs.sh notes add -m MESSAGE [REVISION]
+  vcs.sh notes read -F FILE [REVISION]
+  vcs.sh notes add (-m MESSAGE | -F FILE) [REVISION]
+  vcs.sh notes update --expect NOTE_OBJECT (-m MESSAGE | -F FILE) [REVISION]
 EOF
     exit 64
 }
@@ -45,7 +51,11 @@ detect_vcs() {
     elif command -v git >/dev/null 2>&1 && git rev-parse --show-toplevel >/dev/null 2>&1; then
         vcs=git
     else
-        echo 'not inside a jj or Git repository' >&2
+        if ! command -v git >/dev/null 2>&1; then
+            echo 'system git executable is unavailable; Git repository detection and notes workflow cannot continue' >&2
+        else
+            echo 'not inside a jj or Git repository' >&2
+        fi
         exit 1
     fi
 }
@@ -180,6 +190,13 @@ snapshot() {
     requested_remote=${1-}
     echo "vcs=$vcs"
     echo "notes_fetch_status=$notes_fetch_status"
+    if ! command -v git >/dev/null 2>&1; then
+        echo 'local_notes_status=unavailable'
+    elif notes_git show-ref --verify --quiet refs/notes/commits; then
+        echo 'local_notes_status=present'
+    else
+        echo 'local_notes_status=absent'
+    fi
     case $notes_fetch_status in
         conflict)
             echo 'notes_next_action=resolve the conflicting note for the same commit without replacing either side implicitly'
@@ -315,13 +332,66 @@ notes_command() {
             revision=$(resolve_notes_revision "${1-}")
             notes_git notes --ref=commits show "$revision"
             ;;
-        add)
-            [ "${1-}" = -m ] || usage
+        read)
+            [ "${1-}" = -F ] || usage
             [ "$#" -ge 2 ] && [ "$#" -le 3 ] || usage
-            message=$2
-            [ -n "$message" ] || usage
+            output_file=$2
+            [ -f "$output_file" ] && [ ! -s "$output_file" ] || usage
             revision=$(resolve_notes_revision "${3-}")
-            notes_git notes --ref=commits add -m "$message" "$revision"
+            note_object=$(notes_git notes --ref=commits list "$revision" | awk 'NR == 1 { print $1 }')
+            [ -n "$note_object" ] || {
+                echo "no Git note found for commit: $revision" >&2
+                return 1
+            }
+            notes_git cat-file blob "$note_object" >"$output_file"
+            printf '%s\n' "$note_object"
+            ;;
+        add)
+            case ${1-} in
+                -m|-F) message_option=$1 ;;
+                *) usage ;;
+            esac
+            [ "$#" -ge 2 ] && [ "$#" -le 3 ] || usage
+            message_source=$2
+            if [ "$message_option" = -m ]; then
+                [ -n "$message_source" ] || usage
+            else
+                [ -s "$message_source" ] || usage
+            fi
+            revision=$(resolve_notes_revision "${3-}")
+            notes_git notes --ref=commits add --no-stripspace "$message_option" "$message_source" "$revision"
+            ;;
+        update)
+            [ "${1-}" = --expect ] || usage
+            expected_note_object=${2-}
+            case ${3-} in
+                -m|-F) message_option=$3 ;;
+                *) usage ;;
+            esac
+            [ "$#" -ge 4 ] && [ "$#" -le 5 ] || usage
+            message_source=$4
+            if [ "$message_option" = -m ]; then
+                [ -n "$message_source" ] || usage
+            else
+                [ -s "$message_source" ] || usage
+            fi
+            revision=$(resolve_notes_revision "${5-}")
+            current_ref=$(notes_git rev-parse --verify refs/notes/commits)
+            current_note_object=$(notes_git notes --ref=commits list "$revision" | awk 'NR == 1 { print $1 }')
+            if [ -z "$current_note_object" ] || [ "$current_note_object" != "$expected_note_object" ]; then
+                echo "refusing Git note update: note changed or is absent for commit $revision" >&2
+                return 2
+            fi
+            notes_temp_ref="refs/notes/vcs-update-$$"
+            notes_git update-ref "$notes_temp_ref" "$current_ref" ''
+            notes_git notes --ref="$notes_temp_ref" add -f --no-stripspace "$message_option" "$message_source" "$revision"
+            new_ref=$(notes_git rev-parse --verify "$notes_temp_ref")
+            if ! notes_git update-ref refs/notes/commits "$new_ref" "$current_ref"; then
+                echo "refusing Git note update: notes ref changed concurrently for commit $revision" >&2
+                return 2
+            fi
+            notes_git update-ref -d "$notes_temp_ref"
+            notes_temp_ref=
             ;;
         *) usage ;;
     esac
