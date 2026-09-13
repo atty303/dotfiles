@@ -1,0 +1,24 @@
+Task: compact Git note structure and existing notes
+Anchor: 5761d6798462b557c2d995a7751dd25dbb6fed32
+Base: 778fc8212ba01e1a2b00e6db5a7ccf723eb1ca30
+Work line: main
+Generated commit: 5761d6798462b557c2d995a7751dd25dbb6fed32 — compact Git note transcript guidance
+Canonical repository: /home/atty/.local/share/chezmoi
+Applied guidance: develop-repository, author-skills, fresh review, forward test
+Environment: chezmoi-managed target applied; remote notes absent at task start; local notes present; no push requested.
+
+Evidence
+- The guidance-policy note was reduced from 288 to 80 lines and the Scorepeek-restructure note from 324 to 95 lines while preserving every raw user message.
+- Fresh review covered all 33 and 35 exchanges; forward tests verified multiline user text remains reversible even when a source line begins with `- A:` or `- U<n>:`.
+
+Authority: This note is descriptive history. Current source, tests, living guidance, and newer user instructions are normative.
+
+Transcript
+- U1: 会話notesをみたが見出しが多すぎて冗長すぎる。本文はいいがコンパクト構成を提案して
+  - A: Proposed a compact note with single-line metadata, optional evidence, one authority line, and paired user/agent transcript entries instead of repeated role headings.
+- U2: transcriptの改行が多すぎる。箇条書き1段目がuser、2段目をagentしたほうがコンパクト
+  - A: Adopted one first-level user bullet and one nested agent-summary bullet per exchange, preserving user input verbatim while compressing agent, tool, and observation activity.
+- U3: transcriptは最後にして
+  - A: Reordered the format so metadata, optional evidence, and authority precede Transcript, which is always last.
+- U4: guidanceと既存notesを修正して
+  - A: Updated and applied the canonical guidance, reformatted both existing notes, preserved raw user messages, resolved multiline role-marker ambiguity, ran targeted validation plus fresh review and forward tests, committed the guidance, and read back the notes.
