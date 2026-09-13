@@ -4,11 +4,13 @@ Base: 5761d6798462b557c2d995a7751dd25dbb6fed32
 Line: main
 Commits: 754bc55 implements the agreed task-cycle boundaries, runtime-history gate, and pre-handoff note ordering.
 Guidance: repository AGENTS.md; author-skills; develop-repository; dig; review.
-Environment: canonical chezmoi source at home/dot_agents/skills/develop-repository/SKILL.md; targeted live apply authorized; no push authorized.
+Environment: canonical chezmoi source at home/dot_agents/skills/develop-repository/SKILL.md; targeted live apply completed and verified; no push authorized or performed.
 Evidence:
 - Targeted repository checks, chezmoi diff, and chezmoi dry-run passed.
 - Independent review reported no findings after the no-commit replacement-cycle correction.
 - Forward tests covered intermediate finals, explicit replacement, unavailable history, pre-handoff ordering, and a replacement cycle without a commit.
+- The managed live develop-repository skill matches the canonical source and its targeted chezmoi diff is empty.
+- The Scorepeek note on a91373d was updated through the expected-object path and read back with all seven user messages.
 Authority: The committed skill source is authoritative; the user selected cycle closure, history reconciliation, canonical-only editing, targeted apply, and correction of the existing Scorepeek note, then authorized execution.
 Transcript:
 - U1: guidanceでtranscriptの記録もれがある。なんで？
@@ -26,4 +28,4 @@ Transcript:
 - U7: A
   - A: Recorded the selection to commit the canonical source, apply only the managed live target, and correct the existing Scorepeek note as a separate state change without pushing.
 - U8: 実行して
-  - A: Updated the skill, ran targeted checks and dry-run, resolved independent review findings, forward-tested boundary cases, and committed the guidance as 754bc55; this note was created at the pre-handoff checkpoint before live apply and the separately authorized Scorepeek note correction.
+  - A: Updated the skill, ran targeted checks and dry-run, resolved independent review findings, forward-tested boundary cases, committed the guidance as 754bc55, applied and verified only the managed live target, corrected and read back the Scorepeek note on a91373d through the expected-object path, cleaned agent-owned temporary files, and confirmed both repository trees are clean; no push was performed.
