@@ -1,0 +1,29 @@
+Task: Fix guidance so commit notes retain the complete task-cycle transcript.
+Anchor: 754bc55
+Base: 5761d6798462b557c2d995a7751dd25dbb6fed32
+Line: main
+Commits: 754bc55 implements the agreed task-cycle boundaries, runtime-history gate, and pre-handoff note ordering.
+Guidance: repository AGENTS.md; author-skills; develop-repository; dig; review.
+Environment: canonical chezmoi source at home/dot_agents/skills/develop-repository/SKILL.md; targeted live apply authorized; no push authorized.
+Evidence:
+- Targeted repository checks, chezmoi diff, and chezmoi dry-run passed.
+- Independent review reported no findings after the no-commit replacement-cycle correction.
+- Forward tests covered intermediate finals, explicit replacement, unavailable history, pre-handoff ordering, and a replacement cycle without a commit.
+Authority: The committed skill source is authoritative; the user selected cycle closure, history reconciliation, canonical-only editing, targeted apply, and correction of the existing Scorepeek note, then authorized execution.
+Transcript:
+- U1: guidanceでtranscriptの記録もれがある。なんで？
+  - A: Diagnosed that the existing cycle wording allowed an intermediate final response to be treated as completion, so the later implementation request could be recorded alone.
+- U2: [$dig](/var/home/atty/.agents/skills/dig/SKILL.md) guidanceを修正する
+  - A: Used dig to turn the failure into explicit task-cycle, transcript completeness, persistence, and correction decisions before editing.
+- U3: A
+  - A: Recorded the selection that only an achieved handoff, explicit blocked handoff, or explicit cancellation or replacement closes a cycle; an ordinary final response does not.
+- U4: B
+  - A: Recorded the selection that note creation must enumerate and reconcile the cycle start, every user message, and the last user message against runtime thread history.
+- U5: A
+  - A: Recorded the selection that unavailable or unreconcilable full history prevents note creation and leaves the task incomplete.
+- U6: A
+  - A: Recorded the selection to change only the canonical develop-repository skill source rather than duplicate the rule elsewhere.
+- U7: A
+  - A: Recorded the selection to commit the canonical source, apply only the managed live target, and correct the existing Scorepeek note as a separate state change without pushing.
+- U8: 実行して
+  - A: Updated the skill, ran targeted checks and dry-run, resolved independent review findings, forward-tested boundary cases, and committed the guidance as 754bc55; this note was created at the pre-handoff checkpoint before live apply and the separately authorized Scorepeek note correction.
