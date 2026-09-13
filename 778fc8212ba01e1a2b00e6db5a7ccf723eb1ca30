@@ -1,0 +1,288 @@
+# Task cycle transcript: automatic Git notes and historical lookup
+
+## Context
+
+- Baseline commit: `9bd0d85d0c778dac793d6c51535a0cc0a6166d29`
+- Work line: `main`
+- Generated commit: `778fc82` — guidance, VCS wrapper, and regression tests
+- Canonical repository: `/home/atty/.local/share/chezmoi`
+- Applied guidance: `maintain-agent-guidance`, `dig`, `author-skills`, `develop-repository`, `review`; `investigate-problem` was used for an unexpected sandbox-only check failure.
+- Environment: the home targets are managed by chezmoi. Initial VCS fetch could not write `.git/FETCH_HEAD` in the sandbox and the first full check could not reach `starship.rs`; both succeeded in the approved target-equivalent environment. Four explicit home targets were applied and their rendered diffs became empty. No push was requested or performed.
+
+## Chronological conversation
+
+### User
+
+[$maintain-agent-guidance](/var/home/atty/.agents/skills/maintain-agent-guidance/SKILL.md) notes追加の基準を変更。commit完了後に自動で必要に応じて追加をする [$dig](/var/home/atty/.agents/skills/dig/SKILL.md) 
+
+### Agent summary
+
+Invoked the requested skills and began a one-question-at-a-time design audit. Q26 asked who decides whether a note is necessary.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded that the agent autonomously decides and adds notes, reporting afterward. Q27 asked whether this happens per commit or at task completion.
+
+### User
+
+B. あとpush依頼時はcodeとnotesの療法をpushする
+
+### Agent summary
+
+Recorded that candidates are held and organized at task completion, and that a push request covers both code and notes. Q28 asked for the evidence threshold.
+
+### User
+
+A. これまでの動きではcommit messageが１行しかないので、詳細をもっと書いていい。そこに書ききれないときだけnotesを使う
+
+### Agent summary
+
+Recorded that extra notes are for important evidence that is costly or impossible to reacquire, while commit messages should carry substantially more detail. Q29 asked how to divide commit-message and note content.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded that commit messages contain purpose, major reasoning, scope, user impact, migration, and major verification; notes hold details that do not fit and high-cost point-in-time evidence. Q30 asked whether code and notes pushes must be atomic.
+
+### User
+
+B
+
+### Agent summary
+
+Recorded code-first then notes push, with partial state reported if notes fail. Q31 asked whether required-note failure blocks completion.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded that note failure blocks completion after safe retries; the commit remains and is not automatically amended. Q32 asked how an existing note is handled.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded read-preserve-deduplicate-semantic integration; conflicts retain both meanings and are not silently replaced. Q33 asked whether every push request sends the complete standard notes ref even without a new note.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded that the complete local `refs/notes/commits` is pushed whenever it exists. Q34 asked how divergent remote notes are handled.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded fetch and merge of independent note content, with same-commit semantic conflict stopping the workflow and no force overwrite. Q35 asked about note visibility and content minimization.
+
+### User
+
+A. 不透明idはそのままでいい
+
+### Agent summary
+
+Recorded that notes assume the repository remote's visibility, never contain secrets/confidential/public-inappropriate personal data, and may retain opaque operational identifiers. Q36 asked which commits are eligible.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded that every agent-created commit type is eligible. Q37 asked whether notes require a fixed schema.
+
+### User
+
+C
+
+### Agent summary
+
+Recorded free-form notes rather than a fixed Purpose/Evidence/Scope/Invalidation template. Q38 asked how note creation appears in the final report.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded target commit and a one-line purpose in the final report. Q39 asked whether evaluation also occurs after a committed task becomes failed or blocked.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded evaluation before successful completion or blocked handoff, preserving costly failure evidence as applicable. After inspecting the current skills and wrapper without editing, Q40 asked whether the new policy applies retroactively to the just-completed Scorepeek restructuring.
+
+### User
+
+A. あとタスク遂行時に必要に応じてgit logとnotesを探索する振る舞いも追加したい
+
+### Agent summary
+
+Recorded retroactive application and added historical lookup to the design. Q41 asked when history should be explored.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded lookup when the current tree cannot establish intent, unfinished boundaries, migration, live verification, rejected paths, or rationale and the answer may change the current decision; also for explicit history and resumption requests. Q42 asked how broadly to search.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded targeted search by path/schema/feature/known commit, expanding only as needed. Q43 asked what authority old history has.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded history as descriptive evidence only; current source/tests/living docs/current user instructions stay normative, and unresolved behavior/scope conflicts require asking. Q44 presented an initial common-understanding check.
+
+### User
+
+B. messageにcommitの起点となった会話履歴を保存する。開始プロンプトはメッセージ、全スレッドはnotes。ユーザー入力は全文を元言語で保持。agent応答は要約する。あとから同じタスクを別条件でシミュレーション可能にしたい
+
+### Agent summary
+
+Expanded the design from optional evidence notes to replayable task-cycle notes. Q45 asked what counts as a raw user input.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded only human-authored or human-selected messages as raw input; injected skill bodies, AGENTS, app context, plugin lists, and environment/tool content are excluded, with relevant conditions summarized. Q46 asked how protected content limits full preservation.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded typed placeholders for secrets, confidential content, and public-inappropriate personal data, with necessary simulation properties summarized. Q47 asked which commit anchors a multi-commit task note.
+
+### User
+
+C
+
+### Agent summary
+
+The turn was aborted before this selection was incorporated.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded a single full-thread note on the final anchor commit, listing all generated commit IDs and their mapping. Q48 asked how non-text attachments and external artifacts are represented.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded logical name, digest, and necessary properties without copying external artifacts. Q49 asked whether agent summaries preserve chronological turn correspondence.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded a chronological transcript with full user messages and summarized agent responses, tool operations, and observations. Q50 asked how to identify the task-start prompt.
+
+### User
+
+設計依頼->深堀->実装依頼->完了、のフローを1threadで繰り返す場合もある。実装依頼の直前だけでなく、設計依頼から実装以来までのturnを作業の開始とする。設計依頼はthreadの最初の入力が、直前の完了後の最初の入力になるはずだ
+
+### Agent summary
+
+Recorded a task cycle from the first design/request input after the preceding completion through dig, implementation request, implementation, verification, commit, and completion. Q51 asked what portion appears in the commit message.
+
+### User
+
+A. 深堀の最中のagent応答も会話として要約する。
+
+### Agent summary
+
+Initially recorded design-through-implementation-request user content and summarized design/dig agent responses. Q52 asked whether multi-commit messages repeat this content.
+
+### User
+
+B
+
+### Agent summary
+
+Recorded that only the first commit carries the task-origin summary; later commits refer to its ID and describe their own delta. Q53 asked what non-conversation context is necessary for later simulation.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded baseline commit, work line, generated commits, principal guidance/skills, important environment/permission conditions, and major operations/observations, without claiming exact reproduction of hidden/runtime internals. Q54 asked whether long conversations may be truncated.
+
+### User
+
+A
+
+### Agent summary
+
+Recorded no artificial note size limit or truncation; actual inability to store blocks completion. Q55 asked whether every committed task always receives the full-thread note.
+
+### User
+
+A. このraw会話履歴はnotesがメインで、commit messageにはユーザー依頼の要約だけでいい
+
+### Agent summary
+
+Recorded a mandatory full-thread note for every task that creates at least one commit. This message superseded the earlier raw commit-message requirement: commit messages keep only the user-request/agreement summary plus normal self-contained change details. Q56 restated the complete design for confirmation.
+
+### User
+
+A
+
+### Agent summary
+
+Common understanding was confirmed and implementation began. The canonical chezmoi source, active targets, VCS wrapper, tests, and applicable skills were inspected. The source repository was clean and one commit ahead of `origin/main`; remote standard notes were absent.
+
+The first wrapper draft added existing-note replacement, then targeted tests passed. The draft was frozen for independent review and forward tests. `mise run check` initially failed before checking the changes because sandbox network policy blocked `starship.rs`; investigation classified this as an execution-environment constraint and the target-equivalent rerun passed.
+
+Independent review found that a force replacement could lose concurrent updates and that snapshot did not expose whether a local notes ref existed. The implementation changed to compare-and-swap updates and added `local_notes_status`. Forward testing exposed cycle-boundary, redaction precedence, semantic-conflict, partial-push, Git-unavailable, and long-argv ambiguities; guidance and the wrapper were revised.
+
+Further delta review showed that separate content/object reads could still race, Git stripspace changed full-message bytes, and note-blocked cycle closure could make a missing note permanent. The final wrapper reads content and object from one immutable blob, updates via an atomic notes-ref CAS, accepts `-F FILE`, disables stripspace, and tests concurrent rejection plus byte equality. The final wording keeps a task cycle open whenever its mandatory note remains unsaved, even alongside other blockers.
+
+Final verification succeeded: shell parsing, `mise run test:vcs`, full `mise run check`, targeted rendered chezmoi diff, explicit application of four active targets, empty post-apply diffs, independent delta review, and all forward scenarios. Commit `778fc82` was created with the five source/test files only. No code or notes ref was pushed.
+
+## Additional high-cost evidence
+
+The review evolution above is retained because it records why a simple force-update interface is insufficient: preserving existing notes requires a single immutable read plus an atomic compare-and-swap of the notes ref, and byte-faithful transcripts require `--no-stripspace`. These concurrency and fidelity conditions are not obvious from the final policy text alone.
