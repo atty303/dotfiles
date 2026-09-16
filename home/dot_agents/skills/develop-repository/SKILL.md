@@ -56,6 +56,7 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 - 不具合、障害、回帰または期待と異なる挙動を修正する場合は、product codeを変更する前に
   `investigate-problem` を使用する。利用者が失敗と判断した最終状態、保持済みdiagnostic run、failure oracleおよび原因を
   確認してから修正へ進む。
+- 原因を修正した後は、変更した不変条件から利用者のfailure oracleまでのproduction経路を再評価し、修正によって新しく到達可能になったdownstream state、callerとconsumer間の意味変換、retry、re-entryおよび逆操作を確認する。局所failureの消失または中間状態の成功を最終oracleのpassとみなさない。再評価は変更によって到達性または意味が変わった経路に限定し、無関係な関連codeへ探索を広げない。
 - 既存の観測証拠ではfailure段階を識別できず、対象経路がprogram観測契約の適用対象なら、product fixより先に
   `design-program-observability` で最小の観測経路を実装し、同じfailureを取得できることを確認する。既存証拠で十分なら
   不要なinstrumentationを追加しない。
@@ -75,6 +76,7 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 ### Verification
 
 - 検証の目的を、利用者向けの実装結果について、断定する結果が成立するboundaryをagent自身が観測し、期待どおりか判断できる証拠を得ることとする。requestやcommandの開始だけを観測してdownstreamの永続化や副作用の成功を断定しない。契約がrequest発行またはcommand開始までなら、そのboundaryの観測を完了証拠とし、不要なdownstream readbackを要求しない。人間による確認は、agentが観測できない場合の例外とする。
+- Failure oracleを証明するtestは、変更した不変条件からoracleまでに実際に存在し、変更で到達性または意味が変わったproductionのcaller、dispatcher、consumerおよびstate transitionを通す。Fakeまたはmockで外部境界を置換してもよいが、境界より後の成功状態を直接生成するtestは、その手前までの局所証拠として扱い、最終結果のcompletion gateにしない。最終contractがleaf functionの返り値やrequest発行で終わる場合は、そのboundaryより後を要求しない。対象環境を実行できない場合は、実装経路の検証済み範囲とfailure oracleが未確認であることを分けて報告する。
 - formatter、lint、型検査および静的解析、対象を限定したテスト、DOM、API、ログまたは永続状態による実行時観測、ビルドおよび通常check、利用者が接する最終出力の順に、安価な検証から進める。前段の失敗を解消してから高コストな検証を行い、範囲は変更箇所と回帰リスクに比例させる。
 - `mise run check` で自動修正可能なformatterまたはlint違反が判明した場合は、表示された修正diffの精査や手動編集より、対象を限定した `mise run fix` を優先し、その後にcheckを再実行する。
 - 検証を通すことだけを目的にlint suppressionを追加・変更せず、型検査を無効化せず、testをskipしない。要件上必要な例外は理由、影響および代替検証を示して承認を得る。既存の正当な例外を依頼と無関係に除去しない。
