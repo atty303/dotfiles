@@ -1,0 +1,12 @@
+Task: Promote post-fix failure-oracle validation into reusable agent guidance
+Anchor: d5df67d
+Base: 754bc5589c1eb82f9b8a710ba50562eb66950f7b
+Line: main
+Commits: d5df67d applies the approved guidance to develop-repository and review
+Guidance: repository AGENTS.md; maintain-agent-guidance; author-skills; develop-repository; review
+Execution: durable personal agent skills in the same-user control domain; no new dependency or trust boundary; source state edited before two-target apply
+Evidence: Targeted mise check passed. Chezmoi diff and dry-run showed only the two intended skill targets. Independent review found one overbroad production-layer requirement; the wording was narrowed to elements that actually exist before the oracle. Delta review and positive, near-miss, stopping-condition, and external-boundary forward tests then passed.
+Authority: The current skill sources and tests are authoritative; the approved candidate requires tracing newly reachable production states to the user failure oracle without expanding beyond the actual final contract.
+Transcript:
+- U1: 反映して
+  - A: Interpreted this as approval to apply the previously audited general principle. Updated the canonical chezmoi sources for develop-repository and review, preserved the existing oracle-boundary rule, added post-fix downstream-path and reachable-counterexample checks, bounded them at the actual contract, ran targeted checks and dry-run, completed independent review and forward tests, and committed only the two skill files without pushing.
