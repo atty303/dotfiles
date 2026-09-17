@@ -1,0 +1,24 @@
+Task cycle
+
+User request:
+- Implement the agreed host-specific exclusive game CPU partition.
+- Continue despite the automated Polkit review objection because the single-user host trust model and arbitrary user-selected command were intentional.
+- After the runtime installer was prepared, the user ran it and then ran the active-local-session positive gate.
+
+Implemented:
+- Added an infinitas-only cgroup v2 partition rooted at game.slice with CPUs 0-7,12-19.
+- Added a root helper with exact-state admission, populated checks, rollback, lifecycle diagnostics, and fail-closed behavior.
+- Added an active-local-session-only Polkit rule and a generic game-exclusive wrapper using one fixed transient scope.
+- Wrapped the INFINITAS game, gamescope, and mangoapp entries while leaving the launcher outside.
+- Added host rendering, helper lifecycle, rollback, argument forwarding, and system source tests plus living documentation.
+
+Verification:
+- mise run check passed.
+- All non-E2E repository tests passed, including test:game-exclusive and test:system-config.
+- Runtime spike on infinitas.lan observed partition=root and game effective CPUs 0-7,12-19, with user.slice and system.slice limited to 8-11,20-23.
+- A local active-session scope ran as UID 1000 with Cpus_allowed_list 0-7,12-19; SSH launch was denied; the scope auto-cleaned and left the partition active and unpopulated.
+- Independent fresh review reported no actionable findings.
+
+Deferred:
+- Permanent target apply occurs after this source commit reaches the target.
+- The optional privileged Bazzite container E2E was not run; the real target runtime spike covered the cgroup and Polkit behavior directly.
