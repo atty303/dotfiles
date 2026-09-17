@@ -19,8 +19,10 @@ output $out_middle {
     position 1728,1220
     scale 1
     allow_tearing yes
-    subpixel rgb
+#    adaptive_sync on
+#    subpixel none
     render_bit_depth 10
+    hdr on
     layout_type horizontal
     layout_default_width 0.33333333
     layout_default_height 1
@@ -94,6 +96,7 @@ for_window [app_id="gamescope"] {
     resize set height 1440px
 }
 for_window [shell="^xdg_shell$" title="^beatmania IIDX INFINITAS$"] {
+    move container to workspace 1
     border none
     resize set width 1920px height 1080px
 }

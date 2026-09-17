@@ -197,10 +197,10 @@
             "push-to-talk-delay": 0,
             "hotkeys": {
                 "OBSBasic.SelectScene": [],
-                "libobs.show_scene_item.4": [],
-                "libobs.hide_scene_item.4": [],
                 "libobs.show_scene_item.5": [],
-                "libobs.hide_scene_item.5": []
+                "libobs.hide_scene_item.5": [],
+                "libobs.show_scene_item.4": [],
+                "libobs.hide_scene_item.4": []
             },
             "deinterlace_mode": 0,
             "deinterlace_field_order": 0,
