@@ -1,0 +1,124 @@
+#!/bin/sh
+
+set -eu
+
+readonly expected_cpus=0-7,12-19
+readonly cgroup_root="${GAME_EXCLUSIVE_CGROUP_ROOT:-/sys/fs/cgroup}"
+readonly partition_path="$cgroup_root/game.slice"
+
+emit() {
+  printf 'game-exclusive-partition %s\n' "$*"
+}
+
+fail() {
+  error=$1
+  shift
+  printf 'game-exclusive-partition status=error error=%s %s\n' "$error" "$*" >&2
+  exit 1
+}
+
+read_value() {
+  path=$1
+  [ -r "$path" ] || fail cgroup_file_unavailable "path=$path"
+  cat "$path"
+}
+
+require_unpopulated() {
+  events=$(read_value "$partition_path/cgroup.events")
+  populated=$(printf '%s\n' "$events" | awk '$1 == "populated" { print $2 }')
+  [ "$populated" = 0 ] || fail partition_busy "path=$partition_path"
+}
+
+rollback() {
+  partition=$(read_value "$partition_path/cpuset.cpus.partition")
+  if [ "$partition" != member ]; then
+    printf '%s\n' member >"$partition_path/cpuset.cpus.partition" || return 1
+  fi
+  : >"$partition_path/cpuset.cpus.exclusive" || return 1
+}
+
+check_active() {
+  partition=$(read_value "$partition_path/cpuset.cpus.partition")
+  exclusive=$(read_value "$partition_path/cpuset.cpus.exclusive.effective")
+  effective=$(read_value "$partition_path/cpuset.cpus.effective")
+  [ "$partition" = root ] || fail partition_state_invalid \
+    "expected=root actual=$partition"
+  [ "$exclusive" = "$expected_cpus" ] || fail exclusive_cpus_invalid \
+    "expected=$expected_cpus actual=$exclusive"
+  [ "$effective" = "$expected_cpus" ] || fail effective_cpus_invalid \
+    "expected=$expected_cpus actual=$effective"
+}
+
+activate() {
+  partition=$(read_value "$partition_path/cpuset.cpus.partition")
+  exclusive=$(read_value "$partition_path/cpuset.cpus.exclusive.effective")
+  effective=$(read_value "$partition_path/cpuset.cpus.effective")
+  if [ "$partition" = root ] && [ "$exclusive" = "$expected_cpus" ] && \
+    [ "$effective" = "$expected_cpus" ]; then
+    emit "status=active cpus=$expected_cpus changed=false"
+    return
+  fi
+
+  require_unpopulated
+  rollback || fail rollback_failed "phase=prepare"
+  effective=$(read_value "$partition_path/cpuset.cpus.effective")
+  [ "$effective" = "$expected_cpus" ] || fail effective_cpus_invalid \
+    "expected=$expected_cpus actual=$effective"
+
+  if ! printf '%s\n' "$expected_cpus" >"$partition_path/cpuset.cpus.exclusive"; then
+    rollback || true
+    fail exclusive_cpus_write_failed "cpus=$expected_cpus"
+  fi
+  if ! printf '%s\n' root >"$partition_path/cpuset.cpus.partition"; then
+    rollback || true
+    fail partition_activation_failed "cpus=$expected_cpus"
+  fi
+  partition=$(read_value "$partition_path/cpuset.cpus.partition")
+  exclusive=$(read_value "$partition_path/cpuset.cpus.exclusive.effective")
+  effective=$(read_value "$partition_path/cpuset.cpus.effective")
+  if [ "$partition" != root ] || [ "$exclusive" != "$expected_cpus" ] || \
+    [ "$effective" != "$expected_cpus" ]; then
+    if ! rollback; then
+      fail rollback_failed "phase=activation_verification"
+    fi
+    fail partition_verification_failed \
+      "partition=$partition exclusive=$exclusive effective=$effective"
+  fi
+  emit "status=active cpus=$expected_cpus changed=true"
+}
+
+deactivate() {
+  partition=$(read_value "$partition_path/cpuset.cpus.partition")
+  exclusive=$(read_value "$partition_path/cpuset.cpus.exclusive.effective")
+  if [ "$partition" = member ] && [ -z "$exclusive" ]; then
+    emit 'status=inactive changed=false'
+    return
+  fi
+
+  require_unpopulated
+  rollback || fail rollback_failed "phase=deactivate"
+  partition=$(read_value "$partition_path/cpuset.cpus.partition")
+  exclusive=$(read_value "$partition_path/cpuset.cpus.exclusive.effective")
+  [ "$partition" = member ] || fail partition_deactivation_failed \
+    "expected=member actual=$partition"
+  [ -z "$exclusive" ] || fail exclusive_cpus_release_failed \
+    "actual=$exclusive"
+  emit 'status=inactive changed=true'
+}
+
+case ${1:-} in
+  activate)
+    activate
+    ;;
+  check)
+    check_active
+    emit "status=active cpus=$expected_cpus"
+    ;;
+  deactivate)
+    deactivate
+    ;;
+  *)
+    printf 'usage: %s <activate|check|deactivate>\n' "$0" >&2
+    exit 64
+    ;;
+esac

@@ -64,11 +64,15 @@ umask 077
 umask "$original_umask"
 test "$(file_mode "$all_destination/usr/local/share/wayland-sessions")" = 755
 test -z "$(chezmoi "${all_chezmoi_args[@]}" --use-builtin-diff diff "${all_targets[@]}")"
-while IFS= read -r source_file; do
-  destination_file="$all_destination${source_file#"$repository/root"}"
+while IFS= read -r destination_file; do
+  source_file="$(chezmoi "${all_chezmoi_args[@]}" source-path "$destination_file")"
   cmp "$source_file" "$destination_file"
-  test "$(file_mode "$destination_file")" = 644
-done < <(find "$repository/root" -type f -print)
+  case ${source_file##*/} in
+    executable_*) expected_mode=755 ;;
+    *) expected_mode=644 ;;
+  esac
+  test "$(file_mode "$destination_file")" = "$expected_mode"
+done < <(chezmoi "${all_chezmoi_args[@]}" managed --include=files --path-style absolute)
 
 printf '# drift\n' >>"$target"
 if chezmoi "${chezmoi_args[@]}" verify "$target"; then

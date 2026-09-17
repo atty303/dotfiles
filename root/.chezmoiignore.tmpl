@@ -1,0 +1,7 @@
+{{ if ne .chezmoi.hostname "infinitas" }}
+etc/polkit-1/rules.d/49-game-exclusive.rules
+etc/systemd/system/game.slice
+etc/systemd/system/game-exclusive-partition.service
+etc/systemd/system/multi-user.target.wants/game-exclusive-partition.service
+usr/local/libexec/game-exclusive-partition
+{{ end }}

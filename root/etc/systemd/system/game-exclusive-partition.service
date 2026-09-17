@@ -1,0 +1,17 @@
+[Unit]
+Description=Activate the exclusive game CPU partition
+ConditionHost=infinitas
+Requires=game.slice
+After=game.slice
+Before=display-manager.service graphical.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/libexec/game-exclusive-partition activate
+ExecReload=/usr/local/libexec/game-exclusive-partition check
+ExecStop=/usr/local/libexec/game-exclusive-partition deactivate
+RemainAfterExit=yes
+SyslogIdentifier=game-exclusive-partition
+
+[Install]
+WantedBy=multi-user.target

@@ -40,7 +40,9 @@ local linters = new Mapping<String, Step> {
       "home/dot_local/bin/executable_wayland-session-exec",
       "home/dot_local/libexec/executable_chezmoi-distrobox-scroll-update",
       "home/dot_local/bin/executable_chatgpt",
+      "home/dot_local/bin/executable_game-exclusive",
       "home/dot_local/libexec/executable_chatgpt-update",
+      "root/usr/local/libexec/executable_game-exclusive-partition",
       "tests/e2e/containers/bazzite-crun",
       "tests/e2e/containers/bazzite-podman"
     )

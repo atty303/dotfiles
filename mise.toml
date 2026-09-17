@@ -56,6 +56,7 @@ mise run test:roles
 mise run test:agent-guidance
 mise run test:vcs
 mise run test:system-config
+mise run test:game-exclusive
 mise run test:e2e:harness
 mise run test:e2e
 '''
@@ -107,6 +108,10 @@ run = "sh tests/develop-repository-vcs.sh"
 [tasks."test:system-config"]
 description = "Test all-file and target-limited system configuration management"
 run = "bash tests/system-config.sh"
+
+[tasks."test:game-exclusive"]
+description = "Test the host-scoped exclusive game CPU partition"
+run = "bash tests/game-exclusive.sh"
 
 [tasks."system:diff"]
 description = "Preview all or explicitly named system configuration files"

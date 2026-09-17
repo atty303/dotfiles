@@ -84,6 +84,39 @@ future design rather than part of the current validation guarantee.
 Roles are fixed during `chezmoi init` and stored in the chezmoi config. A normal apply
 does not inspect the current session or infer roles again.
 
+## Exclusive game CPU partition
+
+The `infinitas` host reserves logical CPUs `0-7,12-19` for one foreground game process
+tree. At boot, `game-exclusive-partition.service` makes `game.slice` a cgroup v2
+partition root; ordinary user and system services then run on the complementary CPUs
+`8-11,20-23`. This controls only the cpuset. It does not change CPU, I/O, memory, or OOM
+weights and does not move IRQs or kernel workqueues.
+
+Launch a game from the active local session with:
+
+```sh
+game-exclusive -- command argument...
+```
+
+The wrapper fails closed unless the partition state, exclusive CPU set, and effective
+CPU set exactly match the host contract. It starts the whole command process tree in the
+fixed `game-exclusive.scope`; a second game cannot use the same scope concurrently.
+Polkit permits only starting that exact scope from an active local session, so an SSH or
+inactive session cannot use the wrapper. The managed Konamate INFINITAS game, Gamescope,
+and Mangoapp commands already use it; the launcher itself remains outside the partition.
+
+Inspect the persistent partition and any current game scope with:
+
+```sh
+systemctl status game-exclusive-partition.service game-exclusive.scope
+```
+
+The root helper refuses to change partition membership while the slice is populated.
+Stopping or restarting `game-exclusive-partition.service` therefore cannot silently move
+a running game back to the shared CPUs. If activation fails during boot, the helper rolls
+the slice back to an ordinary `member` and game launch remains fail closed while the
+desktop continues on the normal CPU set.
+
 ## Owner bootstrap
 
 The default `secrets` role requires access to the repository's age identity or the

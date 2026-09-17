@@ -19,6 +19,11 @@ AppData/
 .ssh/SSH_AUTH_SOCK
 .ssh/agent-local
 
+{{ if ne .chezmoi.hostname "infinitas" }}
+# Host-specific game CPU partition launcher.
+.local/bin/game-exclusive
+{{ end }}
+
 {{ if not (has "secrets" .roles) }}
 # Optional encrypted bootstrap artifacts.
 .wakatime.cfg
