@@ -45,7 +45,7 @@ registry = []
 [profiles.infinitas.entries.launcher.env]
 
 [profiles.infinitas.entries.game]
-command = 'game-exclusive -- env VK_LAYER_PATH=/home/atty/src/atty303/scorepeek/target/vulkan-capture-spike/share/vulkan/explicit_layer.d VK_INSTANCE_LAYERS=VK_LAYER_SCOREPEEK_capture_spike SCOREPEEK_VK_CAPTURE_SOCKET=/tmp/scorepeek-vulkan-capture.sock umu-run %r\\game\\app\\bm2dx.exe -t %t'
+command = "game-exclusive -- umu-run %r\\game\\app\\bm2dx.exe -t %t"
 
 [profiles.infinitas.entries.game.env]
 
