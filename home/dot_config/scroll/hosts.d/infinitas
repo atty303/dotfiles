@@ -7,7 +7,8 @@ output $out_game {
     position 0,0
     scale 1.5
     subpixel rgb
-    allow_tearing yes
+    allow_tearing no
+    adaptive_sync on
     layout_type horizontal
     layout_default_width 1
     layout_default_height 1

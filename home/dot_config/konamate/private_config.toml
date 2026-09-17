@@ -1,3 +1,4 @@
+
 [settings]
 browser = "/var/lib/flatpak/exports/bin/com.google.Chrome"
 
@@ -15,12 +16,12 @@ PIPEASIO_NUMBER_INPUTS = "0"
 PIPEASIO_NUMBER_OUTPUTS = "2"
 PIPEASIO_CONNECT_TO_HARDWARE = "on"
 PIPEASIO_FIXED_BUFFERSIZE = "on"
-PIPEASIO_PREFERRED_BUFFERSIZE = "64"
+PIPEASIO_PREFERRED_BUFFERSIZE = "128"
 PIPEASIO_FOLLOW_DEVICE_CLOCK = "off"
 PIPEASIO_SAMPLE_RATE = "44100"
 PIPEASIO_RT_PRIORITY = "off"
 PIPEASIO_CLIENT_NAME = "INFINITAS-PipeASIO"
-DXVK_CONFIG = "d3d9.presentInterval=1"
+DXVK_CONFIG = "d3d9.presentInterval=1;d3d9.maxFrameLatency=1;dxvk.tearFree=False;d3d9.maxFrameRate=-1"
 RADV_DEBUG = "nodcc"
 
 [[profiles.infinitas.common.registry]]
@@ -46,36 +47,45 @@ registry = []
 [profiles.infinitas.entries.game]
 command = 'env VK_LAYER_PATH=/home/atty/src/atty303/scorepeek/target/vulkan-capture-spike/share/vulkan/explicit_layer.d VK_INSTANCE_LAYERS=VK_LAYER_SCOREPEEK_capture_spike SCOREPEEK_VK_CAPTURE_SOCKET=/tmp/scorepeek-vulkan-capture.sock umu-run %r\\game\\app\\bm2dx.exe -t %t'
 
+[profiles.infinitas.entries.game.env]
+
 [[profiles.infinitas.entries.game.registry]]
 action = "set"
-key = 'HKCU\Software\Wine\Explorer\Desktops'
+key = "HKCU\\Software\\Wine\\Explorer\\Desktops"
 name = "Default"
 type = "string"
 value = "1920x1080"
 
 [[profiles.infinitas.entries.game.registry]]
 action = "set"
-key = 'HKCU\Software\Wine\X11 Driver'
+key = "HKCU\\Software\\Wine\\X11 Driver"
 name = "Managed"
 type = "string"
 value = "N"
 
-[profiles.infinitas.entries.game.env]
-
 [profiles.infinitas.entries.gamescope]
 command = "gamescope --backend wayland -W 3840 -H 2160 -w 1920 -h 1080 -r 120 -S auto --rt -f -- env -u RADV_DEBUG umu-run %r\\game\\app\\bm2dx.exe --asio -t %t"
 
+[profiles.infinitas.entries.gamescope.env]
+
 [[profiles.infinitas.entries.gamescope.registry]]
 action = "delete"
-key = 'HKCU\Software\Wine\Explorer\Desktops'
+key = "HKCU\\Software\\Wine\\Explorer\\Desktops"
 name = "Default"
 
 [[profiles.infinitas.entries.gamescope.registry]]
 action = "delete"
-key = 'HKCU\Software\Wine\X11 Driver'
+key = "HKCU\\Software\\Wine\\X11 Driver"
 name = "Managed"
 
-[profiles.infinitas.entries.gamescope.env]
+[profiles.infinitas.entries.mangoapp]
+command = "gamescope --backend wayland -W 3840 -H 2160 -w 1920 -h 1080 -r 120 --adaptive-sync -S auto -f -- env -u RADV_DEBUG VK_LAYER_PATH=/home/atty/scorepeek/vulkan-capture/share/vulkan/explicit_layer.d VK_INSTANCE_LAYERS=VK_LAYER_SCOREPEEK_capture PRESSURE_VESSEL_FILESYSTEMS_RW=/run/user/1000/scorepeek umu-run %r\\game\\app\\bm2dx.exe --asio -t %t"
+registry = []
+
+[profiles.infinitas.entries.mangoapp.env]
+MANGOHUD_CONFIGFILE = "/home/atty/.config/MangoHud/debug.conf"
+DXVK_LOG_PATH = "/home/atty/log"
+DXVK_LOG_LEVEL = "info"
 
 [profiles.sdvx]
 run_profile = "launcher"
