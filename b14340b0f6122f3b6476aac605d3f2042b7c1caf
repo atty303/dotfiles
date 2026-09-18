@@ -1,0 +1,11 @@
+Task: Add twitch-cli to chezmoi
+Anchor: b14340b0f6122f3b6476aac605d3f2042b7c1caf
+Base: ff3be0681d1212782cf22af0effd9c9baf6fb9f8
+Line: main
+Commits: b14340b0f6122f3b6476aac605d3f2042b7c1caf adds the generated Twitch CLI tool stub and Windows launcher
+Guidance: repository AGENTS.md; develop-repository; design-program-observability; investigate-problem; review
+Environment: workspace-write sandbox; live target apply and Twitch OAuth/API calls were not authorized or performed; existing gh keyring authentication was passed only to mise after unauthenticated GitHub API rate limiting
+Authority: The committed source files and repository guidance are the current source of truth.
+Transcript:
+- U1: twitch-cliをchezmoiに追加して
+  - A: Classified the addition as durable and confirmed the repository was clean and synchronized at the base. Reused the existing mise tool-stub pattern, selected official twitchdev/twitch-cli 1.1.24, and generated locked Linux, macOS, and Windows artifacts plus the Windows launcher without adding Twitch credentials or configuration. The first generation and isolated runtime attempts hit the exhausted unauthenticated GitHub API rate limit because mise's stored OAuth refresh failed; diagnosed the boundary, reused the existing gh keyring credential without displaying or storing its value, and left authentication configuration unchanged. Verified the official release assets and checksums, targeted mise checks, chezmoi diff and dry-run, and an isolated Linux x86_64 run reporting twitch-cli/1.1.24. Fresh independent review found no actionable issue; remaining unverified boundaries are other operating systems and architectures, live apply, OAuth, and Twitch API behavior. Committed only the two generated source files and did not apply them to the live home.
