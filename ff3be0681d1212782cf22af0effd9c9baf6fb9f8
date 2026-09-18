@@ -1,0 +1,13 @@
+Task: Persist the verified four-physical-core exclusive game partition on infinitas
+Anchor: ff3be0681d1212782cf22af0effd9c9baf6fb9f8
+Base: 7decf19317500b603927724978f6bea7185d075b
+Line: main
+Commits: ff3be0681d1212782cf22af0effd9c9baf6fb9f8 changes the game partition from eight to four physical cores
+Guidance: repository AGENTS.md; develop-repository; review; maintain-agent-guidance
+Conditions: trusted single-user infinitas host; root system files require local sudo; source, target apply, runtime state, and remote synchronization were verified separately
+Authority: Current source, integration tests, README, and the user's confirmed live game result define the four-core contract.
+Transcript:
+- U1: 4coreで問題なく動くやんけ。永続化して
+  - A: Classified the promotion as durable; changed the systemd slice, root partition helper, user launcher, README, and existing integration test from `0-7,12-19` to `0-3,12-15`; targeted checks, game partition integration tests, and system configuration tests passed. A fresh independent review found no actionable issues. Committed as `ff3be06`, pushed `main`, fast-forwarded the clean infinitas checkout, applied the user launcher, and requested local sudo for the two root-owned files and service reload.
+- U2: 実行した
+  - A: Verified empty system diff, successful system and user-target verification, active partition service, game Allowed/effective/exclusive CPUs `0-3,12-15`, complementary user/system/init effective CPUs `4-11,16-23`, and successful helper check. Removed the agent-owned experiment backup. No additional durable guidance candidate remained because source, tests, and README own the contract.
