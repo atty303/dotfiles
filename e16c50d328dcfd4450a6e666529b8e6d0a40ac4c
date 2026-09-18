@@ -1,0 +1,11 @@
+Task: Add process-compose to the chezmoi-managed executable inventory.
+Anchor: e16c50d328dcfd4450a6e666529b8e6d0a40ac4c
+Base: b14340b0f6122f3b6476aac605d3f2042b7c1caf
+Line: main
+Commits: e16c50d328dcfd4450a6e666529b8e6d0a40ac4c adds the generated process-compose tool stub and Windows launcher.
+Guidance: AGENTS.md; develop-repository; upgrade-tool-versions; investigate-problem; review; maintain-agent-guidance.
+Conditions: Durable personal dotfiles change in the repository workspace; no live chezmoi apply was authorized or performed; origin fetch succeeded and main was clean before the change.
+Authority: The current tree owns the exact mise tool-stub version, platform URLs, checksums, and generated launcher.
+Transcript:
+- U1: process-composeをchezmoiに追加して
+  - A: Confirmed the clean main workspace and existing mise tool-stub convention. Resolved the latest stable process-compose as 1.122.0 from mise and the upstream release, generated a locked stub and its Windows launcher with `mise generate tool-stub`, and verified version consistency across every generated URL. Scoped `mise run check`, `chezmoi diff`, and targeted dry-run passed. Direct execution under the source-state filename failed because mise treated the chezmoi `executable_` prefix as the requested binary name; executing the same stub through its rendered target name in an isolated HOME/XDG environment downloaded the locked artifact and reported Process Compose v1.122.0. Removed the temporary verification directory, committed only the two generated files as e16c50d, and deliberately did not apply the live target.
