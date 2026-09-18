@@ -24,18 +24,18 @@ make_fake_partition() {
 
 fake_root="$temporary/cgroup"
 fake_partition="$fake_root/game.slice"
-make_fake_partition "$fake_partition" member 0 0-7,12-19 ''
+make_fake_partition "$fake_partition" member 0 0-3,12-15 ''
 
 GAME_EXCLUSIVE_CGROUP_ROOT="$fake_root" sh "$partition_helper" activate \
   >"$temporary/activate"
-grep -Fxq 'game-exclusive-partition status=active cpus=0-7,12-19 changed=true' \
+grep -Fxq 'game-exclusive-partition status=active cpus=0-3,12-15 changed=true' \
   "$temporary/activate"
 test "$(cat "$fake_partition/cpuset.cpus.partition")" = root
-test "$(cat "$fake_partition/cpuset.cpus.exclusive")" = 0-7,12-19
+test "$(cat "$fake_partition/cpuset.cpus.exclusive")" = 0-3,12-15
 
 GAME_EXCLUSIVE_CGROUP_ROOT="$fake_root" sh "$partition_helper" check \
   >"$temporary/check"
-grep -Fxq 'game-exclusive-partition status=active cpus=0-7,12-19' "$temporary/check"
+grep -Fxq 'game-exclusive-partition status=active cpus=0-3,12-15' "$temporary/check"
 
 printf 'populated 1\nfrozen 0\n' >"$fake_partition/cgroup.events"
 if GAME_EXCLUSIVE_CGROUP_ROOT="$fake_root" sh "$partition_helper" deactivate \
@@ -59,7 +59,7 @@ rollback_partition="$rollback_root/game.slice"
 mkdir -p "$rollback_partition"
 printf 'populated 0\nfrozen 0\n' >"$rollback_partition/cgroup.events"
 printf 'member\n' >"$rollback_partition/cpuset.cpus.partition"
-printf '0-7,12-19\n' >"$rollback_partition/cpuset.cpus.effective"
+printf '0-3,12-15\n' >"$rollback_partition/cpuset.cpus.effective"
 : >"$rollback_partition/cpuset.cpus.exclusive"
 : >"$rollback_partition/cpuset.cpus.exclusive.effective"
 if GAME_EXCLUSIVE_CGROUP_ROOT="$rollback_root" sh "$partition_helper" activate \
@@ -78,7 +78,7 @@ printf '%s\n' "$@" >"$GAME_EXCLUSIVE_ARGUMENT_LOG"
 EOF
 chmod +x "$fake_systemd_run"
 
-make_fake_partition "$fake_partition" root 0 0-7,12-19 0-7,12-19
+make_fake_partition "$fake_partition" root 0 0-3,12-15 0-3,12-15
 GAME_EXCLUSIVE_CGROUP_ROOT="$fake_root" \
   GAME_EXCLUSIVE_SYSTEMD_RUN="$fake_systemd_run" \
   GAME_EXCLUSIVE_ARGUMENT_LOG="$temporary/arguments" \

@@ -2,7 +2,7 @@
 
 set -eu
 
-readonly expected_cpus=0-7,12-19
+readonly expected_cpus=0-3,12-15
 readonly cgroup_root="${GAME_EXCLUSIVE_CGROUP_ROOT:-/sys/fs/cgroup}"
 readonly partition_path="$cgroup_root/game.slice"
 readonly systemd_run="${GAME_EXCLUSIVE_SYSTEMD_RUN:-systemd-run}"

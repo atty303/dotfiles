@@ -3,4 +3,4 @@ Description=Exclusive game CPU partition
 ConditionHost=infinitas
 
 [Slice]
-AllowedCPUs=0-7,12-19
+AllowedCPUs=0-3,12-15

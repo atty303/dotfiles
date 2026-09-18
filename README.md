@@ -86,10 +86,10 @@ does not inspect the current session or infer roles again.
 
 ## Exclusive game CPU partition
 
-The `infinitas` host reserves logical CPUs `0-7,12-19` for one foreground game process
+The `infinitas` host reserves logical CPUs `0-3,12-15` for one foreground game process
 tree. At boot, `game-exclusive-partition.service` makes `game.slice` a cgroup v2
 partition root; ordinary user and system services then run on the complementary CPUs
-`8-11,20-23`. This controls only the cpuset. It does not change CPU, I/O, memory, or OOM
+`4-11,16-23`. This controls only the cpuset. It does not change CPU, I/O, memory, or OOM
 weights and does not move IRQs or kernel workqueues.
 
 Launch a game from the active local session with:
