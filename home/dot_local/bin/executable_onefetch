@@ -1,0 +1,21 @@
+#!/usr/bin/env -S mise tool-stub
+
+version = "2.28.1"
+
+[platforms.linux-x64]
+url = "https://github.com/o2sh/onefetch/releases/download/2.28.1/onefetch-linux.tar.gz"
+checksum = "sha256:ddf1b1b9f057cdbf71172324de24074e4615fcefd70ce09ab782e9ad5fe41b66"
+size = 6432551 # 6.1 MiB
+bin = "onefetch"
+
+[platforms.macos-arm64]
+url = "https://github.com/o2sh/onefetch/releases/download/2.28.1/onefetch-mac.tar.gz"
+checksum = "sha256:f0e2938c504534c7525e66ea5624489745802f0c53eb02d866103505b305640a"
+size = 5911126 # 5.6 MiB
+bin = "onefetch"
+
+[platforms.windows-x64]
+url = "https://github.com/o2sh/onefetch/releases/download/2.28.1/onefetch-win.tar.gz"
+checksum = "sha256:f896cca9736d5b277025d28d30862577bc30c155dc22670ace63f2ec432f3359"
+size = 6001726 # 5.7 MiB
+bin = "onefetch.exe"
