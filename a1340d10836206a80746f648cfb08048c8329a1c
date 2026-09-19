@@ -1,0 +1,11 @@
+Task: Add scc and onefetch mise tool stubs
+Anchor: a1340d10836206a80746f648cfb08048c8329a1c
+Base: 7c91af9f94a9ad747576218e0f7910286d4b958b
+Line: main
+Commits: a1340d10836206a80746f648cfb08048c8329a1c adds both locked stubs and generated Windows launchers
+Guidance: AGENTS.md; develop-repository; investigate-problem for isolated mise config failure; review
+Environment: Linux x86_64 workspace-write sandbox; target-only chezmoi dry-run approved; live apply not authorized or run
+Authority: Current tree and repository AGENTS.md define the resulting tool-stub contract.
+Transcript:
+- U1: sccとonefetchをtool stubに追加
+  - A: Fetched a clean current main, confirmed both targets were unmanaged, resolved official current versions, generated exact-version checksum-pinned stubs and Windows launchers, and kept live apply out of scope. Targeted checks, chezmoi diff and dry-run, and isolated Linux x86_64 runtime executions passed. Independent review found incorrect onefetch registry platform mappings; onefetch was regenerated through mise explicit platform URLs for only upstream-supported architectures, revalidated, reviewed, and committed as a1340d1. Automatic remote synchronization and CI verification follow this checkpoint.
