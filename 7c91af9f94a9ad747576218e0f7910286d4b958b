@@ -1,0 +1,36 @@
+Task: Replace agent VCS wrappers with direct Git operations
+Anchor: 7c91af9
+Base: e16c50d
+Line: main
+Commits: 7c91af9 refactor: use Git directly for agent VCS
+Guidance: repository AGENTS.md, global Codex AGENTS.md, dig, maintain-agent-guidance, develop-repository, investigate-problem, review
+Execution: durable source-state change; trusted personal control domain; no target apply; direct Git only; repository-authorized main sync pending
+
+Evidence
+
+- `mise run check` passed across 402 files.
+- `mise run test:agent-guidance` passed 8 tests with 0 failures.
+- Targeted `chezmoi apply --dry-run --verbose` passed and showed the guidance updates plus deletion of both wrappers and the Codex rule.
+- Agent-surface reference audit found no remaining wrapper, jj, bookmark, or removed test-task references.
+- Fresh independent review reported no actionable findings. Remaining accepted risks are unapplied targets, an unexercised remote notes conflict path, and the agreed non-atomic window after removing the custom CAS implementation.
+
+Authority: current source tree and tests define the Git-only agent workflow; this note records the task cycle and point-in-time verification.
+
+Transcript
+
+- U1: [$dig](/var/home/atty/.agents/skills/dig/SKILL.md) [$maintain-agent-guidance](/var/home/atty/.agents/skills/maintain-agent-guidance/SKILL.md) vcs操作でラッパーがあまり有効に機能しないので廃止する。agentはjjを認識せず、gitだけ操作でいい。
+  - A: `dig`と`maintain-agent-guidance`を使用し、既存wrapper、agent guidance、tests、Codex rule、人間向けjj設定をread-onlyで監査した。agent経路だけをGit専用にし、人間向けjj環境を維持する選択を推奨してQ1で確認した。
+- U2: A
+  - A: Agent経路限定の廃止を確定した。Wrapperが担っていたGit notesのtask-cycle全文保存も廃止するかをQ2で確認し、単純化の観点から廃止案を推奨した。
+- U3: A
+  - A: Git notes全文保存を維持する方針を確定した。.jjが存在するcolocated repositoryでもagentが通常のGit repositoryとして扱い、jjを検出・同期しないかをQ3で確認した。
+- U4: A
+  - A: `.jj`を検出せず常にGitだけを使う方針を確定した。Direct Gitを固定レシピにせず、安全条件だけ規定する案をQ4で確認した。
+- U5: A
+  - A: Repository適応型のdirect Gitと、ユーザー変更保護・論理commit・remote authorityの不変条件を確定した。Git notesの独自CASを通常のread-before-writeとnon-force pushへ簡略化する案をQ5で確認した。
+- U6: A
+  - A: Notesは既存内容を読み意味を保持して統合し、non-force push競合時は停止し、独自CASは再実装しない方針を確定した。全決定を列挙してQ6で共通理解を確認した。
+- U7: A
+  - A: 共通理解に達したと判断し、agent wrapper・専用test/task/ruleの廃止、Git-only guidance、人間向けjj維持、Git notes維持、memory非変更を決定事項としてまとめた。`dig`に従い、この時点では実装しなかった。
+- U8: 実装して
+  - A: Durableなchezmoi source変更として実装した。Direct Gitでcleanなmainとorigin/main同期を確認し、global/repository guidanceとdevelop-repository skillをGit-onlyへ更新した。Wrapper 2件、専用test、mise task、Codex ruleを削除した。当初のnested `remove_*.sh` markerがshellcheck SC2148に失敗したため`investigate-problem`で原因をsource-selectionへ帰属し、既存`home/.chezmoiremove.tmpl`へ削除対象を統合した。Target applyは行わずdry-runで削除計画を確認した。対象check、全repository check、agent-guidance tests、参照監査、Git diff check、fresh subagent reviewを完了し、actionableな指摘なしを確認してcommit `7c91af9`を作成した。
