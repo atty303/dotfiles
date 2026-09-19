@@ -54,11 +54,11 @@
 
 ## Version Control
 
-- 開発タスクのVCS判定、fetch、state確認、commitおよびpushには `$develop-repository` が指定するscriptを使い、個別の `jj` または `git` コマンドで代替しない。
+- 開発タスクのrepository state確認、fetch、commit、Git notesおよびpushには、`$develop-repository` に従って通常の `git` commandを直接使う。他のVCSのmetadataを検出、解釈または操作しない。
 - ユーザーが未確定のまま残すよう指定しない限り、完了した自分の変更だけを論理単位でローカルに確定し、既存のユーザー変更は含めない。
 - 変更説明やコミットメッセージはリポジトリの慣習に従い、判定できない場合は英語のConventional
   Commits形式を使う。
-- push、リモートbookmarkの更新、PR作成などのリモート操作は、明示的に依頼された場合にのみ行う。
+- push、remote refの更新、PR作成などのリモート操作は、明示的に依頼された場合にのみ行う。
 - PRを作成するときは、draftの指定がない限りready for reviewとして作成する。
 
 ## Durable Guidance

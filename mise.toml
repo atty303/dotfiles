@@ -54,7 +54,6 @@ mise run test:restic
 mise run test:restic-archive
 mise run test:roles
 mise run test:agent-guidance
-mise run test:vcs
 mise run test:system-config
 mise run test:game-exclusive
 mise run test:e2e:harness
@@ -100,10 +99,6 @@ run = "bash tests/roles.sh"
 [tasks."test:agent-guidance"]
 description = "Test agent-guidance session evidence collection"
 run = "deno test -A tests/agent-guidance-session-evidence_test.ts"
-
-[tasks."test:vcs"]
-description = "Test develop-repository VCS wrappers"
-run = "sh tests/develop-repository-vcs.sh"
 
 [tasks."test:system-config"]
 description = "Test all-file and target-limited system configuration management"
