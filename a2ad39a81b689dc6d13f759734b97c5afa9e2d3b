@@ -1,0 +1,16 @@
+Task: Prevent premature completion claims after implementing accepted dig plans
+Anchor: a2ad39a81b689dc6d13f759734b97c5afa9e2d3b
+Base: af1f3436c6d0f0c90b4c755921fddc328e02f703
+Line: main tracking origin/main
+Commits: a2ad39a fix: reconcile implementation with accepted plans
+Guidance: repository AGENTS.md; maintain-agent-guidance; author-skills; develop-repository; review
+Environment: chezmoi source state at /var/home/atty/.local/share/chezmoi; canonical target is ~/.agents/skills/develop-repository/SKILL.md; live apply was not authorized
+Evidence: Targeted mise check passed. Independent review found no actionable defect. Forward tests passed for an omitted documentation item, explicit deployment and live-test non-goals, an unavailable or conflicting plan authority, and a small task without a prior plan.
+Authority: home/dot_agents/skills/develop-repository/SKILL.md is the canonical managed source for the updated workflow.
+Transcript:
+- U1: `[$maintain-agent-guidance](/var/home/atty/.agents/skills/maintain-agent-guidance/SKILL.md) digで作成した計画を実装すると完了を報告するが実際は未達成であることが多い。計画と照合してレビューさせると自分で未達成があると報告してくる。改善したい`
+  - A: Audited dig, develop-repository, review, current guidance, and relevant prior evidence. Identified a missing pre-completion trigger rather than a review-capability failure. Proposed updating develop-repository, not dig, to preserve accepted plans as closed item sets and reconcile every item with evidence before reporting completion. Presented positive, negative, and stopping forward tests and requested approval before persistence.
+- U2: `修正して`
+  - A: Located the chezmoi-managed canonical source, fetched origin/main and notes, and added closed-set plan framing plus pre-review, pre-commit, and pre-handoff reconciliation. A fresh forward test initially found that a known but unavailable plan could still be reconstructed by assumption, so the workflow was tightened to prohibit inferred completion when plan items are unavailable or authorities conflict. The delta passed all four forward scenarios and an independent review. Targeted repository checks and rendered chezmoi diff passed; structural validation was correctly skipped for a body-only skill change. The sandboxed repeat check could not write a temporary file under /tmp, so the same approved `mise run check` was rerun outside the sandbox and passed. Only the managed source was changed; live apply remained a separate unapproved stage. Commit a2ad39a was created.
+- U3: `続けて`
+  - A: Continued from the frozen reviewed diff through the local commit and required Git-note and remote synchronization workflow.
