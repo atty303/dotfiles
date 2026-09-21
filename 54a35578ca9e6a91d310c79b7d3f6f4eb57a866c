@@ -1,0 +1,43 @@
+Task: make flaky verification failures require causal diagnosis and durable repository-owned fixes
+Anchor: 54a3557
+Base: 68bc7b47a087bfaafdf1bfb2a95ea9aa6041048b
+Work line: main tracking origin/main
+Commits: 54a3557 updates the develop-repository verification workflow
+Guidance: repository AGENTS.md; dig; maintain-agent-guidance; author-skills; develop-repository; investigate-problem; review
+Execution: source-only chezmoi change; target apply and live reload excluded; one sandbox check hit read-only /tmp and the unchanged check passed in the normal environment
+
+Evidence
+- Targeted mise check, git diff --check, chezmoi diff, and targeted chezmoi apply dry-run passed.
+- Fresh scenario tests covered repository-owned pre-existing and cross-module failures, external HTTP 502 evidence, build-workflow races, natural product tests, exploratory diagnostics, green-only retries, and unavailable observation tools.
+- Independent review found and resolved two wording gaps: the first retry had to be prohibited before investigation, and exploratory status had to be explicitly designated before execution. A final fresh review found no actionable issue.
+
+Authority: the current develop-repository skill and the user-approved attached implementation prompt define the durable workflow; this note records the task cycle but does not replace them.
+
+Transcript
+- U1: `[$dig](/var/home/atty/.agents/skills/dig/SKILL.md) [$maintain-agent-guidance](/var/home/atty/.agents/skills/maintain-agent-guidance/SKILL.md) タスクのtestや動作確認でflakyな振る舞いに遭遇したとき、その場の手順で回避して恒久修正をしない振る舞いを直したい`
+  - A: Read the applicable skills, current develop-repository and investigate-problem guidance, and relevant prior examples. Identified the unresolved boundary between repository-owned defects and external/transient failures, then began the one-question dig sequence.
+- U2: `なにを無関係と判断する？ 自分のrepoの実装が原因なのに現在のtaskと無関係と判断して修正しないケースがある。しかし、本当にgithub障害などに起因する場合もある`
+  - A: Separated current-diff causality from repository ownership. Asked whether repository-controlled causes anywhere in the same repository should automatically become blockers; recommended yes while preserving existing approval boundaries.
+- U3: `A`
+  - A: Recorded that repository-controlled causes are automatically fixed even when pre-existing or in another module. Asked how an unknown flaky that passes on retry affects task completion.
+- U4: `C`
+  - A: Recorded that unresolved required gates block completion while pre-designated exploratory checks may be non-blocking with causal exclusion and residual-risk reporting. Asked what evidence is required to classify an external transient.
+- U5: `A`
+  - A: Recorded boundary localization, same-condition controls, and intact repository invariants as the external-cause standard. Asked how to validate a durable flaky fix.
+- U6: `B`
+  - A: Pointed out that a bare one-pass standard would recreate green-retry behavior. Asked whether one post-fix pass is acceptable only when root cause and causality were independently established before the change.
+- U7: `A. これにいちいち回帰テストを作っていたら負債にしかならないから避けたいだけ`
+  - A: Recorded that pre-fix evidence establishes root cause and one post-fix pass checks only the normal path. Asked when adding a regression test is justified.
+- U8: `A. live/test code由来のflakyで自然な回帰testは追加していいが、例えばビルドタスクのflakyを直すためにbuild workflow自体のtestを書くのはあきらかに過剰投資だ`
+  - A: Recorded that natural deterministic product/test coverage is allowed, while new workflow meta-test infrastructure, timing sleeps, and excessive repetitions are normally over-investment. Proposed integrating the rule into develop-repository Verification rather than duplicating global or investigate-problem guidance, then asked for common-understanding confirmation.
+- U9: `skill本文を更新したから読み直して`
+  - A: Detected and reread the updated dig skill. Reported its new self-contained implementation-handoff format and repeated the common-understanding confirmation under the updated contract.
+- U10: `A`
+  - A: Produced the required self-contained implementation prompt in a single four-backtick block. The prompt preserved every agreed success condition, decision reason, rejected alternative, authority boundary, non-goal, unverified premise, and implementation instruction.
+- U11:
+    [Attached file: `貼り付けたテキスト.txt`; SHA-256 `b2af4ae4b9ed079707f66622cac85c384c49e57387ab4bb78690b7528c6b1e8e`; contents are the approved self-contained implementation prompt generated in A10. The attachment is referenced rather than duplicated.]
+
+    `Pasted text contains the user's request.`
+
+    `## My request:`
+  - A: Treated the attachment as the implementation authority. Confirmed the chezmoi source path, fetched code and notes, classified the skill update as durable, and edited only `home/dot_agents/skills/develop-repository/SKILL.md`. Replaced the two existing flaky-verification bullets with four integrated rules covering the investigation trigger, repository ownership, external/unknown classification, and proportional fix validation. Ran targeted checks, rendered diff, dry-run, scenario forward tests, and independent reviews. Investigated a sandbox-only read-only `/tmp` failure before rerunning the unchanged check in the normal environment. Resolved both review findings, committed only the skill source as `54a3557`, and did not apply or reload the target.
