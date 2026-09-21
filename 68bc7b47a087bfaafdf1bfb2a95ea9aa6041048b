@@ -1,0 +1,58 @@
+Task: Make dig agreement output a copyable implementation handoff prompt
+Anchor: 68bc7b47a087bfaafdf1bfb2a95ea9aa6041048b
+Base: 5b63ee00284948e6c77631de49426e9540054707
+Workline: main tracking origin/main
+Commits: 68bc7b47a087bfaafdf1bfb2a95ea9aa6041048b implements the agreed dig output and unavailable-fact stop contract
+Guidance: repository AGENTS.md; dig; author-skills; develop-repository; review; investigate-problem; atty303 engineering policy
+Environment: read-only Codex sandbox for ordinary commands; scoped repository check rerun in the approved host-equivalent environment after sandbox /tmp denial
+Authority: User-approved design summary in U11 and current home/dot_agents/skills/dig/SKILL.md
+Evidence:
+- Target-limited mise check, git diff check, chezmoi target diff, and chezmoi target dry-run passed.
+- Fresh independent review and forward tests for intended completion, near-miss continuation, and unavailable fact sources passed after two bounded wording fixes.
+Transcript:
+- U1: [$dig](/var/home/atty/.agents/skills/dig/SKILL.md) dig skillで合意確定時の出力を実装に引き継ぐためのコピー可能プロンプトにしたい
+  - A: Read the applicable skill and repository guidance, confirmed the chezmoi canonical source, and asked Q1 whether the handoff should be self-contained, conversation-dependent, or both; recommended a self-contained prompt.
+- U2: A
+  - A: Asked Q2 whether all output sections should be fixed and explicit even when empty; recommended fixed mandatory sections with `なし`.
+- U3: A
+  - A: Asked Q3 which required sections to carry; recommended request, purpose, success criteria, decisions, constraints, non-goals, unverified assumptions, and implementation instructions.
+- U4: A
+  - A: Asked Q4 how much rationale to preserve; recommended including reasons and material rejected alternatives without the full deliberation transcript.
+- U5: A
+  - A: Asked Q5 for the final response envelope; recommended a single four-backtick code block with no surrounding prose.
+- U6: A
+  - A: Asked Q6 how implementation should react when an assumption fails; recommended autonomous internal adaptation only while preserving the agreed major contract, otherwise stop and ask.
+- U7: A
+  - A: Asked Q7 how authority should be represented; recommended authorizing implementation and needed verification while preserving explicit agreement and applicable guidance boundaries without inferring commit, push, deploy, migration, or target-apply authority.
+- U8: A
+  - A: Asked Q8 whether completion reporting should map back to the agreed criteria; recommended one-to-one evidence, out-of-scope rationale, or unmet-state mapping.
+- U9: A
+  - A: Asked Q9 for common-understanding confirmation using the complete proposed contract.
+- U10: A
+  - A: Returned the required dig summary of all settled decisions and stopped before implementation.
+- U11:
+    実装して。
+
+    ## まとめ
+
+    ### 決まったこと
+
+    - `dig` の合意確定時の出力を、新しい task へそのまま貼り付けられる自己完結した実装プロンプトにする。
+    - 最終応答は、前置きや追記を付けず、単一の四連バッククォートコードブロックだけにする。
+    - 実装プロンプトには次のセクションを必須とする。該当事項がない場合も省略せず「なし」と明記する。
+      - `依頼`
+      - `目的`
+      - `成功条件`
+      - `決定事項`
+      - `制約`
+      - `対象外`
+      - `未検証の前提`
+      - `実装時の指示`
+    - 実装判断に影響する決定には、決定理由と主要な棄却案を併記する。検討過程全体は含めない。
+    - 実装担当には、引き継がれた項目を closed set として扱い、黙示的に統合、省略、再解釈しないよう指示する。
+    - 実装前に未検証の前提と現在の source、環境、適用 guidance を確認させる。
+    - 前提が崩れた場合、目的、成功条件、制約、利用者向け contract を維持できる内部変更は自律的に行える。
+    - 主要 contract、scope、authority、外部影響などを変える必要がある場合は、変更を止めて根拠と代替案を示し、利用者へ確認する。
+    - プロンプトは実装と必要な検証を依頼する。それ以外の操作は元の合意と適用 guidance に従わせ、commit、push、deploy、migration、実機適用などの権限を推測で拡張させない。
+    - 実装完了時には、各成功条件と制約を、達成証拠、対象外とした根拠、または未達事項へ一対一で対応させて報告させる。
+  - A: Classified the one-file body-only skill change as durable, fetched and verified clean main at origin/main, edited the canonical chezmoi source, and froze the draft. Target-limited repository check, chezmoi diff, and dry-run passed. Fresh review found a self-containment bug in `元の合意`; forward testing found the unavailable-fact stop condition was under-specified. Updated the template to refer to agreement written in the prompt and added an explicit stop report when no fact source or independent branch is available. Delta review and forward recheck passed. A sandbox-only /tmp denial on a repeated mise check was diagnosed as an environment boundary, and the same scoped check passed in the approved host-equivalent environment. Committed the reviewed source-only change as 68bc7b4; live target apply was deliberately not performed.
