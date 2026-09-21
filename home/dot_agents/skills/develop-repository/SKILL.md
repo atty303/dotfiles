@@ -14,6 +14,8 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 ### Solution Framing
 
 - 実装前に、依頼、適用guidance、repositoryの原典および実環境から、目的、observableな成功条件、hard constraint、明示された手段および未検証の前提を確定する。この整理だけのためにrepository文書を作成しない。
+- ユーザーが承認した計画、設計まとめ、checkpointまたはその他の実装原典がある場合は、変更前にその全項目をclosed setとして列挙し、各項目をobservableな成功条件、hard constraint、明示的なnon-goal、確認済みの選択または未検証の前提へ分類する。曖昧な上位目的へ統合して項目を消失させず、実装中も同じ項目集合と対応を維持する。この照合だけのためにrepository文書を作成しない。
+- 存在が示された実装原典の全項目を取得できない場合、または適用authority間の衝突により項目集合、分類もしくは達成判定を確定できない場合は、欠落を推測で補わず確認を求め、解消するまでtask全体を完了扱いにしない。独立した範囲を継続できる場合は未完了境界を保ち、継続できない場合はblocked handoffとする。
 - Requested pathと、repository変更なし、既存機構の利用、削除、簡略化または前提変更を含む最小コストのviable alternativeを、成果差と継続的な保守コストに比例する範囲で比較する。同等の結果を得る内部設計は自律的に選択するが、user-visible contract、scope、migration、dependency、権限、外部影響、互換性または保存dataを変えない。
 - 明示された技術または構造からの逸脱は、前提の誤り、目的への阻害またはmaterialな成果差もしくは複雑性差をsourceや実環境から確認できる場合だけ提案する。現案、代替案、前提差、保守コスト、利用者への影響および推奨案を一度に示し、承認されるまで明示手段を変更しない。差が僅か、未検証または成果に影響しない場合は再交渉しない。
 - 実装中に前提の崩壊、目的を満たさない経路または不釣り合いな複雑化を検出した場合は、局所的な追加実装を止めてsolution framingへ戻る。主要contractを変えずに解消できなければ、変更を続ける前に確認する。
@@ -91,6 +93,8 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 
 ### Review
 
+- Commit、完了を示す最終報告および必須reviewの開始前に、diffや実装経緯から離れて、元の依頼、受理済み計画および現在のrepository原典を再読する。計画の各項目を、達成済みならobservableな証拠、対象外ならその根拠となる明示的なauthority、未達または未検証なら残作業へ一対一で対応付ける。Reviewへ渡すacceptance criteriaも同じ項目集合を保持する。
+- 成功条件とhard constraintがすべて証拠付きで達成され、non-goalとの境界が保たれ、未達または未検証項目がない場合だけtask全体を完了とする。依頼範囲内で解消できる未達は作業を継続し、解消できない項目が残る場合はpartialまたはblockedとして未達項目と必要な次のactionを報告する。局所test、build、reviewまたはcommitの成功だけで、対応付けられていない計画項目を達成済みとみなさない。
 - `durable`な変更をローカルcommitとして確定する前に、[$review](../review/SKILL.md)をすべて読み、成果物が実際に越えるtrust boundaryとoperational safety上のblast radiusに比例したfresh subagent reviewを完了する。`spike`は独立レビューを必須とせず、上記の目的限定の完了条件を実装者が確認する。明示的にspikeのreviewを依頼された場合は、`review`へartifact profileと目的限定のacceptance criteriaを渡す。
 - 複数の論理単位がある場合は、変更の結合度とリスクから、タスク全体または論理単位ごとのレビューを選ぶ。
 - 指摘を`review`が定める基準で自動対応、棄却またはユーザー判断へ裁定する。自動対応とユーザーが採用した対応対象だけを一括修正して関連検証を再実行し、比例的な再確認と最終diffの完了条件を満たす。
