@@ -3,48 +3,30 @@ name: investigate-problem
 description: 不具合、障害、エラーまたは期待と異なる振る舞いを、保持済みの観測証拠、必要な再現および反証から診断する。ソフトウェア、設定または実行環境の問題調査、原因究明または修正前調査を依頼されたときに使用する。
 ---
 
-# Problem Investigation
+# Problem investigation
 
-## Scope the investigation
+## Fix the question and evidence boundary
 
-- 期待する結果、実際の症状、再現条件および影響を確定する。
-- ユーザーが指定した原因、故障箇所または修正方法、およびモデルが学習知識、memoryまたは類似事例から導いた当該事象の原因候補は、明示的に確認済みのcontractまたは観測事実ではなく、いずれも反証可能なpriorとして扱う。観測された症状と期待状態をfailure oracleとし、いずれかの説明へ証拠を当てはめない。
-- 修正前に、利用者が失敗と判断した最終状態を成功・失敗のoracleとして固定する。redirect、title、request開始または初期renderなどの途中状態や、異なる条件での成功をoracleの代用にしない。
-- 対象programが観測面を持つ場合は、[program観測契約](../../references/agent-computer-interface-observability.md)を
-  すべて読み、再現より先に報告されたrunを探す。run ID、発生時刻、program version、runtime、environmentおよび利用者操作を
-  対応付け、resource、operation tree、status、error type、event、linkおよびartifactを確認する。
-- runの完全性が`partial`または`dropped`、あるいはrecording subsystemがdegradedなら、欠落を事象の不在として扱わない。
-  保存済みrunで判断できないboundaryと、追加で必要な観測を明示する。
-- 症状が報告された環境、各観測を実行する環境および期待結果が成立すべき対象環境を区別する。Codexの実行環境はsandboxであり得る一方、ユーザーの指示や報告が同じ制約下にあるとは仮定しない。
-- filesystem、network、socket、device、credential、GUI sessionその他の環境境界に関係する失敗は、観測した環境を証拠へ付記する。Codex sandboxだけで再現した失敗を対象環境の不具合と断定せず、許可された対象相当環境での再観測、またはユーザーが実行できる正確な観測手順によって切り分ける。
-- 原因調査と修正のどちらを依頼されているかを区別する。修正まで依頼されていなければ、読み取り専用かつ状態を変更しない観測だけを行う。
-- 適用されるguidance、source、設定、ログおよび履歴から低コストで確認できる事実を再利用し、発見できない意図または欠落情報だけを確認する。
+- 期待結果、症状、再現条件、影響、および調査だけか修正も含むかを確定する。修正依頼がなければread-only観測に限る。
+- [Failure oracle and causal verification](../../references/failure-oracle-and-causal-verification.md) を読み、利用者が判断する最終状態をoracleとして固定する。提示された原因や修正案、model知識、memoryおよび類似事例は反証可能なpriorとする。
+- 対象programが観測面を持つ場合は [program observability contract](../../references/agent-computer-interface-observability.md) を読み、再現前に該当runを探す。Run ID、時刻、version、runtime、environmentと操作を対応付け、operation tree、status、error type、event、link、artifactおよび完全性を確認する。Partial、droppedまたはdegradedを事象の不在とみなさない。
+- 症状環境、観測環境および結果が成立すべき環境を分ける。Sandbox内だけの不存在、接続失敗または権限拒否を対象環境の事実にせず、許可された対象相当環境または正確な利用者向け観測で切り分ける。
 
-## Choose the next observation
+## Choose discriminating observations
 
-- 専門領域の一つの説明へ絞る前に、症状までの経路にある未検証の前提を層をまたいで候補へ含める。ユーザー操作、物理接続と電源、入力、実際のentry path、設定、runtimeおよび対象environmentのうち、結果を変え得る未除外の層を検討し、agentが詳しい層や観測しやすい層を高確率とみなさない。すべてを順番に確認するchecklistにはせず、高signalな既存証拠で除外済みの層は飛ばす。
-- failure oracleを直接再評価でき、秒から数分で戻せる前提確認が有力仮説を分けるなら、各層を局所化する診断より先に行う。たとえば接続し直す、実際のentry pathや入力を選び直す、既知の最小入力と比較するなどであり、その試行自体が最終結果を観測できる場合は、下位層の認識を先に証明することを前提にしない。ただし、高signalな既存証拠がその前提を除外している場合は繰り返さない。
-- 次の観測は、得られる情報量やagentが単独で実行できるかではなく、有力仮説を分離または反証する力と総コストで順位付けする。総コストには、ユーザーの経過時間、操作・認知負担、中断とcontext switch、downtime、状態変更、失敗risk、復旧負担、およびagent・toolの所要時間を含め、特にユーザーの時間と労力を重く扱う。数秒のユーザーだけが行える確認が深いread-only調査より総コストを大きく下げるなら、先に依頼できる。
-- 保持済みrun、log、source、runtime状態およびread-only probeを再利用するが、「agentがまだ調べられる」ことだけを理由に、より安価で識別力の高い観測を後回しにしない。ユーザーへ観測を依頼するときは、区別する仮説、実行内容、期待する分岐、おおよその所要時間、および状態変更やriskを簡潔に示す。
-- reboot、別kernelや別OSでの起動、install、設定変更、boot media作成、firmwareまたはBIOS更新、分解、長時間の再現など高コストな観測へ進む前に、同じ有力仮説を反証できる低コストな観測が残っていないことを確認する。高コストな観測がどの仮説を分け、その結果によって次の行動がどう変わるかを説明できなければ実行または依頼しない。
-- 観測が予想と外れた、複数回の観測で有力仮説が狭まらない、またはユーザーから新しい視点が示された場合は、既存の説明へ継ぎ足す前に未検証前提と仮説集合を組み直す。
-- 調査budgetを暗黙に無制限としない。次の観測の期待識別価値が総コストに見合わない、観測を重ねても仮説が狭まらない、またはユーザーが許容時間を示していない状態で数分を超える操作、rebootやdowntime、反復作業へ進む場合は、その前に停止する。現在の証拠、残る仮説、各選択肢の期待利益、所要時間、負担およびriskを示し、続行するかをユーザーの選択へ戻す。
+- User operation、physical input、entry path、configuration、runtime、environmentおよびdownstream stateを横断して未検証前提を候補にし、高signalな証拠で除外済みの層は飛ばす。
+- 次の観測を仮説の反証力と総コストで順位付けする。総コストにはユーザーの時間、操作・認知負担、downtime、状態変更、risk、復旧およびtool時間を含める。短い利用者確認が深いagent調査より安ければ、区別する仮説、操作、分岐、時間およびriskを示して先に依頼できる。
+- 高コストなreboot、install、設定変更、別OS、firmware、分解または長時間再現は、より安い識別手段がなく、結果で次の行動が変わる場合だけ提案する。数分超の操作や識別価値が低い探索へ進む前に、証拠、残る仮説、利益、負担およびriskを示して選択を戻す。
+- 予想外の観測、仮説が狭まらない反復、または新しい視点があれば、既存説明へ継ぎ足さず仮説集合を組み直す。
 
-## Build and test hypotheses
+## Test hypotheses
 
-- 観測事実、仮説、推論および未確認事項を区別する。
-- 不確実性または競合する説明がある場合は、有力な原因候補を複数検討し、到達可能な失敗条件と各仮説を反証できる観測を定める。
-- 追加観測または再現では、区別する仮説、再現baseline、比較を伴うなら変更する一要因、取得する観測値、および各仮説の反証条件を定める。報告されたbrowser、runtime、
-  version、entry path、inputおよびtimingのうち結果へ影響し得る条件を再現baselineへ記録する。再現に状態変更が必要な場合は
-  実行せず、必要性と影響を示して追加の承認を求める。
-- 症状が現れた場所と原因を区別し、破られた不変条件から症状までの因果連鎖を確認する。
-- 症状を迂回する設定変更またはworkaroundでfailure oracleがpassしても、原因を除いた証拠とはみなさない。調査中の恒久化は避け、ユーザーが一時的なmitigationも明示的に求めた場合だけ、診断結果と分けて提案する。
-- 仮説比較ではbaselineから一度に一要因だけを変え、失敗段階を観測する前に恒久修正を積み重ねない。修正も依頼されている場合は、修正前の失敗を記録し、同じbaselineの最終oracleがfailからpassへ変わることを確認する。修正前後を同じbaselineで直接比較できない、または別要因の混入を除外できない状態でroot causeを断定する場合だけ、安全かつ検証コストに比例する範囲で、変更を外すか失敗条件を戻した対照によりpassからfailへ戻ることも確認する。対象条件を実行できなければ、異なる条件での成功を修正確認とせず、未確認boundaryとして報告する。
+- 観測、仮説、推論およびunknownを分け、有力候補ごとに到達可能な失敗条件と反証観測を定める。
+- 再現ではbaseline、変更する一要因、取得値および反証条件を決める。状態変更が必要ならauthorityと影響を示して承認を得る。
+- 症状の場所と原因を区別し、workaroundによるpassを原因除去とみなさない。恒久化せず、明示依頼された一時mitigationだけを診断と分けて提案する。
+- 修正前のfailureと同じbaselineの最終oracleが修正後にpassすることを確認する。異なる条件のsuccessは未確認boundaryとして扱う。
 
-## Conclude or stop
+## Conclude or hand off
 
-- root causeを特定した場合は、破られた不変条件から症状までの因果連鎖を示す。
-- 証拠が足りない場合は断定せず、未確定の候補と必要な追加観測を示す。
-- いずれの場合も、観測証拠、除外した有力仮説、影響範囲、現在の確信度、未確認事項、残存リスクおよび調査を終了または停止した理由を報告する。
-- 修正も依頼されている場合は、原因を取り除いてfailure oracleを満たす最小の変更面を示す。ユーザー指定の修正方法と異なる場合は、`develop-repository`のsolution framingに従って主要contractへの影響と確認要否を裁定し、同workflowに引き渡す。
-  観測面の追加または修復が必要なら、product fixより先に`design-program-observability`を使用するよう明示する。
+- Root causeを確定した場合は破られたinvariantからoracleまでの因果連鎖を示す。未確定なら断定せず、証拠、除外候補、残る仮説、確信度、追加観測、riskおよび停止理由を報告する。
+- 修正も依頼された場合は、原因を除く最小変更面とoracleを`$develop-repository`へ渡す。観測不足ならproduct fixより先に`$design-program-observability`へ渡す。

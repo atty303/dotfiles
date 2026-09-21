@@ -1,95 +1,47 @@
 # Common Rules
 
-## Command Approval
+## Authority and execution
 
-- 承認が必要なコマンドは、必要最小限かつ再利用可能な単位で永続承認できるように実行する。
-- 長くなりそうなタスクでは、必要な承認を開始時に見積もり、予見できるものを可能な限り早い段階でまとめて求める。
+- 承認が必要なcommandは必要最小限かつ再利用可能な単位で早めに求める。sandbox外実行の許可を、操作内容、外部影響または権限拡張の承認とみなさない。
+- deploy、release、data migrationおよびcloud resourceの変更は、ユーザーが明示的に依頼または承認した場合だけ行う。
+- Sandbox内の可視性、到達性および権限と対象環境の状態を区別する。対象環境について結論する必要があれば承認された対象相当環境で最小限に観測し、確認できない範囲を明示する。
+- Agent自身が作った一時resourceはownershipとcleanup対象を特定し、保持理由がなければ完了前に削除する。既存、利用者提供または対象不明の広いresourceは削除しない。
 
-## Sandbox Observation
+## Task interpretation
 
-- 開発中の確認を含むすべての観測で、sandbox内の可視性・到達性・権限と対象環境の状態を区別する。空の列挙、NotFound、接続失敗または権限拒否だけで、対象環境でも不存在、停止または利用不能と断定しない。
-- 対象環境について結論するために必要なら、承認された対象相当環境で最小限の観測を行う。確認できなければ観測した環境と未確認の範囲を報告する。sandbox外での実行許可を、操作内容や外部影響の追加承認とみなさない。
+- 指示を目的、observableな成功条件、hard constraint、明示された手段および未検証の前提へ分ける。目的、authority、外部影響および受け入れ可能な結果はユーザーが決める。
+- 同じscope、authority、外部影響、互換性、保存data、dependency approvalおよび主要contract内では、目的を同等以上に満たす単純で保守コストの低い内部設計を自律的に選べる。
+- User-visible contract、scope、migration、dependency、権限、外部影響または確認済みの技術選択を変える必要がある場合は、根拠、影響および推奨案を示して確認する。効果が僅かな好みや根拠のない改善案のために再交渉しない。
 
-## External State Changes
+## Data safety
 
-- deploy、release、data migrationの実行およびcloud resourceの変更は、ユーザーから明示的に依頼または承認された場合だけ行う。
+- Password、private key、access/refresh token、session cookie、認証header、credential入りURLなど、所持により認証、認可、復号、署名またはなりすましが可能な値は、rawまたは復元可能な形で表示、記録またはcommitしない。
+- Confidential contentとprivacy-sensitive dataはauthorizedなtask内で必要な範囲だけ扱い、無関係な外部service、public artifactまたはlogへ送らない。
+- 権限不足時は、IAM管理が依頼または承認済みでない限りidentity、credential、role、policyまたはscopeを変更・拡張せず、失敗したactionとresourceを示して停止する。詳細分類とsink別規則は必要時に `~/.agents/references/data-handling.md` を読む。
 
-## Temporary Resources
+## Human-facing commands
 
-- タスクのためにagent自身が作成した一時file、directoryおよびその他の一時resourceは、再利用、handoffまたは診断証拠として保持する必要が明示されていない限り、成功・失敗を問わずタスク完了前に削除する。作成時にcleanup対象とownershipを特定し、既存resource、利用者が提供したresource、または対象を特定できない広い一時領域を削除しない。安全にcleanupできない場合は、残した対象と理由を完了報告に含める。
-
-## Task Interpretation
-
-- ユーザーの指示を、目的とobservableな成功条件、hard constraint、明示された手段、および未検証の前提へ分けて解釈する。ユーザーを目的、許可、外部影響および受け入れ可能な結果の最終決定者とするが、提示された原因、実装案または手順が常に正確または最適とは仮定しない。
-- Authority、外部状態変更、破壊的または不可逆な操作、secretとconfidentiality、明示的なcontract、および確認済みの選択は再解釈しない。同じauthority、scope、外部影響、互換性、保存data、dependency approvalおよび主要contract内の内部設計は、目的を同等以上に満たす単純で保守コストの低い案へ自律的に変更できる。
-- User-visible contract、scope、migration、dependency、権限または外部影響を変える案、指示間の矛盾、および目的の解釈によって主要contractが変わる場合は、根拠、成果への効果、前提差、保守コスト、利用者への影響および推奨案をまとめて確認する。
-- 技術または構造が明示されている場合は無言で置換しない。ただし、前提が誤っている、目的を阻害する、または別案で大幅に単純化できるという根拠がある場合は一度だけ代替案を提示し、承認後に変更する。回答が得られない間は明示手段を維持し、agentの推奨を承認とみなさない。
-- 効果が僅かな好み、証拠のない改善案または現在の成果に影響しない別案のために指示を再交渉せず、探索を打ち切って依頼を進める。
-
-## Secret Handling
-
-- 情報は文字列の見た目ではなく、値が与える能力、明示的なconfidentiality contractおよび出力先で分類する。`secret`は所持により認証、認可、復号、署名またはなりすましが可能なpassword、private key、access/refresh token、session cookie、認証header、credential入りURLおよび署名付きURLなどとし、raw値または復元可能な表現を出力先にかかわらず記録、表示またはcommitしない。
-- ユーザー、repository、契約またはdata ownerが非公開と指定した本文やdataは`confidential content`とし、authorizedなtask内で必要な範囲だけ処理し、無関係な外部service、public artifactまたはlogへ送らない。実名、email、住所、位置、行動履歴、会話、画面または個人fileの内容は`privacy-sensitive data`とし、secretとは呼ばず、authorizedなtask surfaceでは必要に応じて利用し、publicまたは無関係な外部sinkでは目的に不要な値を最小化する。
-- usernameを含むhome path、hostname、account名、IP、PID、port、device名、repository path、UUID、digestおよびcommit IDは、明示的な別contractがない限り`operational identifier`とする。Codexの会話、許可されたtool outputおよび利用者専用local diagnosticではそのまま利用できる。Public artifactで不要な個人・host固有値をplaceholder、相対pathまたは一般例へ置き換える場合は、secret redactionではなくprivacyまたはportability上の最小化として扱う。
-- 高entropy、長い文字列、`user`を含むpath、private permissionまたは環境固有性だけをsecretの根拠にしない。Credential形式、auth field、値が与える能力または明示的なconfidentiality contractから判定する。判定不能な値は文脈を確認するまでrawで再掲しないが、entropyだけで恒久的にredactしない。
-- 認証、IAM、OAuthまたは外部サービスの設定をAPIやCLIで取得するときは、raw responseをterminalやtool outputへ出さない。取得時点でallowlistにより必要な非機密fieldだけを抽出し、client secret、access/refresh token、API keyおよびprivate keyを除外する。
-- 外部サービスの新しい認証経路では、既存のagent専用actorまたはidentity boundaryと短期・最小権限credentialを優先し、固定key、長期credentialまたは人間用credentialへ到達する迂回経路を追加・拡張しない。
-- 外部サービスへの操作が権限不足で失敗した場合、IAM管理自体が依頼または承認済みでない限り、IAM policy、role、permission boundary、profile、credentialまたはidentityを変更せず、より広いidentityやscopeへ切り替えない。失敗したactionとresourceを示して停止する。この規則をsandboxのcommandやnetworkの承認、および設定済みconnectorを既存権限内で利用する操作には適用しない。
-
-## Human-Facing Commands
-
-- 人間が端末で実行するコマンドを提示するときは、表示上の都合だけでバックスラッシュによる行継続を使わず、1回でコピー＆ペーストできる単一行のコードブロックにする。
-- 複数の独立した操作は、それぞれを単一行のコマンドとして分ける。構造の説明や読みやすい表記が必要な場合も、実行用コマンドとは分離する。
-- ユーザーが対話シェルへ直接入力する一時的なコマンドは、明示的な指定または対象環境の制約がない限り、Nushell構文を基本とする。
-- この既定を、リポジトリやその他の永続化ファイルに記述するスクリプト、タスク、設定およびドキュメント例の言語選択には適用しない。そこでは既存形式と対象環境を優先し、ユーザーの対話シェルを理由にNushellを導入しない。
+- 人間が端末へ入力するcommandは、表示用の行継続を使わず一度にcopyできる単一行にする。独立した操作は別々のcommandにする。
+- 一時的な対話commandは、明示指定や環境制約がなければNushell構文を使う。Repository内のscript、task、設定およびdocument例は既存形式と対象環境を優先する。
 
 ## Dotfiles
 
-- ホームディレクトリのdotfilesは原則としてchezmoiで管理されている。
-- 編集前に `chezmoi source-path <target>` で管理対象か確認する。パスには `~` または `/home/atty`
-  を使い、`/var/home/atty` は使わない。
-- 管理対象の場合は、返されたsource stateに適用される `AGENTS.md` を読んでからsource stateを編集し、target実体を直接編集しない。
-- 未管理の場合はchezmoiへ自動追加せず、target実体を直接編集する。
+- Homeのdotfileは原則chezmoi管理である。編集前に `chezmoi source-path <target>` を `~` または `/home/atty` のpathで確認する。
+- Managed targetは適用される `AGENTS.md` を読んでsource stateを編集し、targetを直接編集しない。Unmanaged targetは自動追加せずtargetを編集する。
 
-## Version Control
+## Version control
 
-- 開発タスクのrepository state確認、fetch、commit、Git notesおよびpushには、`$develop-repository` に従って通常の `git` commandを直接使う。他のVCSのmetadataを検出、解釈または操作しない。
-- ユーザーが未確定のまま残すよう指定しない限り、完了した自分の変更だけを論理単位でローカルに確定し、既存のユーザー変更は含めない。
-- 変更説明やコミットメッセージはリポジトリの慣習に従い、判定できない場合は英語のConventional
-  Commits形式を使う。
-- push、remote refの更新、PR作成などのリモート操作は、明示的に依頼された場合にのみ行う。
-- PRを作成するときは、draftの指定がない限りready for reviewとして作成する。
+- Repository操作は `$develop-repository` に従って通常のGit commandだけを使い、他VCSのmetadataを操作しない。
+- Push、remote ref更新およびPR作成は、明示依頼または適用guidanceのstanding authorizationがある場合だけ行う。
 
-## Task Completion
+## Task completion
 
-- 成功条件をすべて満たしたtaskの完了報告を送る直前だけ、現在のruntimeにthread title更新操作があれば一度実行する。途中報告、質問、partialまたはblocked handoff、明示的な中止、および別taskへの置換では更新しない。会話内でユーザーがtitleを指定したか維持する意図を示した場合も上書きしない。
-- Titleは既存値への追記や直近taskだけの要約ではなく、thread全体を再評価し、主要な目的と最終的な到達点を、ユーザーが主に使用した言語による簡潔な一文で表す。製品名、識別子およびcode用語は必要に応じて原表記を保ち、`完了`、`Done`などの固定状態語を付けない。操作が利用不能または失敗してもtask本体の完了を妨げず、その場合だけ更新できなかった事実と設定を試みたtitleを完了報告へ含め、成功時は追加報告しない。
+- 全成功条件を満たす最終報告の直前だけ、runtimeに操作がありユーザーがtitleを指定・維持していなければ、thread全体の主要目的と到達点を表す簡潔なtitleへ一度更新する。途中、partial、blocked、中止またはtask置換では更新しない。
+- 更新不能はtaskを妨げない。失敗時だけ試みたtitleを報告し、成功時は報告しない。
 
-## Durable Guidance
+# Workflow routing
 
-- タスク完了時に、将来の複数タスクで有効、既存の原典から自明でない、かつ具体的な失敗、確認または成功で裏付けられた学びだけを永続化候補として評価する。
-- 候補がある場合は `$maintain-agent-guidance`
-  を使用し、自動反映せず、保存先、根拠、理由および具体的な変更案を提示する。承認後に元の成果物とは別の論理変更として確定する。
-
-# Investigation Tasks
-
-- 不具合、障害、エラーまたは期待と異なる振る舞いの診断および原因調査では
-  `$investigate-problem` を使用する。
-- 修正まで依頼されている場合も、product codeを変更する前に `$investigate-problem` で原因と観測証拠を確定し、その後
-  `$develop-repository` へ引き渡す。
-
-# Development Tasks
-
-- 開発、修正、リファクタリング、レビュー対応など、リポジトリを変更するタスクでは
-  `$develop-repository` を使用する。
-- 開発開始時に、成果物が仮説検証用の`spike`か、release、常用、再利用または運用依存を想定する`durable`かを、依頼、計画およびrepositoryの原典から確定する。同時に、入力、コードおよびresourceを支配する主体のcontrol domainを確認し、reviewと検証の範囲を`$develop-repository`に従って決める。
-- 外部境界、状態変更、非同期・並行、複数段階または再現困難性を持つprogram経路を追加・変更するときは、実装前に
-  `$design-program-observability` を使用する。観測面の原典は
-  `~/.agents/references/agent-computer-interface-observability.md` とする。
-- 明示的な指示がない限り、変更は対象リポジトリ内に限定する。
-- 承認済みcommand prefix、別repositoryのguidance、memory、過去taskでの利用実績、または環境内に必要なtoolが存在することを、現在のrepositoryの開発、build、testまたは依存調査環境を選ぶ根拠にしない。実行環境は、現在のrepositoryのsource、task、build process、適用guidanceまたはユーザーの明示指定から確定する。別のapplicationや運用目的で用意されたcontainerまたはruntimeを、明示的な根拠なしに開発環境へ転用しない。
-- ライブラリ、開発ツール、テスト用パッケージを含む新規依存は、必要性があり、保守性、安全性または実装の単純化に寄与する場合は積極的に採用候補とする。独自実装を優先せず、採用理由、主な代替案、および依存追加による影響を示したうえで、追加前に承認を求める。
-- リポジトリの主目的ではない補助ライブラリおよび開発・検証ツールの設定は、upstreamの標準設定をbaselineとし、依頼達成に必要な最小差分に限定する。ユーザーが具体的に指定または承認していないカスタマイズは、得られる価値とupstream追随を含む継続的な保守コストを示し、変更前に承認を求める。
-- 対象リポジトリ固有の互換性方針および明示的な互換性要件を優先する。それらがない場合は、既存挙動の維持を暗黙の要件とせず、変更後の設計の一貫性、単純性および保守性を優先し、必要な破壊的変更を許容する。
-- 変更後の成果物を差分や実装経緯から切り離して見直し、現在の要件に不要な互換レイヤー、旧経路、別名、分岐、経緯を説明するコメントおよび文書を残さない。
-- 利用者による移行、データ変換または選択が必要な破壊的変更は、影響と移行方法を示し、実装前に確認を求める。
+- 不具合、障害、errorまたは期待外の挙動の診断には `$investigate-problem` を使う。修正も依頼された場合は原因と観測証拠を確定してから `$develop-repository` へ引き渡す。
+- Repositoryの開発、修正、refactorまたはreview対応には `$develop-repository` を使う。
+- 外部境界、状態変更、async・concurrent、複数段階または再現困難なprogram経路を追加・変更する場合は、実装前に `$design-program-observability` で適用判定する。
+- AGENTS、skill、agent guidance、永続化規則または過去taskの学びの保存・整理・監査をユーザーが明示的に依頼した場合だけ `$maintain-agent-guidance` を使う。通常taskの完了時には起動しない。

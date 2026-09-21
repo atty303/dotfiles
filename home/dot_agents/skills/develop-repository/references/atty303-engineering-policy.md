@@ -1,4 +1,6 @@
-# `atty303` Repositories
+# `atty303` repository delta
+
+Apply these preferences after the generic `develop-repository` workflow. This profile does not redefine generic authority, dependency, review, verification, data-handling, observability, or Git-evidence contracts.
 
 ### Implementation Style
 
@@ -25,8 +27,7 @@
 
 ### Single Source of Truth
 
-- 各概念には可能な限り一つの原典を定め、型、設定、コードなどの別表現は原典から導出する。
-- README、設計文書およびコードコメントは一つの原典へリンクするか、原典から生成する。
+- 各概念には可能な限り一つの原典を定め、型、設定、コードなどの別表現は原典から導出する。README、設計文書およびコードコメントは原典へリンクするか原典から生成する。
 - 重複排除で複雑性や結合が大きく増える場合は重複を許容し、乖離リスクがあれば静的検査または自動検証で同期を保証する。
 - Reproducibilityでコミット対象とするlockfileを除き、生成物は原則としてコミットせず、`mise`
   経由で再生成できるようにする。
@@ -42,8 +43,7 @@
 - `hk.pkl` をformatter、lint、静的検査および軽量テストなどGit hookで常用できる高速な検証と修正の原典とし、Git hook、`hk check` および `hk fix` から同じstep群を再利用する。複雑なstepは選択されたファイルを維持して内部の `mise` child taskを呼び出せるが、そのtaskから標準入口へ戻る循環依存を作らない。
 - `mise run check [FILES...]` と `mise run fix [FILES...]` は、それぞれ `hk check` と `hk fix` の共通入口とする。ファイルを指定した場合はそのファイルだけを対象とし、引数なしではstaged filesに限定せずrepository全体を対象とする。`check` はファイルを変更せず、`fix` は利用可能な修正を適用する。
 - `mise run test` は `check` を含む再現可能な全検証の入口とし、コンパイルが必要なlintや型検査、build、重いテストおよび統合・E2Eテストを含める。実機または外部serviceに依存するlive検証は個別taskに分離し、必要な変更やリリース前に別途実行する。CIの総合検証は `mise run test` を実行する。
-- 利用者価値が高い重要フローと重大障害につながる経路はE2Eで保証する。[program観測契約](../../../references/agent-computer-interface-observability.md)の
-  適用対象では、変更経路に関連するconformance scenarioも検証し、結果が症状だけを報告する状態ではE2E契約を完了扱いにしない。
+- 利用者価値が高い重要フローと重大障害につながる経路はE2Eで保証する。
 - バグを型や設計で再発不能にできた場合、回帰テストを必須にしない。静的に排除できない再発リスクが残る場合だけ追加する。
 
 ### Reproducibility
@@ -53,7 +53,6 @@
 - 必要なランタイム、ツール、依存関係およびタスクは `mise` で管理する。
 - 一時的な作業にはホスト上のツールを使用できるが、コミットする成果物からそのツールへの依存を持たせない。
 - この方針に従えない場合は、事前に承認を求める。
-- ライブラリ、開発ツール、テスト用パッケージを含む、すべての新規依存追加について事前に承認を求める。
 - `mise` および各package managerのlockfileを原則としてコミットする。
 - 新規リポジトリは、`mise` 設定、lockfile、`hk.pkl`、Git hook、`mise run check`、`mise run fix`、`mise run test` およびCI連携を初期構成に含める。
 - 既存リポジトリがこの方針に準拠していない場合、依頼された変更の実行、検証または再現に必要なら同じタスク内で整備する。無関係なら変更せず、残件として報告する。

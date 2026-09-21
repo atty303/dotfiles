@@ -72,4 +72,12 @@ if [ -f "$metadata_file" ]; then
     esac
 fi
 
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+agents_root=$(CDPATH='' cd -- "$script_dir/../../.." && pwd)
+graph_validator=$script_dir/validate-reference-graph.ts
+if [ ! -f "$graph_validator" ]; then
+    graph_validator=$script_dir/executable_validate-reference-graph.ts
+fi
+deno run --allow-read "$graph_validator" "$agents_root"
+
 echo "valid skill: $skill_name"

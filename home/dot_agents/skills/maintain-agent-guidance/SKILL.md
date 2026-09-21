@@ -1,80 +1,42 @@
 ---
 name: maintain-agent-guidance
-description: 現在タスクまたは複数sessionとmemoryからcandidate learningを監査し、AGENTS.md、global guidance、skill、scriptまたはautomationへの永続化を検証・提案する。
+description: AGENTS、skill、agent guidance、永続化規則または過去taskの学びの保存・整理・監査をユーザーが明示的に依頼した場合に、候補を検証し適切な原典への変更を提案する。
 ---
 
-# Candidate Learning
+# Maintain agent guidance
 
-- Codex memoryをknowledge baseやpolicyではなく、過去sessionから生成された反証可能なdescriptiveな仮説cacheとして扱う。memory単独からnormativeな規則へ昇格させない。
-- session logを一次証拠として扱うが、成功や失敗の観測だけで因果関係を確定しない。source、testまたはlive observationで検証し、現在事実とnormativeな規則を区別する。
-- AGENTS.md、global guidance、skill、scriptおよびautomationは、人間が採用したnormativeな規則の原典とする。memoryと衝突する場合は行動規範としてこれらを優先し、memoryは原典の陳腐化を再検証するtriggerとしてのみ使う。
-- current-task auditまたはcross-session auditでcontradictedまたは陳腐化したmemoryを検出しても、生成されたmemory fileを直接編集しない。読み取り専用の候補として報告し、人間が別途明示した場合だけ利用可能なmemory controlで訂正または忘却する。
-- 検証失敗の原因が確定した時点、論理変更の確定前およびタスク完了時をcheckpointとする。実装結果、失敗した操作、成功した操作、ユーザーによる訂正、不要な往復、手動で促された処理および既存規則が実行されなかった事例を対等なcandidate learningとして監査する。
-- 依頼範囲内で修正できる決定的な欠陥は永続化候補へ延期せず、source、test、task、build processまたは実行環境の最も近い原典で通常の開発workflowとして解消する。
-- 依頼範囲内の原典で通常の開発workflowとして解消する決定的な欠陥を除き、永続化候補は保存先にかかわらず自動反映しない。保存先、根拠、理由および具体的な追加・修正文を提示し、承認後に元の成果物とは別の論理変更として確定する。この制限は、`Historical Evidence`に従って開発taskの履歴を保存する標準Git noteには適用しない。
-- 最終報告では、checkpointで解消できなかった横断的または非決定的な候補だけを提示する。
-- 失敗履歴や一時的な環境情報をそのまま残さず、適用条件、正しい手順および禁止事項へ一般化する。
-- 候補を提示する前に振り返り手順自体への訂正も一度だけ同じ基準で評価し、再帰的な振り返りは行わない。
+Use this workflow only for an explicit user request to preserve, organize, compress, or audit agent guidance or learnings. Do not run it as an automatic task-completion or development checkpoint.
 
-### Historical Evidence
+## Treat evidence correctly
 
-- Git repositoryのcurrent treeへ、過去の判断、調査、比較、棄却案またはpoint-in-timeの検証結果を履歴保存だけの目的で追加しない。現在も有効な契約、制約、不変条件および再現手順は最も近いsource、test、task、referenceまたは未完了planへ統合する。
-- Commitを一件以上作成したtaskでは、`develop-repository`に従い、最終commitをanchorとしてtask cycleの全thread noteを完了またはblocked handoff前に自動作成する。事前outlineや個別承認は求めない。既存noteは読んで意味を保持し、重複排除した統合本文へ更新する。意味的衝突は自動解決せず、note保存が解消不能ならtaskを完了扱いにしない。Note作成または更新自体がblockerなら、未保存の理由とanchorを報告してblocked handoffする。
-- Commit messageにはユーザー依頼と合意事項の要約、変更目的、主要な判断理由、変更範囲、user-visibleな影響、migrationおよび主要検証を該当する範囲で自足的に残す。Git noteはその代替、secretやconfidential contentの保存先、またはrepository inclusion boundaryの迂回路にしない。
-- 全thread以外の詳細な調査証拠、検証環境または棄却案は、再取得が高コストまたは不可能で、commitの解釈、運用または再検証に重要な場合だけnoteへ追加する。Commitまたはcurrent treeから復元できる情報は追加しない。
+- Codex memory is a falsifiable descriptive hypothesis cache, not a policy or knowledge source. Session logs are primary historical evidence but do not prove causality; verify claims with source, tests, or live observation.
+- AGENTS, global guidance, skills, scripts, automations, and domain sources contain adopted normative rules. They override memory as behavior guidance. Do not edit generated memory directly; report a correction candidate unless the user separately authorizes the memory control.
+- Deterministic defects inside the authorized scope belong in the nearest source, test, task, build process, or runtime workflow, not in a deferred learning proposal.
+- Do not auto-promote a candidate. Propose its destination, evidence, reason, exact change, positive case, near-miss, and stop condition. Apply it only after approval as a separate logical change.
 
-### Validation
+## Validate candidates
 
-candidate learningは次の順序で評価する。
+For each candidate:
 
-1. 成功または失敗の記録をそのまま規則化せず、そこから推定した一般則を仮説として明示する。
-2. 原因をsource、test harness、taskまたはbuild process、workflow trigger、実行環境、一時的外因、agent操作ミス、memoryの陳腐化または未確定のいずれかへ帰属する。ユーザーのnormativeな選択は因果問題でないため`not applicable: normative choice`とする。
-3. 同じ操作の成功・失敗、別repository、別version、別権限または別入力を反証・対照例として探す。成功例でもその操作が必要条件だったかを検証する。
-4. 適用範囲を個人全体、repository、OS、version、toolまたは単一taskのいずれかに限定する。
-5. source、test、現行guidance、skillまたはscriptですでに解消済みでないことを確認する。
-6. `promote`、`retain as hypothesis`、`needs validation`、`contradicted`、`already resolved`または`one-off/no persistence`のいずれかへ分類する。
+1. State the generalized hypothesis rather than copying a success or failure.
+2. Attribute the cause to source, test harness, task/build, workflow trigger, runtime, external condition, agent error, stale memory, normative user choice, or unknown.
+3. Seek contrary and control cases; a success does not prove an operation was necessary.
+4. Bound scope to personal global, repository, OS, version, tool, or one task.
+5. Check whether the nearest source, test, guidance, skill, or script already resolves it.
+6. Classify it as `promote`, `retain as hypothesis`, `needs validation`, `contradicted`, `already resolved`, or `one-off/no persistence`.
 
-- `retain as hypothesis`は、現時点では一般化できず、追加検証を計画する価値や具体的な検証経路も不足する仮説に使う。
-- `needs validation`は、汎化する価値または影響があり、次に実行する具体的な検証、反証条件および停止条件を定義できる仮説に使う。
-- `already resolved`は、仮説が妥当でも最も近いsource、test、guidance、skillまたはscriptですでに解消され、追加の永続化が不要な場合に使う。
+Ordinary workflow rules and tool preferences require multiple independent cases or a reproduction and counterexample. An explicit personal preference may be globally proposed after scope and conflicts are checked. A high-impact authority or safety policy may rest on one explicit decision. A repository specification may rest on current source or tests.
 
-- 通常のworkflow規則またはtool選好の昇格には、独立した複数事例、または再現testと反証例を必要とする。
-- ユーザーが明示した個人的な好みは、衝突と適用範囲を確認すれば単一発言でもglobal guidance候補にできる。
-- 権限、安全性または破壊的操作に関する明示policyは、被害が大きい場合に単一事例でも候補にできる。
-- repository固有の決定的仕様は、sourceまたはtestで確認できれば事例数を要求しない。
-- repository固有の仕様がsourceまたはtestで正しく保有され、agentの行動を変える追加条件もない場合は`already resolved`とする。sourceから容易に発見できないAI専用の行動条件が残る場合だけ、近いAGENTS.mdへの昇格を検討する。
-- `promote`または`needs validation`には、期待する正例、誤った一般化を検出する負例、および昇格を中止する停止条件を含むforward testを定義する。
+## Audit multiple sessions only when requested
 
-### Cross-session Audit
+- For an explicit cross-session or memory audit, run `scripts/collect-session-evidence.ts` against completed root sessions. Exclude the current audit, subagents, incomplete sessions, duplicates, read-only external-service lookups, and general consultations.
+- Follow the requested range. Without one, inspect up to 25 development root sessions from the last seven days, oldest first, continuing batches while eligible sessions remain.
+- Use memory only as an index and trace every claim to a session log or other primary evidence. A session with parse warnings, redacted messages, truncation, or omissions is incomplete; narrow the extraction or corroborate it before promotion.
+- Keep the audit read-only. Report coverage, evaluated session IDs, remaining count, rejection totals by reason, and at most five candidates with evidence, counterexamples, attribution, confidence, scope, current-guidance relation, destination, forward test, and exploration lost by a false generalization.
 
-- 明示的に複数sessionのmemoryやcandidate learningの監査を依頼されたときだけ、`scripts/collect-session-evidence.ts`を使って完了済みroot sessionを収集する。現在の監査thread、subagent、未完了sessionおよび重複session IDは対象にしない。
-- source stateまたは実行権限のないcopyからは、`mise exec -- deno run --allow-env=CODEX_HOME,HOME,USERPROFILE --allow-read <skill-dir>/scripts/collect-session-evidence.ts ...`として実行する。chezmoiで適用済みのexecutable targetは直接実行してもよい。
-- 対象範囲と期間は依頼に従う。指定がなければ、全local repositoryの直近7日間の開発root sessionを古い順に最大25件評価し、残件を報告する。session内のいずれかのturnでrepository変更、実装計画、VCS確定またはPRが依頼・実行されたらsession全体を開発sessionとする。read-onlyの外部service参照だけのsession、一般相談および監査自体は含めない。
-- extractorの`--limit`はroot sessionの収集batch数であり、開発sessionの判定は監査側で行う。batch内の開発sessionが25件未満で`remainingSessions`が残る場合は、最後に読んだ`startedAt`を次の`--after`にして続け、25件または対象期間の終端で停止する。
-- memoryは候補発見のindexとしてのみ読み、claimに対応するsession logまたはその他の一次証拠へ遡れなければ昇格対象にしない。session extractorの`parseWarnings`、`redactedMessages`、`truncatedMessages`または`omittedMessages`が1以上の証拠は不完全とし、そのsessionだけを根拠とした昇格を禁止する。欠落範囲を狭いsecret-safeなqueryで再抽出するか、source、testまたはlive observationで補完できた場合だけ評価を続ける。
-- 監査はread-onlyで行い、memory、repository、issueまたはVCSを更新しない。候補の採用後に、別の開発turnで論理変更として反映する。
-- coverage期間、評価したsession IDおよび残件を報告したうえで、candidate learningを最大5件まで提示する。各候補にID、仮説、由来、一次証拠、反証・対照例、原因帰属と確信度、適用範囲、現行guidanceとの関係、推奨判断と保存先、必要なforward testおよび誤った一般化で失われる探索経路を示す。
-- 昇格できないmemory由来候補、`already resolved`の候補、一時的外因および単発の実装経緯は昇格候補へ含めず、棄却理由別の件数だけを報告する。候補がなければcoverageと棄却集計だけを簡潔に報告する。
+## Route to the nearest owner
 
-### Routing
-
-- 全タスクに共通する個人方針はglobal
-  guidance、リポジトリ固有のAI向け規約、コマンドおよび検証条件は適用範囲に最も近い `AGENTS.md`
-  の候補にする。
-- 学びごとにsourceまたはdocumentation、test、taskまたはbuild process、実行環境、repo `AGENTS.md`、global guidance、skill、scriptまたはautomation、永続化不要のいずれかを原典として選ぶ。
-- 人間にも重要な仕様、設計および業務知識はsource、documentationまたは外部システムを原典とし、`AGENTS.md`
-  へ重複させない。
-- 単一環境の決定的な反復処理はscript、taskまたはautomationへ移し、guidanceにはtriggerと入口だけを置く。
-- 2つ以上の実例で入出力、手順および失敗条件を確認した汎用ワークフローは、personal global
-  skillとして提案する。候補には目的、trigger、入出力、手順、失敗条件、停止条件、検証方法および保存先を示す。
-- skillには汎用手順だけを置き、固有値は各原典から読み取る。承認後に作成し、配布要件が生じた場合だけplugin化を検討する。
-- 他者のリポジトリや外部workspaceでは既存方針と権限範囲を優先し、適合する場合だけ永続化を提案する。
-
-### Maintenance
-
-- 各反映提案で対象ファイル全体を監査し、新規追記より既存指示の統合、置換、簡略化および削除を優先する。
-- 既存規則があったのに実行されなかった場合は同じ規則を重複させない。agentの行動を開始させるtriggerは実際のworkflowを定義するskillの入口または終了条件へ組み込み、単一環境で機械的に強制できる処理は最も近いtask、scriptまたはautomationへ移す。
-- 行動を変えない情報、原典から容易に発見できる事実および一度限りの判断はguidanceへ追加しない。
-- 同じ規則は一度だけ記載し、詳細な手順、例および参考資料はskill、scriptまたはdocumentationへ移す。
-- 規則を定義するskill自体が起動されなかった場合は、到達不能なskill本文へtriggerを追加しない。個人またはrepository全体に適用するなら常に読み込まれるAGENTS.md、特定workflowだけなら上位skillまたはdispatcher、機械的に判定できるならtask、scriptまたはautomationをtriggerのownerにする。
-- 重複、矛盾、陳腐化、長い手順またはスコープ不明な規則を検出した場合だけ、全体的な棚卸しを提案する。固定の長さではなく情報密度と適用範囲で判断する。
+- Put human-facing specifications and design knowledge in source or documentation; repository-specific agent behavior in the nearest AGENTS; personal cross-task policy in global guidance; reusable workflows in skills; and deterministic repeated operations in scripts, tasks, or automations.
+- A reusable personal skill requires at least two examples establishing inputs, outputs, procedure, failures, stop conditions, and verification. Keep repository values out of the workflow and consider a plugin only when distribution is needed.
+- For every target file, prefer integration, replacement, simplification, and deletion over appending. Do not duplicate a rule that was merely skipped; repair its reachable trigger or mechanically enforce it at the nearest owner.
+- Do not preserve discoverable facts, behavior-neutral information, one-off reasoning, historical narrative, or content already owned by a closer source. Propose a broad inventory only when evidence shows duplication, contradiction, staleness, long procedures, or unclear scope.

@@ -24,7 +24,7 @@ description: Skillを新規作成または更新し、frontmatter、bundled reso
 ## Validate proportionally
 
 - For a new skill or a change to `SKILL.md` frontmatter or `agents/openai.yaml`, run `<author-skills-dir>/scripts/validate-skill.sh <skill-dir>`. It obtains pinned `yq` through mise on demand.
-- For a body-only change, skip structural validation unless the edit also changes metadata or resource paths.
+- For a body-only change, skip structural validation unless the edit also changes metadata or resource paths. After changing a Markdown link or shared reference, run `scripts/validate-reference-graph.ts <agents-root>`; it rejects missing, workspace-external, self-cyclic, and multi-file cyclic links.
 - Execute every added or changed bundled script on representative success and failure input. Check every referenced file exists and remove unused placeholders or resources.
 - For a new or materially changed workflow, freeze the draft and run independent review and realistic forward tests in parallel when safe. Cover the intended trigger, a near-miss that must not trigger, explicit stopping conditions, and unavailable required tools when relevant. Give fresh agents the skill and a user-like task without the intended answer or prior diagnosis. Keep their writes isolated and integrate fixes through one owner.
 - After fixes, rerun only affected checks and ask reviewers to recheck unresolved findings or materially changed areas instead of restarting a full review cycle.
