@@ -1,0 +1,22 @@
+Task: Consolidate and live-apply global agent guidance while preserving its semantic contracts
+Anchor: 77b063f04e52b14f9ead019bb20961267ea51c7c
+Base: 686cdc5f41d8a54dc142544c72203c4b1f2b90a0
+Branch: main
+Commits: 77b063f04e52b14f9ead019bb20961267ea51c7c refactor: consolidate global agent guidance
+Guidance: global AGENTS; repository AGENTS; develop-repository; author-skills; design-program-observability; review; canonical global references
+Conditions: durable global guidance; one-user trusted control domain; read-only sandbox with approved writes; repository AGENTS excluded from edit and compression scope; source commit precedes targeted live apply
+## Evidence
+Attachment `貼り付けたテキスト.txt`, sha256 `91083e676178bd10c369e82cf2f21b335b608945aeda30a3a1c84824789f481e`, contained the approved implementation request, success criteria, decisions, constraints, non-goals, assumptions, and execution instructions; its content is not duplicated here.
+Authority: the user attachment above, current repository source and tests, applicable global and repository AGENTS, and the selected skills and canonical references
+## Transcript
+- U1:
+    
+    # Files pasted by the user:
+    
+    ## "# 実装依頼 ## 依頼 `/var/home/atty/.local/share/chezmoi`で管理しているglobal agent guidanceを…": /home/atty/.codex/attachments/f0344c39-8a95-43e9-9baa-937ee0d0d5ef/貼り付けたテキスト.txt
+    
+    Pasted text contains the user's request.
+    
+    ## My request:
+    
+  - A: Read the complete attachment, applicable repository guidance, develop-repository, author-skills, design-program-observability, review, current global sources, Git state, installed paths, and relevant prior evidence; fetched code and notes and confirmed a clean synchronized main baseline; classified the durable authority- and Git-evidence-changing work as mandatory independent review and the note helper as observability-applicable with Git's local object/ref state plus structured failures as its existing observation surface; measured the baseline; consolidated data handling, artifact/control domain, failure-oracle/causal verification, Git task evidence, and observability into a DAG of canonical references; reduced the always-on AGENTS and workflow skills, made maintain-agent-guidance explicit-only, made review a precedence-defined risk closed set, retained inline dig handoff rules, narrowed the atty303 profile, and preserved local-commit, Codex-history, remote-authority, and thread-title contracts; implemented a realpath-aware reference validator and a schema-validating compare-and-swap Git note helper with source/installed-compatible tests; fixed formatter/API, sandbox/test-environment, Git no-note, transcript grammar, symlink, credential-authentication, environment-provenance, and remote-notes-first-use issues found by tests and fresh agents; ran source-state forward tests for routing, near-misses, review blocking, observability, authority, and runtime evidence; completed a fresh full independent review followed by two delta reviews, resolving all seven findings; passed all changed skill validators, reference graph tests, Git note helper tests, existing session-evidence tests, targeted repository checks, and diff checks; committed only the 19 global-guidance files as 77b063f, leaving repository AGENTS unchanged, and prepared the normalized note before targeted live apply and installed-state verification.
