@@ -1,0 +1,11 @@
+Task: Remove the task-completion requirement to report sandbox permission candidates
+Anchor: 5b63ee0
+Base: a2ad39a
+Worktree: main
+Commits: 5b63ee0 docs: stop reporting sandbox permission candidates
+Guidance: repository AGENTS.md; maintain-agent-guidance; develop-repository
+Environment: read-only Codex filesystem sandbox; scoped checks and Git writes ran with approved target-equivalent authority
+Authority: home/dot_codex/AGENTS.md is the current global agent-guidance source.
+Transcript:
+- U1: [$maintain-agent-guidance](/var/home/atty/.agents/skills/maintain-agent-guidance/SKILL.md) 基本的にsandboxを使わなくするので、agent guidanceからtask完了時にsandboxに許可するルールを提示する指示を削除したい
+  - A: Located the prior preference and the source-state rule, removed only the task-completion reporting bullet, retained independent approval-planning and sandbox-observation safeguards, verified the rendered target and dry-run, passed the target-limited repository check, and committed the change.
