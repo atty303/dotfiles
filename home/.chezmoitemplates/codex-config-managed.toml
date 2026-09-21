@@ -6,8 +6,11 @@ _chezmoi_owned_top_level_keys = [
 ]
 _chezmoi_owned_feature_keys = ["network_proxy"]
 
-allow_login_shell = false
-default_permissions = "personal-development"
+default_permissions = ":danger-full-access"
+allow_login_shell = true
+
+approval_policy = "on-request"
+approvals_reviewer = "auto_review"
 
 [permissions.personal-development]
 description = "Personal development with mise, version control, and SSH signing."

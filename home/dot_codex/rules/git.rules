@@ -1,0 +1,21 @@
+prefix_rule(
+    pattern = ["git", "push"],
+    decision = "prompt",
+    justification = "Gitのremoteを変更する可能性がある",
+)
+
+prefix_rule(
+    pattern = ["sudo"],
+    decision = "prompt",
+    justification = "Review privileged commands.",
+)
+
+prefix_rule(
+    pattern = [
+        "systemctl",
+        ["start", "stop", "restart", "enable", "disable", "mask", "unmask", "daemon-reload"],
+    ],
+    decision = "prompt",
+    justification = "Review service state changes.",
+)
+
