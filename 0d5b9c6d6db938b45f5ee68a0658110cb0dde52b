@@ -1,0 +1,126 @@
+Task: Codex task完了時のthread title更新をglobal guidanceへ統合
+Anchor: 0d5b9c6d6db938b45f5ee68a0658110cb0dde52b
+Base: 54a35578ca9e6a91d310c79b7d3f6f4eb57a866c
+Workline: main
+Commits: 0d5b9c6 feat: refresh thread titles on task completion
+Guidance: repository AGENTS.md; develop-repository; maintain-agent-guidance; dig; review; openai-docs
+Conditions: durable personal global guidance; no trust boundary crossed; target live apply excluded; current runtime exposes no thread title update tool
+Authority: home/dot_codex/AGENTS.md is the current normative source for the adopted personal policy.
+Transcript:
+- U1: [$dig](/var/home/atty/.agents/skills/dig/SKILL.md) [$maintain-agent-guidance](/var/home/atty/.agents/skills/maintain-agent-guidance/SKILL.md) thread titleをtask完了時にthread全体を反映したタイトルに更新するようにしたい
+  - A: `dig`、`maintain-agent-guidance`、`openai-docs`を使用し、公式app-server仕様、runtime tool可用性、既存global guidanceを調査した。設計ツリーを一問ずつ進める方針を示した。
+- U2: A
+  - A: 成功完了時だけ更新する選択を確定し、ユーザーが明示したtitleの扱いを質問した。
+- U3: A
+  - A: 会話内でユーザーがtitle指定または維持意図を示した場合は上書きしない選択を確定し、更新失敗時の完了扱いを質問した。
+- U4: A. 更新しようとしたタイトルを含めること
+  - A: 更新はbest-effortで本体完了を妨げず、失敗報告には試行titleを含める選択を確定し、title生成形式を質問した。
+- U5: A
+  - A: thread全体を毎回再評価して主要目的と最終到達点を表す選択を確定し、title言語を質問した。
+- U6: A
+  - A: ユーザーの主言語を使い技術固有名は原表記を保つ選択を確定し、適用範囲を質問した。
+- U7: A
+  - A: 個人global guidanceとして全Codex taskへ適用する選択を確定し、固定状態語の有無を質問した。
+- U8: A
+  - A: `完了`や`Done`などの固定状態語を付けない選択を確定し、成功時の報告方法を質問した。
+- U9: A
+  - A: 成功時はtitle更新を追加報告しない選択を確定し、全決定事項を列挙して共通理解を確認した。
+- U10: A
+  - A: 共通理解の成立を受け、closed setの成功条件、決定事項、制約、対象外、未検証の前提、実装時の指示を含む自己完結した実装依頼promptを作成した。
+- U11:
+    ```markdown
+    # 実装依頼
+
+    ## 依頼
+    chezmoi で管理している個人用 Codex global guidance `home/dot_codex/AGENTS.md` に、成功した task の完了時、thread 全体を反映したタイトルへ自動更新する規則を統合してください。
+
+    ## 目的
+    - Codex の各 thread が、初期依頼や直近の task だけではなく、thread 全体の主要な目的と最終的な到達点を表すタイトルになること。
+    - sidebar 上で、完了した thread の内容を簡潔に識別・検索できること。
+    - タイトル更新機能の利用不能や一時的な失敗によって、完了済みの task 本体が未完了扱いにならないこと。
+    - ユーザーが明示的に付けた、または維持を求めたタイトルが自動処理で失われないこと。
+
+    ## 成功条件
+    - `home/dot_codex/AGENTS.md` に、すべての Codex task へ適用されるタイトル更新規則が統合されている。
+    - 成功条件をすべて満たして task を完了するときだけ、完了報告の直前にタイトル更新を一度試みる規則になっている。
+    - 調査結果、途中報告、質問、partial handoff、blocked handoff、明示的な中止、別 task への置換ではタイトル更新を要求しない。
+    - タイトルは既存タイトルへの追記や直近 task だけの要約ではなく、その時点の thread 全体を毎回再評価して生成する規則になっている。
+    - タイトルは、thread の主要な目的と最終的な到達点を表す簡潔な一文になる。
+    - タイトルは thread でユーザーが主に使用した言語に合わせ、製品名、識別子およびコード用語は必要に応じて原表記を保つ。
+    - タイトルへ `完了`、`Done`、`[完了]` などの固定状態語を付けない。
+    - 会話内でユーザーがタイトルを明示的に指定した、または現在のタイトルを維持する意図を示した場合は上書きしない。
+    - 現在の実行環境で thread title 更新操作が利用できる場合だけ実行する。
+    - タイトル更新操作が利用不能または失敗しても、task 本体の完了を妨げない。
+    - タイトル更新が利用不能または失敗した場合、完了報告に更新できなかった事実と、設定を試みた具体的なタイトルを含める。
+    - タイトル更新に成功した場合、完了報告へタイトル更新に関する追加記載を行わない。
+    - 既存 guidance と重複・矛盾せず、task の終了処理に最も近い既存規則へ簡潔に統合されている。
+    - source の構文・内容、chezmoi による対象への対応、および関連する差分が適切に検証されている。
+
+    ## 決定事項
+    - 更新契機は task の成功完了だけとする。
+      - 理由: 完了した成果をタイトルへ反映することが目的であり、途中報告や未完了の終端でタイトルを変動させないため。
+      - 主な棄却案: blocked handoff、中止、別 task への置換を含む全終端での更新、および final response ごとの更新。未完了状態や中間状態までタイトルへ反映して揺らすため棄却した。
+    - タイトルは thread 全体から毎回再生成する。
+      - 理由: 複数の task cycle を含む thread でも、現在までの主題と到達点を一つの読みやすい表現へ圧縮するため。
+      - 主な棄却案: 既存タイトルへの追記、および直近 task だけの要約。前者は肥大化と古い表現の残存を招き、後者は thread 全体を反映しないため棄却した。
+    - タイトルは thread でユーザーが主に使用した言語へ合わせる。
+      - 理由: thread ごとの文脈へ自然に適応しながら、技術的な固有名の検索性を維持するため。
+      - 主な棄却案: 常に日本語または常に英語へ固定すること。thread の言語と不一致になるため棄却した。
+    - 固定の完了状態語をタイトルへ付けない。
+      - 理由: sidebar の表示領域を thread 固有の目的と到達点に使うため。
+      - 主な棄却案: `完了`、`Done` または同等の接頭辞・接尾辞を必須にすること。内容の識別力を下げるため棄却した。
+    - 会話内で明示されたユーザーのタイトル指定・維持意図を自動更新より優先する。
+      - 理由: ユーザーが整理目的で選んだ名称を自動処理で失わないため。
+      - 主な棄却案: 成功完了時には常に上書きすること、および既存タイトルがあれば一切更新しないこと。前者は明示的な命名を侵害し、後者は自動更新をほぼ無効化するため棄却した。
+    - タイトル更新は best-effort の終了処理とする。
+      - 理由: UI メタデータ操作の利用不能や一時的失敗によって、本体成果の成功判定を壊さないため。
+      - 主な棄却案: 更新成功を task 全体の必須成功条件にすること。タイトル操作だけで完了済み task が blocked になるため棄却した。
+    - 更新失敗時だけ、試行したタイトルを含めて報告する。
+      - 理由: 失敗を診断可能にしつつ、正常な終了処理で毎回完了報告を増やさないため。
+      - 主な棄却案: 成功時にも設定タイトルを必ず報告すること、および失敗を黙って省略すること。前者は冗長で、後者は失敗を観測できないため棄却した。
+    - 保存先は個人用 global guidance とする。
+      - 理由: thread title は特定リポジトリや開発 task に限定されない Codex 全体の終了動作だから。
+      - 主な棄却案: chezmoi リポジトリ限定または開発 task 限定の規則。適用範囲が目的より狭いため棄却した。
+
+    ## 制約
+    - 編集対象は、この変更に必要な chezmoi repository 内の source と関連検証だけに限定する。
+    - dotfiles の target 実体を直接編集せず、chezmoi source の `home/dot_codex/AGENTS.md` を編集する。
+    - 既存の規則を全体監査し、単純な末尾追記より、近接する終了処理規則への統合、重複排除および簡略化を優先する。
+    - タイトル更新機能が利用不能であることを、task 本体の blocker にしない。
+    - ユーザーが会話内で指定または維持を求めたタイトルを上書きしない。
+    - タイトル更新の成功時は、完了報告へ更新結果を追加しない。
+    - 新規依存を追加しない。
+    - repository の適用 guidance に従って検証、review、commit および許可済みの同期境界を扱うこと。適用 guidance が与えていない deploy、実機 apply、migration またはその他の外部変更権限を推測しないこと。
+
+    ## 対象外
+    - Codex Desktop または app-server 自体への機能実装。
+    - thread title 更新 API、tool または connector の新規開発。
+    - blocked、中止、置換、partial その他の未成功 task cycle に対するタイトル更新。
+    - ユーザーが明示的に指定・維持したタイトルの自動再生成。
+    - 固定の文字数上限、固定テンプレート、固定の完了状態語の導入。
+    - タイトル更新履歴の保存。
+    - repository 固有 guidance への同一規則の重複記載。
+    - target home への live apply。
+
+    ## 未検証の前提
+    - `home/dot_codex/AGENTS.md` が現在も個人用 Codex global guidance の chezmoi source であり、対応する target が `~/.codex/AGENTS.md` であること。
+    - 現在の `home/dot_codex/AGENTS.md` に、タイトル更新規則と統合すべき task 完了処理の節が存在するかどうか。
+    - 現在の Codex runtime が、完了時に対象 thread のタイトルを設定できる tool または同等の操作を公開しているかどうか。
+    - runtime ごとにタイトル更新操作の可用性が異なる場合、guidance の文言だけで安全に条件分岐できること。
+    - source の変更に対して必要な repository 固有の検証、review、commit および同期手順。
+    - 作業開始時の branch、upstream、index、working tree、および remote との差分状態。
+
+    ## 実装時の指示
+    - このpromptの各項目をclosed setとして扱い、黙示的に統合、省略または再解釈しないこと。
+    - 編集前に現在のsource、環境、適用guidanceを調査し、未検証の前提を確認すること。
+    - 目的、成功条件、制約および利用者向けcontractを維持できる内部設計の変更は、自律的に行ってよい。
+    - 前提の崩壊により主要contract、scope、authorityまたは外部影響を変える必要がある場合は、変更を止め、根拠、影響および代替案を示して確認を求めること。
+    - 実装と必要な検証を行うこと。それ以外の操作は、このpromptに明記された合意と適用guidanceのauthorityに従い、commit、push、deploy、migrationまたは実機適用の権限を推測で拡張しないこと。
+    - 完了報告では、各成功条件と制約を、達成を示す証拠、対象外とした根拠、または未達事項のいずれかへ一対一で対応付けること。
+    - `$maintain-agent-guidance` を使用し、個人全体に適用される明示的なユーザー選好として global guidance への統合を扱うこと。
+    - repository を変更するため `$develop-repository` を使用し、durable な guidance 変更として必要な調査、検証、review、commit および適用 guidance で許可された同期を行うこと。
+    - Codex の thread title 操作に関する現行仕様を確認する必要がある場合は、公式 OpenAI documentation を使用すること。
+    - guidance の規則は、利用可能な特定 tool 名へ不必要に固定せず、「現在の runtime に公開された thread title 更新操作」を使用する形を基本とすること。ただし、既存 global guidance の記述様式や実際の tool contractから具体名が必要と判明した場合は、それに従うこと。
+    - task の全成功条件を満たした後、完了報告を送る直前に、新しい規則自身に従ってこの thread のタイトル更新を一度試みること。操作が利用不能または失敗した場合は、task 本体を未完了扱いにせず、完了報告にその事実と設定を試みた具体的なタイトルを含めること。
+    ```
+  - A: 合意済みpromptをclosed setとして照合した。source mapping、git state、official thread naming capability、現在のruntime tool不在を確認し、個人方針を`promote`と分類した。`home/dot_codex/AGENTS.md`へTask Completion節を追加し、targeted `mise run check`、`git diff --check`、`chezmoi diff`、target限定dry-runを成功させた。fresh reviewerはactionableな指摘なしと判定した。live applyは実行せず、commit `0d5b9c6`を作成した。rollout `01a0c427-3e44-7ab2-8e87-179273bd6eae`でcycle全user messageを照合し、必須Git noteを準備した。
