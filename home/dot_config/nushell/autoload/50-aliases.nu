@@ -1,6 +1,7 @@
 alias ch = chezmoi
 alias che = chezmoi --watch --apply
 alias cha = chezmoi apply
+alias chu = chezmoi update
 alias vi = hx
 alias r = mise run
 alias jf = jj git fetch
