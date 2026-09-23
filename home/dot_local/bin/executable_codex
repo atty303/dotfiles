@@ -1,36 +1,36 @@
 #!/usr/bin/env -S mise tool-stub
 
 tool = "codex"
-version = "0.149.0"
+version = "0.155.1"
 
 [lock]
 
 [lock.platforms]
 
 [lock.platforms.linux-arm64]
-url = "https://github.com/openai/codex/releases/download/rust-v0.149.0/codex-package-aarch64-unknown-linux-musl.tar.gz"
-checksum = "sha256:dac03e4db966e94f7083b9eb9f95d8b40da9d568fd2fdbb6885b0ea7d5b0d97f"
+url = "https://github.com/openai/codex/releases/download/rust-v0.155.1/codex-package-aarch64-unknown-linux-musl.tar.gz"
+checksum = "sha256:71857dbc9bea3613410e8a69cfb46b07c0402d6d20fec18843dbaffd757634bd"
 
 [lock.platforms.linux-arm64-musl]
-url = "https://github.com/openai/codex/releases/download/rust-v0.149.0/codex-package-aarch64-unknown-linux-musl.tar.gz"
-checksum = "sha256:dac03e4db966e94f7083b9eb9f95d8b40da9d568fd2fdbb6885b0ea7d5b0d97f"
+url = "https://github.com/openai/codex/releases/download/rust-v0.155.1/codex-package-aarch64-unknown-linux-musl.tar.gz"
+checksum = "sha256:71857dbc9bea3613410e8a69cfb46b07c0402d6d20fec18843dbaffd757634bd"
 
 [lock.platforms.linux-x64]
-url = "https://github.com/openai/codex/releases/download/rust-v0.149.0/codex-package-x86_64-unknown-linux-musl.tar.gz"
-checksum = "sha256:1c08ba262820b78d49ea7a93f326b6b430b72e5fe46830e433edef12e5123244"
+url = "https://github.com/openai/codex/releases/download/rust-v0.155.1/codex-package-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:a65b895c6ac1a73629bbe4b864640c86133e94a43b4d67b3103044e1a306d5a2"
 
 [lock.platforms.linux-x64-musl]
-url = "https://github.com/openai/codex/releases/download/rust-v0.149.0/codex-package-x86_64-unknown-linux-musl.tar.gz"
-checksum = "sha256:1c08ba262820b78d49ea7a93f326b6b430b72e5fe46830e433edef12e5123244"
+url = "https://github.com/openai/codex/releases/download/rust-v0.155.1/codex-package-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:a65b895c6ac1a73629bbe4b864640c86133e94a43b4d67b3103044e1a306d5a2"
 
 [lock.platforms.macos-arm64]
-url = "https://github.com/openai/codex/releases/download/rust-v0.149.0/codex-package-aarch64-apple-darwin.tar.gz"
-checksum = "sha256:6c7589a52fe90e3742e35662115a4c55c39715601df0d41345ba8ec8f4221d4e"
+url = "https://github.com/openai/codex/releases/download/rust-v0.155.1/codex-package-aarch64-apple-darwin.tar.gz"
+checksum = "sha256:e6e08717da9e35b72332eff753527fe79a9ae876081033c5c6820a8e5f58b943"
 
 [lock.platforms.macos-x64]
-url = "https://github.com/openai/codex/releases/download/rust-v0.149.0/codex-package-x86_64-apple-darwin.tar.gz"
-checksum = "sha256:ba332e647cc898e3b4e86a3bc6e8db414a124eb88d8480f4707bbc66b0432f9d"
+url = "https://github.com/openai/codex/releases/download/rust-v0.155.1/codex-package-x86_64-apple-darwin.tar.gz"
+checksum = "sha256:be752aebb2ac022c5bfed3fa14f46943d11ddb36a950b553b058794aba22496a"
 
 [lock.platforms.windows-x64]
-url = "https://github.com/openai/codex/releases/download/rust-v0.149.0/codex-package-x86_64-pc-windows-msvc.tar.gz"
-checksum = "sha256:bc470b4b90654c38ee52716056d6d5fc19a49afd08f419328034f4f324536459"
+url = "https://github.com/openai/codex/releases/download/rust-v0.155.1/codex-package-x86_64-pc-windows-msvc.tar.gz"
+checksum = "sha256:f45c273b7835c192aaa9cef5b93aa9528966ac7301444632de80a565a9bf14e8"

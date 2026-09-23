@@ -1,36 +1,36 @@
 #!/usr/bin/env -S mise tool-stub
 
 tool = "claude"
-version = "2.1.241"
+version = "2.1.278"
 
 [lock]
 
 [lock.platforms]
 
 [lock.platforms.linux-arm64]
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.241/claude-linux-arm64.tar.gz"
-checksum = "sha256:d3563afb0328eee644b5b830c3de42699b56a0d83de3423a466a0e2065b2417d"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.278/claude-linux-arm64.tar.gz"
+checksum = "sha256:5e3cc367f997847c89cdba3f5b1cd6ff5aabb8e94e14b19bad401124c0e838ed"
 
 [lock.platforms.linux-arm64-musl]
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.241/claude-linux-arm64-musl.tar.gz"
-checksum = "sha256:8a8604a3ee67254fb8e16d0cacc2e0daffd8700f55b8cf3460aa656aa138d000"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.278/claude-linux-arm64-musl.tar.gz"
+checksum = "sha256:a9fe96bb925f823608aa2d56cb7adc2c3ed4ca60f6184c588d26db608801f1e8"
 
 [lock.platforms.linux-x64]
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.241/claude-linux-x64.tar.gz"
-checksum = "sha256:c171011648d71b96a0956469a46315a4c826ccba7e20854ae62aa5c776d6a794"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.278/claude-linux-x64.tar.gz"
+checksum = "sha256:1d1f9950b96acb5a50bf342a3d3bd51cdf40b1714b2ca3ce2319ba8e8e7f3633"
 
 [lock.platforms.linux-x64-musl]
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.241/claude-linux-x64-musl.tar.gz"
-checksum = "sha256:51802fd5584df7b435ccbef0de44b71f5b6af3ff52d6500b05bb0b97cf3b111a"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.278/claude-linux-x64-musl.tar.gz"
+checksum = "sha256:b2bddcaafe22a33ccf1aadc3d56dc0e89f05321447d317a0332857d469c98b93"
 
 [lock.platforms.macos-arm64]
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.241/claude-darwin-arm64.tar.gz"
-checksum = "sha256:439a69a041f68a282c01fb8268b1743cf6ea03deef34e71a8f55e33e2288e6ca"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.278/claude-darwin-arm64.tar.gz"
+checksum = "sha256:d16dc23a4e27155a59cdc35251eccd7fa30ed46482c51af1c33e71b14d790f6b"
 
 [lock.platforms.macos-x64]
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.241/claude-darwin-x64.tar.gz"
-checksum = "sha256:3184842d2377e071514c38aa0c1e162f701f9ebc045b79f3e6004b24d367771f"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.278/claude-darwin-x64.tar.gz"
+checksum = "sha256:d5fa59ea628b85b0a9d4b2c8aa59a20a9b9714a0b08c938b2d04de1f00c07bb2"
 
 [lock.platforms.windows-x64]
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.241/claude-win32-x64.zip"
-checksum = "sha256:e80109edee1e1c0df3a7af06fb899c024b84a137809c0d74dd9e1c1cb11e3413"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.278/claude-win32-x64.zip"
+checksum = "sha256:8a223953a84861805ca7d00be12dee25590c06533e02f48dd9496f90db709d2e"
