@@ -1,7 +1,8 @@
 {{- $nvidia := eq (includeTemplate "distrobox-nvidia-enabled" . | trim) "true" -}}
 [noctalia]
-image=ghcr.io/atty303/arch-noctalia:noctalia-git-94e49bac
+image=ghcr.io/atty303/arch-noctalia:noctalia-git-ba54d98b
 pull=true
+pre_init_hooks=grep -q umea.archive.pkgbuild.com /etc/pacman.d/mirrorlist || sed -i '/archive.archlinux.org/{p;s#archive.archlinux.org#umea.archive.pkgbuild.com#;}' /etc/pacman.d/mirrorlist
 {{ if $nvidia }}nvidia=true
 {{ end }}volume=/run/dbus/system_bus_socket:/run/dbus/system_bus_socket
 volume=/usr/share/applications:/usr/local/share/applications
