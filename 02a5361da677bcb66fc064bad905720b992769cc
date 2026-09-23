@@ -1,0 +1,11 @@
+Task: Remove general guidance from dig final prompt execution instructions
+Anchor: 02a5361da677bcb66fc064bad905720b992769cc
+Base: 77b063f04e52b14f9ead019bb20961267ea51c7c
+Branch: main
+Commits: 02a5361 fix: keep dig execution instructions task specific
+Guidance: Repository AGENTS.md; dig; author-skills; develop-repository; maintain-agent-guidance
+Conditions: Same-environment prompt assumption; pre-existing unrelated author-skills working-tree change; source-state edit only
+Authority: User request and repository guidance
+## Transcript
+- U1: dig skillの最終プロンプトの実行時の指示にタスク固有でない一般global guidanceと重複する記述が多すぎる。基本的にpromptは生成時と同じ環境に入力される前提で、タスク固有の指示だけを書く。
+  - A: Inspected the managed dig skill and relevant guidance, removed two generic template rules, stated the same-environment assumption, verified Git and chezmoi diffs plus dry run, and committed only dig/SKILL.md. The unrelated pre-existing author-skills edit remains untouched; no live target apply or automatic remote sync was performed.
