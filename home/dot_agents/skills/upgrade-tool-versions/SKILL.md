@@ -50,7 +50,7 @@ Each candidate subagent completes the applicable checks below before returning a
   - Current and candidate versions or image references.
   - Whether the action is a version change, lock regeneration, or image-reference change.
   - Release dates and links to the first-party evidence.
-  - High-value features, fixes, performance improvements, and security changes relevant to this repository.
+  - Highlights of important new features, fixes, performance improvements, and security changes across the researched releases, including material upstream changes without a direct local impact.
   - Breaking changes, deprecations, migrations, and platform support changes.
   - Concrete local files or behaviors affected.
   - A recommendation of `upgrade`, `defer`, or `no change`, with confidence and rationale.
@@ -60,7 +60,8 @@ Each candidate subagent completes the applicable checks below before returning a
 
 ## Confirm selections one at a time
 
-- As subagent reports arrive, the parent presents one decision-ready candidate at a time and waits for its answer. Queue other completed reports while awaiting a response; do not wait for every investigation to finish before asking the first question.
+- Ask every user-facing question in this workflow in an ordinary assistant reply, not through `AskQuestion`, `AskUserQuestion`, or another question tool. This includes candidate choices, follow-up questions after `C`, and post-commit questions about excluded candidates. Keep the required per-target elevated execution approval for `chezmoi apply`.
+- As subagent reports arrive, the parent presents one decision-ready candidate at a time and waits for its answer. In the same reply, present the release highlights, compatibility and migration conditions, concrete local impact, first-party links, recommendation and rationale, and the choices below. Queue other completed reports while awaiting a response; do not wait for every investigation to finish before asking the first question.
 - Use fixed uppercase choices for every decision-ready candidate: `A=更新`, `B=見送り`, `C=追加説明・調査`. Omit `A` when an update cannot be assessed safely. State the recommended letter and its reason. Accept a lowercase reply as the corresponding choice, but display uppercase letters.
 - For `C`, provide the requested explanation or additional research, then ask for the same candidate's choice again before presenting another candidate. If the missing evidence cannot be obtained, explain that `A` remains unavailable and wait for `B` or new evidence; do not advance or treat `C` as update approval.
 - Record each explicit selection. Do not edit sources, apply targets, test, review, or commit while any candidate choice remains open. Report candidates with no updateable difference or unresolved evidence without treating them as approved changes.
