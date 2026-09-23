@@ -1,0 +1,75 @@
+Task: Update upgrade-tool-versions skill for parallel research and batched completion
+Anchor: 3815dc65fd4f474545be1fe0398227cc9093cc79
+Base: dae3b5e0abd7da15586fc36871a535dff82a85ea
+Branch: main
+Commits: 3815dc6 refactor: batch tool upgrade decisions and verification
+Guidance: repository AGENTS.md; author-skills; develop-repository; maintain-agent-guidance; review
+Conditions: skill source only; no tool/image/target update; scoped checks and independent review; origin/main was two commits behind at start
+Authority: user implementation request and applicable repository and skill guidance
+## Transcript
+- U1:
+    # 実装依頼
+    
+    ## 依頼
+    
+    `/var/home/atty/.agents/skills/upgrade-tool-versions/SKILL.md` を更新し、候補の調査と選択を速く進め、全候補の選択後に変更と検証をまとめる手順にする。実際のtoolやDistrobox imageの更新は行わない。
+    
+    ## 目的
+    
+    - 更新候補の調査を並行して進め、利用者は届いた結果から一件ずつ簡単に判断できるようにする。
+    - 候補ごとのtest・review・commitをなくし、選択後にまとめて完了させる。
+    
+    ## 成功条件
+    
+    - 親agentが全対象の軽量な版差分を先に確認する。更新可能な差分がある候補を、一候補につき一つのsubagentへ渡し、利用可能な枠で並行調査する。
+    - subagentは現行skillが求める全リリースの一次資料調査、移行条件、関連するローカル設定の確認を維持する。
+    - 親agentは調査結果を到着順に一件ずつ提示し、各候補への回答を待つ。選択肢は大文字の `A=更新`、`B=見送り`、`C=追加説明・調査` に固定し、推奨する回答と理由を示す。
+    - 全候補の選択後に、選択された変更をまとめて編集する。その後、一つの検証段階で必要な静的チェックと対象別の動作確認を行う。
+    - 検証で問題が残る候補は今回の変更から外す。通過した変更の全差分を最後に一度確認し、現行の必要条件に該当する場合だけ独立reviewを一度行って、一つのcommitにする。問題のある候補への対応はcommit後に別途利用者へ確認する。
+    - 更新可能なimmutable Distrobox imageがなく、upstream版だけが先行する場合は、親agentが短く報告し、その理由だけでsubagentを起動しない。
+    
+    ## 決定事項
+    
+    - 全選択後に編集する。
+      - 理由: 判断中の作業を軽くし、確定した選択をまとめて検証するため。
+      - 主な棄却案: 選択のたびに編集する案。判断と変更が交互に発生するため。
+    - 候補ごとの詳しい調査は維持し、親の軽量な差分確認後にsubagentへ並行して委ねる。
+      - 理由: 判断材料を減らさず、待ち時間を短くするため。
+      - 主な棄却案: 選択前の調査を簡略化する案、およびsubagentを常に一件ずつ起動する案。
+    - 判断は結果の到着順に一件ずつ確認し、選択肢の意味を固定する。
+      - 理由: 並行調査の成果を早く使い、短い入力でも選択ミスを防ぐため。
+      - 主な棄却案: 全調査の完了待ち、および候補ごとに文字の意味を変える案。
+    - 「testを一回」は一つの検証段階を意味する。
+      - 理由: 複数の対象に必要な確認を行いながら、候補ごとの検証を挟まないため。
+      - 主な棄却案: 単一のtestコマンドだけに制限する案。
+    - 問題が残る候補は除外し、成功した候補だけを一つのcommitにする。
+      - 理由: 独立した更新を確定し、問題への対応を後続の判断として扱うため。
+      - 主な棄却案: 全体を選択からやり直す案、および問題のある候補もcommitする案。
+    - 全差分の確認は一度行い、独立reviewは現行の必要条件に従う。
+      - 理由: 単純な生成物に対する現行の省略基準を保つため。
+      - 主な棄却案: すべての変更で独立reviewを必須にする案。
+    
+    ## 制約
+    
+    - 現行skillの安全条件、停止条件、更新対象の範囲、一次資料の要件、chezmoiの対象別applyと承認境界を維持する。
+    - 選択された候補間に依存関係がある場合は、問題の切り分け時にもその関係を保つ。
+    - 検証で候補を外した場合は、その候補のsource変更を今回のcommitから除き、適用済みの対象があれば現行skillの復旧条件に従って確認する。
+    - 通過した変更が一つもなければcommitは作らず、その状態と問題を報告する。
+    
+    ## 対象外
+    
+    - この依頼でtool stub、Distrobox manifest、実際のtarget環境を更新すること。
+    - imageの公開、`atty303/distrobox-image` の変更、新しい更新対象の追加。
+    
+    ## 未検証の前提
+    
+    - 対象skillの現在の内容と、適用されるrepository・skill guidanceの最新版。
+    - 利用可能なsubagent枠、および実装時に利用できるskill検証手段。
+    
+    ## 実装時の指示
+    
+    - 手順の順序が「親の軽量差分確認 → 差分候補の並行調査 → 到着順に一件ずつ選択 → 全選択後の編集 → 一つの検証段階 → 全差分の確認と必要時の独立review → 一つのcommit」と読めるよう、既存skillの重複や矛盾を整理する。
+    - `C` が選ばれた候補は説明・追加調査の後、同じ候補の判断を再確認してから次へ進む。
+    - 検証中に修正や候補の除外が必要になった場合は、同じ検証段階の中で影響範囲を再確認する。
+    
+  - A: Read guidance and canonical source; fetched origin, confirmed notes remote ancestor; edited only the skill body; scoped mise check, chezmoi diff/dry-run, independent review and read-only forward tests passed; committed 3815dc6. No tool, image, or target apply occurred.
