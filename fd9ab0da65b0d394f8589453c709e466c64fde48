@@ -1,0 +1,25 @@
+Task: Template upgrade candidate questions
+Anchor: fd9ab0da65b0d394f8589453c709e466c64fde48
+Base: 5a19904c4c88ca7d25685316074322d45474e411
+Branch: main
+Commits: fd9ab0d docs: template tool upgrade questions
+Guidance: repository AGENTS.md; author-skills; develop-repository; maintain-agent-guidance
+Conditions: source skill only; user previously declined live apply; no tool/image/target update; scoped check, independent review and forward test
+Authority: user template request and applicable repository and skill guidance
+## Transcript
+- U1:
+    ```less
+    ### ❓ [tool]: [質問文]
+    
+    [調査結果]
+    
+    - **A** — [選択肢]
+    - **B** — [選択肢]
+    - ...
+    
+    **推奨: [A/B/...]** — [理由]
+    ```
+    
+    質問をテンプレート化したい
+    
+  - A: Verified clean main and chezmoi source; fetched origin code and notes; added an ordinary Markdown candidate-question template to the canonical SKILL.md, including same-candidate C follow-up, required research fields and safety-based A omission; scoped mise check, chezmoi diff/dry-run, independent review and read-only forward tests passed; committed fd9ab0d. Did not apply the live target or change any tool/image.
