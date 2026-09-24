@@ -25,6 +25,7 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 
 - 既存format、生成元およびrepositoryの標準taskを使う。Generated fileとlockfileはownerを特定して正規手順で更新し、推測で手編集しない。
 - 補助toolの設定はupstream標準をbaselineとし、依頼に必要な最小差分だけを持つ。成果物を経緯から切り離して読み、不要なcompatibility layer、旧経路、alias、分岐、commentおよびdocumentを残さない。
+- Module等の移動・分割・責務再配置では、対象の実装本体を新しい場所へ移し、内部参照も新経路へ更新する。旧経路のre-export等は確認済みの公開互換性契約に必要な場合だけ残す。実装本体を移せなければ移動完了とせず、理由と残作業を報告する。
 - Program経路を追加・変更する前に `$design-program-observability` で適用判定する。対象なら [program observability contract](../../references/agent-computer-interface-observability.md) に従い、変更経路と再利用される共有境界だけを準拠させる。
 - 不具合修正は先に `$investigate-problem` で原因とoracleを確定する。[failure oracle and causal verification](../../references/failure-oracle-and-causal-verification.md) に従い、既存証拠でfailure段階を識別できなければproduct fixより先に最小観測経路を作る。
 - Public behavior、CLI、設定または公開APIを変えた場合は関連documentationも同じ変更で更新する。
