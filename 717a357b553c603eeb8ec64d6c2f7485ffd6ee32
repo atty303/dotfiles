@@ -1,0 +1,58 @@
+Task: Clarify implementation relocation completion in develop-repository skill
+Anchor: 717a357b553c603eeb8ec64d6c2f7485ffd6ee32
+Base: 683ed9cec390619a7418bf744667a7bfc8d0ed7d
+Branch: main
+Commits: 717a357 docs: require implementation relocation in refactors
+Guidance: repository AGENTS.md; develop-repository, maintain-agent-guidance, and author-skills skills
+Conditions: source-state guidance edit only; target apply not requested; no new dependency; current workspace initially clean
+Authority: current user implementation request and repository guidance
+## Transcript
+- U1: # 実装依頼
+    
+    ## 依頼
+    
+    `develop-repository` skillに、moduleなどの移動・分割・責務の再配置を伴うリファクタリングの完了条件を追加してください。既存の指針との重複や矛盾を確認し、適切な箇所へ統合してください。
+    
+    ## 目的
+    
+    - 整理先にre-exportなどの軽量adapterを作っただけで、実装の実体が旧場所に残る作業を完了扱いにしない。
+    
+    ## 成功条件
+    
+    - 移動対象の実装の実体と内部参照が新しい場所へ移ったことを、完了判定で確認する指針になっている。
+    - 旧pathのre-exportを残せる条件が、確認済みの公開互換性契約に限定されている。
+    - 実体を移せなかった場合は、理由と残作業を報告し、移動完了と表現しない指針になっている。
+    - 既存の互換層に関する指針と重複・矛盾せず、repositoryや言語を問わず適用できる。
+    
+    ## 決定事項
+    
+    - 移動・分割・責務の再配置を依頼された場合は、実装の実体と内部参照の移動を完了条件とする。
+      - 理由: re-exportだけでは依頼された責務の再配置が起きないため。
+      - 主な棄却案: 整理先から利用できれば完了とする案。実体が旧場所に残る問題を解消しないため。
+    - この条件を共通の`develop-repository` skillに適用する。
+      - 理由: 問題は特定のrepositoryや言語に限らないため。
+      - 主な棄却案: repository固有の指針、または「実体を移す」と明記された依頼だけに適用する案。通常のリファクタリング依頼で同じ問題が残るため。
+    - 旧pathのre-exportは、確認済みの公開互換性契約を守る必要がある場合に限って認める。
+      - 理由: 必要な互換性を維持しつつ、内部構造の移動を完了できるため。
+      - 主な棄却案: 旧pathを常に削除する案。公開互換性を破る場合があるため。
+    
+    ## 制約
+    
+    - 今回の対象はagent guidanceの更新であり、個別repositoryのmoduleは移動しない。
+    - 既存の指針を読み、追記より統合・簡潔化を優先する。
+    - 確認できていない互換性契約を推測で例外扱いしない。
+    
+    ## 対象外
+    
+    - 特定repositoryのリファクタリング実装。
+    - Codex memoryの直接編集。
+    
+    ## 未検証の前提
+    
+    - `develop-repository` skillと関連する共通guidanceの現行内容、および対象ファイルの管理元・編集手順。
+    
+    ## 実装時の指示
+    
+    - 変更前に、既存の「不要なcompatibility layerを残さない」という指針との関係を確認する。
+    - 変更後は、re-exportだけで実体が残る例、実体が移動した例、公開互換性のため旧pathを残す例に照らして、完了判定の文言を確認する。
+  - A: Located chezmoi source owner; reviewed existing compatibility rule and skill authoring guidance; added explicit implementation and internal-reference relocation criterion with public-compatibility exception and unfinished-work reporting; checked git diff, chezmoi diff and targeted dry run; committed 717a357.
