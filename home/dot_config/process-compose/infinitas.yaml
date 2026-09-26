@@ -1,0 +1,108 @@
+version: "0.5"
+
+log_level: debug
+log_configuration:
+  disable_json: true
+  add_timestamp: true
+log_location: /tmp/konamate.log
+
+disable_env_expansion: true
+
+environment:
+  - GAME=infinitas
+  - TWITCH_BROADCASTER_ID=141025463
+  - TWITCH_GAME_ID=1055720961
+  - TWITCH_STREAM_TITLE=低難易度からリハビリする。ついでに正規厨も卒業する
+  - TWITCH_STREAM_TAGS=LinuxGaming,bemani
+
+processes:
+  prepare:
+    command: |
+      exit 0
+    availability:
+      restart: exit_on_failure
+
+  game:
+    command: |
+      konamate run $GAME
+    availability:
+      # Exit the whole processes when the game ends
+      exit_on_end: true
+    depends_on:
+      prepare:
+        condition: process_completed_successfully
+
+  scorepeek:
+    command: |
+      scorepeek run --capture vulkan-layer --overlay-wayland --overlay-obs
+    depends_on:
+      game:
+        condition: process_started
+    readiness_probe:
+      http_get:
+        host: 127.0.0.1
+        scheme: http
+        path: "/overlay"
+        port: 3939
+      initial_delay_seconds: 3
+      period_seconds: 5
+      timeout_seconds: 1
+      success_threshold: 1
+      failure_threshold: 3
+
+  # streaming: Check condition
+  starting-stream:
+    command: |
+      exit 0
+    depends_on:
+      prepare:
+        condition: process_completed_successfully
+
+  
+  # streaming: OBS Studio
+  obs:
+    command: |
+      flatpak run com.obsproject.Studio --disable-shutdown-check --startstreaming
+    # OBS does not support graceful shutdown by signal, so we have to close it by window manager
+    shutdown:
+      timeout_seconds: 10
+      command: |
+        scrollmsg '[app_id="^com[.]obsproject[.]Studio$"] kill'
+    depends_on:
+      starting-stream:
+        condition: process_completed_successfully
+      scorepeek:
+        condition: process_healthy
+  
+  # streaming: Update twitch channel description
+  twitch-update:
+    command: |
+      set -- api patch /channels
+      set -- "$@" -q "broadcaster_id=$TWITCH_BROADCASTER_ID"
+      set -- "$@" -q "game_id=$TWITCH_GAME_ID"
+      set -- "$@" -q "title=$TWITCH_STREAM_TITLE"
+
+      IFS=,
+      set -f
+
+      for tag in $TWITCH_STREAM_TAGS; do
+          set -- "$@" -q "tags=$tag"
+      done
+
+      twitch "$@"
+      twitch_exit_code=$?
+      if [ "$twitch_exit_code" -eq 1 ] && [ "$twitch_output" = "Endpoint responded with status 204" ]; then
+        twitch_exit_code=0
+      fi
+      exit "$twitch_exit_code"
+    depends_on:
+      starting-stream:
+        condition: process_completed_successfully
+
+  # streaming: Twitch chat client
+  twitch-chat:
+    command: |
+      ghostty --class=chatuino --gtk-single-instance=false --quit-after-last-window-closed=true --initial-command='chatuino'
+    depends_on:
+      starting-stream:
+        condition: process_completed_successfully
