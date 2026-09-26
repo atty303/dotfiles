@@ -2,10 +2,19 @@ local args, state = ...
 
 local scroll = require("scroll")
 
-local target_class = "steam_app_infinitas"
+local function is_target(view)
+    if scroll.view_get_class(view) == "steam_app_infinitas" then
+        return true
+    end
+    if true then
+        return false
+    end
+    return scroll.view_get_app_id(view) == "bm2dx.exe"
+        and scroll.view_get_shell(view) == "xdg_shell"
+end
 
 local function reject_fullscreen(view)
-    if scroll.view_get_class(view) ~= target_class then
+    if not is_target(view) then
         return
     end
 

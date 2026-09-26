@@ -5,7 +5,7 @@ browser = "/var/lib/flatpak/exports/bin/com.google.Chrome"
 [games]
 
 [profiles.infinitas]
-run_profile = "gamescope"
+run_profile = "game"
 
 [profiles.infinitas.common.env]
 WINEPREFIX = "/home/atty/Games/konamate/infinitas"
@@ -22,7 +22,7 @@ PIPEASIO_SAMPLE_RATE = "44100"
 PIPEASIO_RT_PRIORITY = "off"
 PIPEASIO_CLIENT_NAME = "INFINITAS-PipeASIO"
 DXVK_CONFIG = "d3d9.presentInterval=1;d3d9.maxFrameLatency=1;dxvk.tearFree=False;d3d9.maxFrameRate=-1"
-RADV_DEBUG = "nodcc"
+PRESSURE_VESSEL_FILESYSTEMS_RW = "/run/user/1000/scorepeek"
 
 [[profiles.infinitas.common.registry]]
 action = "set"
@@ -45,9 +45,12 @@ registry = []
 [profiles.infinitas.entries.launcher.env]
 
 [profiles.infinitas.entries.game]
-command = "game-exclusive -- umu-run %r\\game\\app\\bm2dx.exe -t %t"
+command = "game-exclusive -- umu-run %r\\game\\app\\bm2dx.exe --asio -t %t"
 
 [profiles.infinitas.entries.game.env]
+VK_INSTANCE_LAYERS = "VK_LAYER_SCOREPEEK_capture"
+PROTON_ENABLE_WAYLAND = "1"
+WAYLANDDRV_FOCUS_LOSS = "0"
 
 [[profiles.infinitas.entries.game.registry]]
 action = "set"
@@ -64,9 +67,10 @@ type = "string"
 value = "N"
 
 [profiles.infinitas.entries.gamescope]
-command = "game-exclusive -- gamescope --backend wayland -W 3840 -H 2160 -w 1920 -h 1080 -r 120 -S auto --rt -f -- env -u RADV_DEBUG umu-run %r\\game\\app\\bm2dx.exe --asio -t %t"
+command = "game-exclusive -- gamescope --backend wayland -W 3840 -H 2160 -w 1920 -h 1080 -r 120 --adaptive-sync -S auto -f -- env -u RADV_DEBUG VK_INSTANCE_LAYERS=VK_LAYER_SCOREPEEK_capture umu-run %r\\game\\app\\bm2dx.exe --asio -t %t"
 
 [profiles.infinitas.entries.gamescope.env]
+RADV_DEBUG = "nodcc"
 
 [[profiles.infinitas.entries.gamescope.registry]]
 action = "delete"
@@ -79,10 +83,11 @@ key = "HKCU\\Software\\Wine\\X11 Driver"
 name = "Managed"
 
 [profiles.infinitas.entries.mangoapp]
-command = "game-exclusive -- gamescope --backend wayland -W 3840 -H 2160 -w 1920 -h 1080 -r 120 --adaptive-sync -S auto -f -- env -u RADV_DEBUG VK_LAYER_PATH=/home/atty/scorepeek/vulkan-capture/share/vulkan/explicit_layer.d VK_INSTANCE_LAYERS=VK_LAYER_SCOREPEEK_capture PRESSURE_VESSEL_FILESYSTEMS_RW=/run/user/1000/scorepeek umu-run %r\\game\\app\\bm2dx.exe --asio -t %t"
+command = "game-exclusive -- gamescope --backend wayland -W 3840 -H 2160 -w 1920 -h 1080 -r 120 --adaptive-sync -S auto -f -- env -u RADV_DEBUG VK_INSTANCE_LAYERS=VK_LAYER_SCOREPEEK_capture umu-run %r\\game\\app\\bm2dx.exe --asio -t %t"
 registry = []
 
 [profiles.infinitas.entries.mangoapp.env]
+RADV_DEBUG = "nodcc"
 MANGOHUD_CONFIGFILE = "/home/atty/.config/MangoHud/debug.conf"
 DXVK_LOG_PATH = "/home/atty/log"
 DXVK_LOG_LEVEL = "info"

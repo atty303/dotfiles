@@ -374,27 +374,27 @@
                         "bounds_type": 0,
                         "bounds_align": 0,
                         "bounds_crop": false,
-                        "crop_left": 125,
-                        "crop_top": 92,
-                        "crop_right": 60,
+                        "crop_left": 192,
+                        "crop_top": 136,
+                        "crop_right": 148,
                         "crop_bottom": 374,
                         "id": 7,
                         "group_item_backup": false,
                         "pos": {
-                            "x": 1320.0,
-                            "y": 1076.0
+                            "x": 1341.0,
+                            "y": 1071.0
                         },
                         "pos_rel": {
-                            "x": 0.66666668653488159,
-                            "y": 0.99259257316589355
+                            "x": 0.70555555820465088,
+                            "y": 0.98333334922790527
                         },
                         "scale": {
-                            "x": 1.1771689653396606,
-                            "y": 1.1771653890609741
+                            "x": 1.4053190946578979,
+                            "y": 1.4047619104385376
                         },
                         "scale_rel": {
-                            "x": 1.1771689653396606,
-                            "y": 1.1771653890609741
+                            "x": 1.4053190946578979,
+                            "y": 1.4047619104385376
                         },
                         "bounds": {
                             "x": 0.0,
@@ -540,6 +540,8 @@
             "push-to-talk-delay": 0,
             "hotkeys": {
                 "OBSBasic.SelectScene": [],
+                "libobs.show_scene_item.4": [],
+                "libobs.hide_scene_item.4": [],
                 "libobs.show_scene_item.5": [],
                 "libobs.hide_scene_item.5": [],
                 "libobs.show_scene_item.6": [],
@@ -630,7 +632,7 @@
     "saved_projectors": [],
     "preview_locked": false,
     "scaling_enabled": false,
-    "scaling_level": -15,
+    "scaling_level": -11,
     "scaling_off_x": 0.0,
     "scaling_off_y": 0.0,
     "virtual-camera": {

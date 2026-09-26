@@ -5,8 +5,8 @@ set $out_dashboard DP-3
 output $out_game {
     resolution 3840x2160@120Hz
     position 0,0
-    scale 1.5
-    subpixel rgb
+    scale 2
+    scale_filter linear
     allow_tearing no
     adaptive_sync on
     layout_type horizontal
@@ -16,7 +16,8 @@ output $out_game {
 
 output $out_dashboard {
     resolution 1920x1080@60Hz
-    position 320,1440
+#    position 320,2160
+    position 320,1080
     scale 1
     subpixel rgb
     layout_type horizontal
@@ -24,19 +25,32 @@ output $out_dashboard {
     layout_default_height 1
 }
 
+#focus_on_window_activation none
+
 workspace game output $out_game
 workspace dashboard output $out_dashboard
 
 workspace --no-auto-back-and-forth game
 
+# umu X11
 for_window [class="^steam_app_infinitas$"] {
     border none
     move container to workspace game
 }
-for_window [shell="^xdg_shell$" title="^beatmania IIDX INFINITAS$"] {
+# gamescope
+#for_window [shell="^xdg_shell$" title="^beatmania IIDX INFINITAS$"] {
+#    border none
+#    move container to workspace game
+#    fullscreen enable
+#}
+# umu Wayland
+for_window [shell="^xdg_shell$" app_id="bm2dx.exe"] {
     border none
     move container to workspace game
+    floating disable
+#    fullscreen application enable
     fullscreen enable
+#    resize set width 3840px height 2160px
 }
 
 for_window [app_id="com.obsproject.Studio"] {
