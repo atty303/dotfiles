@@ -1,0 +1,23 @@
+Task: Manage Twitch CLI client credentials with encrypted partial-file ownership and apply the target on infinitas.lan
+Anchor: 5606e9ba6407760d2dd6533914af9f2da10eea1b
+Base: e04d9157cbed99640d22ce1e957a00818429d7f1
+Branch: main
+Commits: 5606e9ba6407760d2dd6533914af9f2da10eea1b manages the Twitch CLI client credentials and secrets-role routing
+Guidance: repository AGENTS.md; develop-repository; review; investigate-problem; data-handling; artifact-profile-and-control-domain; failure-oracle-and-causal-verification; git-task-evidence
+Conditions: durable encrypted chezmoi source; Twitch CLI 1.1.24 on infinitas.lan; raw credentials and OAuth tokens excluded from this note; complete Codex session JSONL compared; remote source repository left clean at its pre-existing local commit
+## Evidence
+- Generated the encrypted modify-template on infinitas.lan from only CLIENTID and CLIENTSECRET; the generator reported exact equality with the existing six-field configuration, a two-field absent-target bootstrap, and preservation of ACCESSTOKEN, REFRESHTOKEN, TOKENSCOPES, and TOKENEXPIRATION.
+- Local structural decryption asserted that the encrypted source contains only the two owned client fields and no OAuth token field literals. Target-only dry-run output was discarded. `mise run check` passed for both changed paths.
+- Fresh independent review of staged snapshot SHA-256 18457b4d9b8178ed070f2cbfaa7c9a2026e54bd7d3d34ab2bd21570b42b117ff reported no actionable findings.
+- Commit 5606e9ba6407760d2dd6533914af9f2da10eea1b was pushed non-force to `ssh/main`.
+- A target-only dry-run and apply used a temporary minimal source on infinitas.lan because its normal source repository contains an unrelated clean local commit. Post-apply verification reported an empty chezmoi diff, mode 0600, and one non-empty occurrence of every expected six field names. The temporary source was removed and the normal source repository remained unchanged.
+Authority: current repository source and AGENTS.md, the four user messages below, and the applied development, review, data-handling, verification, and Git-evidence guidance
+## Transcript
+- U1: chezmoiの暗号化と部分ファイル管理で同時に使える？
+  - A: Confirmed that chezmoi `modify_` and `encrypted_` attributes can be combined, explained that the decrypted modify artifact must preserve unmanaged content, and distinguished encrypted partial ownership from encrypting the complete mutable Twitch CLI configuration.
+- U2: まさにtwitch cliだがどうやって追加する？
+  - A: Proposed an encrypted private modify source for `~/.config/twitch-cli/.twitch-cli.env`, owning only CLIENTID and CLIENTSECRET while preserving CLI-managed access token, refresh token, scope, and expiration fields; warned against adding the complete file with `chezmoi add --encrypt`.
+- U3: infinitas.lanで実行して
+  - A: Inspected Twitch CLI 1.1.24 and its six-field configuration on infinitas.lan. During the first attempt a verbose local dry-run exposed the then-current client credential in the private task log, so work stopped, all pending repository artifacts were removed, no commit, push, or apply occurred, and credential rotation was requested without repeating the value.
+- U4: 更新した
+  - A: Verified the updated remote configuration by field name only, generated and validated the encrypted modify-template without displaying values, passed targeted checks and fresh independent review, committed and pushed the source, then applied only the target file on infinitas.lan from a temporary source and verified mode 0600, an empty diff, preserved dynamic fields, cleanup, and no change to the host's normal source repository.
