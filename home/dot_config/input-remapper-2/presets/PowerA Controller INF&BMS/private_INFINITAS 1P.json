@@ -1,0 +1,195 @@
+[
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 299,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "if_single(key(KEY_ESC),)",
+        "name": "E4",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 299,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            },
+            {
+                "type": 1,
+                "code": 288,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_KP1",
+        "name": "E4+1",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 299,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            },
+            {
+                "type": 1,
+                "code": 289,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_KP2",
+        "name": "E4+2",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 299,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            },
+            {
+                "type": 1,
+                "code": 290,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_KP3",
+        "name": "E4+3",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 299,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            },
+            {
+                "type": 1,
+                "code": 291,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_KP4",
+        "name": "E4+4",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 299,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            },
+            {
+                "type": 1,
+                "code": 292,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_KP5",
+        "name": "E4+5",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 299,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            },
+            {
+                "type": 1,
+                "code": 293,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_KP6",
+        "name": "E4+6",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 299,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            },
+            {
+                "type": 1,
+                "code": 294,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_KP7",
+        "name": "E4+7",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 299,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            },
+            {
+                "type": 1,
+                "code": 296,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_KP8",
+        "name": "E4+E1",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 299,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            },
+            {
+                "type": 1,
+                "code": 297,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_KP9",
+        "name": "E4+E2",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 299,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            },
+            {
+                "type": 1,
+                "code": 298,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "KEY_KP0",
+        "name": "E4+E3",
+        "mapping_type": "key_macro"
+    }
+]

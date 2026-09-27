@@ -2,5 +2,7 @@
     "version": "2.2.1",
     "autoload": {{ if eq .chezmoi.hostname "sdvx" }}{
         "Konami Amusement SOUND VOLTEX controller": "SDVX"
+    }{{ else if eq .chezmoi.hostname "infinitas" }}{
+        "PowerA Controller INF&BMS": "INFINITAS 1P"
     }{{ else }}{}{{ end }}
 }
