@@ -1,0 +1,29 @@
+Task: Configure INFINITAS E4 modifier behavior and host autoload
+Anchor: b12dc51711b7b2cf726da1d9d1549c694cc112cd
+Base: d3f5a0d14d40fc22b0cf598e7ebcd0a96c453ae3
+Branch: main
+Commits: b12dc51 feat: autoload INFINITAS remapper preset on infinitas
+Guidance: repository AGENTS.md; develop-repository; investigate-problem; design-program-observability applicability checked
+Conditions: target infinitas.lan; remote preset initially unmanaged; local and remote source clean; live apply explicitly targeted; no dependency added
+## Evidence
+- Original remote preset SHA256 36c49b31ffffb0430d023f2e32c59772a1061296f8b2747d7dbc98c9b4b807c1; contained ten E4 combinations and no E4-alone mapping.
+- Input Remapper 2.2.1 on infinitas accepts all eleven mappings after the addition. E4 input code 299 is outside the global gamepad virtual output range 304-318, so the user selected Escape for E4-alone output.
+- Targeted chezmoi diff on infinitas showed only the E4 mapping and autoload entry before apply, and was empty afterward. Service log confirmed autoload loading INFINITAS 1P and starting injection. Physical button behavior was not directly observed.
+Authority: user instructions and repository AGENTS.md govern source, host apply, and synchronization
+## Transcript
+- U1: input rematterで特定のボタンの組み合わせにkey inputを割り当て、そのボタン単体はボタンのままにできる？ 
+  - A: Checked upstream combination documentation and explained that an earlier button press passes through before the chord completes.
+- U2: A+BをA->Bと順に押すとAがゲームに送られてしまう。
+  - A: Confirmed the observed behavior is the documented combination behavior and that release-input cannot undo the earlier press.
+- U3: それはできるの？
+  - A: Found upstream if_single macro and explained that a delayed single tap is possible but original immediate hold semantics are not preserved.
+- U4: infinitas.lanにあるinfinitasのpresetをその構成にしたい。まず設定をよんで把握して。E4ボタンをmodifierのようにしたく、単体押下だけ遅れて出力でいい
+  - A: Read the remote INFINITAS 1P preset and autoload config on infinitas, identifying E4 code 299 and ten existing E4 combinations.
+- U5: その形で変更してchezmoiに取り込んで。infinitas hostでautoloadする
+  - A: Began implementation and discovered that Input Remapper's global gamepad output cannot emit the original E4 code 299; stopped the incompatible proposal before commit or live apply.
+- U6: 利用対象はcristinaではなくinfinitasだぞ
+  - A: Confirmed that all target runtime observations were made on infinitas.lan and clarified the input-forwarding versus macro-output capability difference.
+- U7: じゃあe4単体はescape keyでいい
+  - A: Imported remote preset into chezmoi, added an E4-alone if_single Escape mapping, added infinitas autoload, validated host rendering and all eleven mappings, passed check and Linux E2E, committed and pushed source, fast-forwarded source on infinitas, applied only the two named targets, and activated autoload.
+- U8: e4入力は認識するのに出力できないのは不自然だが
+  - A: Explained that unmodified E4 can be forwarded on a virtual copy of the source device, while the separate macro output device does not support code 299; retained the approved Escape mapping.
