@@ -24,6 +24,6 @@ Authority: user instructions and repository AGENTS.md govern source, host apply,
 - U6: 利用対象はcristinaではなくinfinitasだぞ
   - A: Confirmed that all target runtime observations were made on infinitas.lan and clarified the input-forwarding versus macro-output capability difference.
 - U7: じゃあe4単体はescape keyでいい
-  - A: Imported remote preset into chezmoi, added an E4-alone if_single Escape mapping, added infinitas autoload, validated host rendering and all eleven mappings, passed check and Linux E2E, committed and pushed source, fast-forwarded source on infinitas, applied only the two named targets, and activated autoload.
+  - A: Accepted Escape as the E4-alone output and began preparing the remote preset for chezmoi.
 - U8: e4入力は認識するのに出力できないのは不自然だが
-  - A: Explained that unmodified E4 can be forwarded on a virtual copy of the source device, while the separate macro output device does not support code 299; retained the approved Escape mapping.
+  - A: Explained that unmodified E4 can be forwarded on a virtual copy of the source device, while the separate macro output device does not support code 299. Imported the remote preset into chezmoi, added the E4-alone if_single Escape mapping and infinitas autoload, validated host rendering and all eleven mappings, passed check and Linux E2E, committed and pushed source, fast-forwarded source on infinitas, applied only the two named targets, and activated autoload.
