@@ -16,7 +16,6 @@ output $out_game {
 
 output $out_dashboard {
     resolution 1920x1080@60Hz
-#    position 320,2160
     position 320,1080
     scale 1
     subpixel rgb
@@ -24,8 +23,6 @@ output $out_dashboard {
     layout_default_width 0.5
     layout_default_height 1
 }
-
-#focus_on_window_activation none
 
 workspace game output $out_game
 workspace dashboard output $out_dashboard
@@ -38,6 +35,14 @@ for_window [class="^steam_app_infinitas$"] {
     move container to workspace game
 }
 
+# umu Wayland
+for_window [shell="^xdg_shell$" app_id="^bm2dx[.]exe$"] {
+    border none
+    move container to workspace game
+    floating disable
+    fullscreen enable
+}
+
 # gamescope
 #for_window [shell="^xdg_shell$" title="^beatmania IIDX INFINITAS$"] {
 #    border none
@@ -45,20 +50,12 @@ for_window [class="^steam_app_infinitas$"] {
 #    fullscreen enable
 #}
 
-# umu Wayland
-for_window [shell="^xdg_shell$" app_id="bm2dx.exe"] {
-    border none
-    move container to workspace game
-    floating disable
-    fullscreen enable
-}
-
 for_window [app_id="^com[.]obsproject[.]Studio$"] {
     move container to workspace dashboard
     set_size h 0.5
 }
 
-for_window [app_id="^com[.]mitchellh[.]ghostt$" title="^Chatuino$"] {
+for_window [app_id="^com[.]mitchellh[.]ghostty$" title="^Chatuino$"] {
     move container to workspace dashboard
     set_size h 0.25
 }

@@ -12,10 +12,10 @@ log_location: /tmp/konamate.log
 disable_env_expansion: true
 
 environment:
-  - GAME=infinitas
+  - GAME=sdvx
   - TWITCH_BROADCASTER_ID=141025463
-  - TWITCH_GAME_ID=1055720961
-  - TWITCH_STREAM_TITLE=プレイ環境が整ったので楽しくなってきた
+  - TWITCH_GAME_ID=1259504587
+  - TWITCH_STREAM_TITLE=インペリアルを目指して地力つける
   - TWITCH_STREAM_TAGS=LinuxGaming,bemani
 
 processes:
@@ -34,24 +34,6 @@ processes:
     depends_on:
       prepare:
         condition: process_completed_successfully
-
-  scorepeek:
-    command: |
-      scorepeek run --capture vulkan-layer --overlay-wayland --overlay-obs
-    depends_on:
-      game:
-        condition: process_started
-    readiness_probe:
-      http_get:
-        host: 127.0.0.1
-        scheme: http
-        path: "/overlay"
-        port: 3939
-      initial_delay_seconds: 3
-      period_seconds: 5
-      timeout_seconds: 1
-      success_threshold: 1
-      failure_threshold: 3
 
   # streaming: Check condition
   starting-stream:
@@ -73,9 +55,7 @@ processes:
     depends_on:
       starting-stream:
         condition: process_completed_successfully
-      scorepeek:
-        condition: process_healthy
-  
+
   # streaming: Update twitch channel description
   twitch-update:
     command: |
