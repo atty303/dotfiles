@@ -473,7 +473,7 @@ mode "spaces" {
     bindsym Ctrl+0 space restore 0; mode default
     bindsym Escape mode "default"
 }
-bindsym $mod+g mode "spaces"
+#bindsym $mod+g mode "spaces"
 
 #
 # Utilities:
