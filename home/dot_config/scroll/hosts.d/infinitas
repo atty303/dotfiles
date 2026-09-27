@@ -61,4 +61,4 @@ for_window [app_id="^com\\.chatterino\\.chatterino$"] {
     move container to workspace dashboard
 }
 
-bindsym --no-repeat $mod+g exec gtk-launch io.github.atty303.infinitas.session
+bindsym --no-repeat $mod+g exec host-exec gtk-launch io.github.atty303.infinitas.session
