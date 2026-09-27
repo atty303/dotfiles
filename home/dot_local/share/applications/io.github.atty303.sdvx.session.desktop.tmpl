@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=SOUND VOLTEX EXCEED GEAR (Session)
+Exec=ghostty --class=io.github.atty303.sdvx.session -e {{ .chezmoi.homeDir }}/.local/bin/process-compose up -f {{ .chezmoi.homeDir }}/.config/process-compose/sdvx.yaml
+Icon=applications-games
+Terminal=false
+StartupNotify=true
+StartupWMClass=io.github.atty303.sdvx.session
+Categories=Game;
