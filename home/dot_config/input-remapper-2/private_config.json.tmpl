@@ -1,6 +1,6 @@
 {
     "version": "2.2.1",
-    "autoload": {
+    "autoload": {{ if eq .chezmoi.hostname "sdvx" }}{
         "Konami Amusement SOUND VOLTEX controller": "SDVX"
-    }
+    }{{ else }}{}{{ end }}
 }
