@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=beatmania IIDX INFINITAS (Session)
+Exec=ghostty --class=io.github.atty303.infinitas.session -e {{ .chezmoi.homeDir }}/.local/bin/process-compose up -f {{ .chezmoi.homeDir }}/.config/process-compose/infinitas.yaml
+Icon=applications-games
+Terminal=false
+StartupNotify=true
+StartupWMClass=io.github.atty303.infinitas.session
+Categories=Game;
