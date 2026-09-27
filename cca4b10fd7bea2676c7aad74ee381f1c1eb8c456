@@ -1,0 +1,21 @@
+Task: Manage input-remapper autoload by host
+Anchor: cca4b10fd7bea2676c7aad74ee381f1c1eb8c456
+Base: 407946a7fe67b77870b751efa0c27b5f9fabb896
+Branch: main
+Commits: cca4b10 feat: autoload SDVX preset only on sdvx host
+Guidance: repository AGENTS.md; develop-repository; design-program-observability applicability checked
+Conditions: source-only change; no live apply; no new dependency; complete user-message history checked against local Codex rollout
+Authority: user messages and repository AGENTS.md govern scope and synchronization
+## Transcript
+- U1: hostごとにinput remapperの設定管理したい
+  - A: Inspected existing shared config and preset, hostname conventions, and repository guidance.
+- U2: 提案だけ
+  - A: Kept work read-only and proposed host-specific autoload while keeping preset management shared.
+- U3: presetのignoreはしないでいい。sdvxならautoloadする。あとでinfinitasのpresetを追加する予定
+  - A: Refined proposal to leave presets available on all hosts and vary only config.json autoload.
+- U4: sdvx.lanでautoloadする
+  - A: Verified chezmoi hostname is a short name and specified sdvx as the matching hostname.
+- U5: ok
+  - A: Acknowledged proposal; made no changes under the proposal-only scope.
+- U6: 実装して
+  - A: Renamed input-remapper config source to a template; sdvx renders the SDVX autoload entry and other hosts render an empty autoload map. Validated both renderings as JSON, inspected targeted chezmoi diff and dry run, and committed the source change without applying it live.
