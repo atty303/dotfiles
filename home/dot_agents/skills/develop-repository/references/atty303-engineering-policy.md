@@ -1,6 +1,10 @@
 # `atty303` repository delta
 
-Apply these preferences after the generic `develop-repository` workflow. This profile does not redefine generic authority, dependency, review, verification, data-handling, observability, or Git-evidence contracts.
+Apply these repository-specific preferences within the generic `develop-repository` workflow. This profile does not redefine generic authority, dependency, review, verification, data-handling, observability, or Git-evidence contracts.
+
+### Branch selection
+
+- 作業開始時のbranchが`main`なら、その`main`上で作業を続ける。ユーザーまたはrepository guidanceが別branchを明示的に指定・要求している場合を除き、新しいbranchを作成したり、別branchへ切り替えたりしない。
 
 ### Implementation Style
 

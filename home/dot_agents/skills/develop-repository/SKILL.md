@@ -17,7 +17,7 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 
 - 通常のGit commandだけを使う。Git repositoryでなければ停止し、別VCSを解釈、操作または初期化しない。
 - 変更前にremoteがあればcodeと標準notes refをfetchし、branch、upstream、HEADと親、index、working tree、default branchおよび必要なdiffを確認する。Remoteにnotes refが未作成なら正常な空状態とし、network、権限、競合または破損によるfailureと区別する。Code fetch失敗時はremote情報の陳腐化を明示し、notes fetch・merge失敗時はlocalまたはremote noteを暗黙に置換しない。
-- 指定branchまたは依頼に対応する既存branchを優先する。無関係な変更から新しい作業を派生させず、rewrite、既存branch移動または未確定変更を伴う切替は確認する。
+- Branchの作成・切り替えを判断する前にRepository profileを適用する。適用されるbranch方針がなければ、指定branchまたは依頼に対応する既存branchを優先する。無関係な変更から新しい作業を派生させず、rewrite、既存branch移動または未確定変更を伴う切替は確認する。
 - 現在のsourceやliving documentationだけでは判断できない意図、未完了範囲またはmigrationがある場合は、関連path、schema、featureまたはcommitに限定してGit logとnotesを調べる。履歴はdescriptiveであり現在の原典を上書きしない。
 - 開発、build、test環境は現在のrepositoryのsource、task、build process、適用guidanceまたはユーザーの明示指定から確定する。承認済みcommand、memory、過去task、toolの存在または別用途のcontainer・runtimeだけを根拠に転用しない。
 
