@@ -1,0 +1,91 @@
+Task: Keep main for atty303-owned repository work; session 01a0e677-67c0-7e92-937c-2908bb344bee
+Anchor: 9098d60c1fff920534b7b38f45391f62b5ebfe9f
+Base: 8d11cb64e72e1971f76ee7991f1831fa658e706f
+Branch: main
+Commits: 9098d60c1fff920534b7b38f45391f62b5ebfe9f (owner-specific branch policy and early profile routing)
+Guidance: global and repository AGENTS.md; maintain-agent-guidance; dig; develop-repository; author-skills; review; git-task-evidence; data-handling
+Conditions: Linux chezmoi source state; started clean on main equal to origin/main; only two named skill targets applied with require_escalated; isolated fixture remotes were identity-only and no network or commits were permitted in forward tests
+## Evidence
+- Frozen reviewed diff SHA-256: ec647171547c6107f507680b6f663a3beb6098d0f5d061b077282750650944b4; independent read-only review found no actionable issues.
+- Fresh-agent forward test: atty303/main/no override stayed main despite an existing corresponding branch; atty303/main/explicit branch created codex/readme-wording; atty303/non-main stayed on its existing task branch; other owner/main switched to the corresponding existing task branch under generic rules.
+- Parent independently verified all four final branches and exact README contents, only README unstaged, no index changes, one original commit each, and clean diff checks. Fixtures are disposable task-owned resources.
+- Complete runtime session JSONL parsed without errors or compaction: four human messages retained verbatim; three automatically injected context/skill messages excluded; no attachments or secret content in retained requests.
+Authority: User approved owner-scoped policy and explicitly requested source edits and named target application; repository AGENTS authorizes clean-main sync through ssh and separate standard notes push; author-skills requires independent review and forward tests.
+## Transcript
+- U1:
+    [$maintain-agent-guidance](/var/home/atty/.agents/skills/maintain-agent-guidance/SKILL.md) [$dig](/var/home/atty/.agents/skills/dig/SKILL.md) digのpromptを新規タスクに渡すと毎回branchを作られる。開始位置がmainならそのまま作業してほしい
+    
+  - A: 現行の dig、maintain-agent-guidance、develop-repository、global AGENTS と chezmoi source mapping を確認した。dig には branch 作成の指示がなく、main 維持も未指定だった。過去の個別 task の原因は未確定と区別し、全開発 task の共通方針か dig 限定かを Q1 で確認した。OpenAI 公式 docs と既存 guidance 分担も参照した。
+- U2:
+    atty303 owner repoの共通方針
+    
+  - A: 既存の atty303-engineering-policy.md と origin の GitHub owner による適用規則を確認した。main 開始は維持し、明示された別 branch 指定を優先し、他 owner と非 main 開始は既存方針に従う案を提示して Q2 で共通理解を確認した。
+- U3:
+    A
+    
+  - A: 合意した scope、正確なルール、4ケースの成功条件、owner 別 policy の原典、branch 判断前の参照順、指定 skill target の個別適用を含む実装依頼 prompt を作成した。
+- U4:
+    # 実装依頼
+    
+    ## 依頼
+    
+    `/var/home/atty/.local/share/chezmoi` で管理している agent guidance を更新し、GitHub owner が `atty303` の repository では、作業開始時の branch が `main` ならそのまま `main` 上で作業する方針を追加してください。対応する個人 skill の適用先にも反映してください。
+    
+    ## 目的
+    
+    - dig が生成した prompt を新規タスクへ渡した場合を含め、atty303 所有 repository で main から始めた作業に不要な branch が作られることを防ぐ。
+    
+    ## 成功条件
+    
+    - atty303 所有 repository の共通方針に、次のルールが記載されている。
+      > 作業開始時のbranchが`main`なら、その`main`上で作業を続ける。ユーザーまたはrepository guidanceが別branchを明示的に指定・要求している場合を除き、新しいbranchを作成したり、別branchへ切り替えたりしない。
+    - branch の作成・切り替えを判断する前に、owner 別方針を参照する流れになっている。
+    - 次の各ケースで適用される指示に矛盾がないことを確認する。
+      - atty303 所有・main 開始・別指定なし：main を維持する。
+      - atty303 所有・別 branch の明示指定あり：その指定に従う。
+      - atty303 所有・main 以外で開始：既存の branch 選択方針に従う。
+      - 別 owner：既存の branch 選択方針に従う。
+    - 変更した source state と対応する個人 skill の適用先が一致している。
+    
+    ## 決定事項
+    
+    - 適用範囲は、既存の owner 判定に従い、`origin` の GitHub owner が `atty303` の repository とする。
+      - 理由: 利用者が指定した共通方針の範囲であり、既存の owner 別方針の仕組みを利用できる。
+      - 主な棄却案: 全 owner への適用。希望する範囲を超えるため。
+    - 方針の原典は `home/dot_agents/skills/develop-repository/references/atty303-engineering-policy.md` とする。
+      - 理由: atty303 所有 repository の共通方針が既に集約されている。
+      - 主な棄却案: global `AGENTS.md` への追加。owner 別方針の原典が分散するため。
+    - dig 経由に限定せず、対象 repository の開発タスク全般に適用する。
+      - 理由: branch の選択方針は依頼 prompt の生成方法に依存しない。
+      - 主な棄却案: dig が生成する prompt ごとに同じルールを記載すること。共通方針が重複するため。
+    - ユーザーまたは repository guidance による別 branch の明示的な指定・要求を優先する。
+      - 理由: main 維持を既定動作としつつ、個別の作業要件を尊重する。
+      - 主な棄却案: main 上の作業を例外なく強制すること。明示された作業要件と衝突するため。
+    
+    ## 制約
+    
+    - owner 判定には既存の仕組みを使う。
+    - main 以外から開始した作業を、自動的に main へ切り替えるルールにはしない。
+    - この変更を push、PR 作成、履歴書き換えなどの権限拡張にしない。
+    
+    ## 対象外
+    
+    - dig の質問形式や生成 prompt の構成変更。
+    - 過去のタスクで作られた branch の削除・統合。
+    - 個々の過去タスクが branch を作成した原因の確定。
+    - 別 owner の repository に対する branch 方針の変更。
+    
+    ## 未検証の前提
+    
+    - 現在の `develop-repository` で、owner 別方針の参照が branch 選択前に行われることが十分明確かは未確認。既存の branch 選択指示との関係を確認する。
+    
+    ## 実装時の指示
+    
+    - 主な変更対象:
+      - `/var/home/atty/.local/share/chezmoi/home/dot_agents/skills/develop-repository/references/atty303-engineering-policy.md`
+    - 参照順の明確化が必要な場合の変更対象:
+      - `/var/home/atty/.local/share/chezmoi/home/dot_agents/skills/develop-repository/SKILL.md`
+    - owner 固有のルール本文は policy ファイルに集約し、skill 本体では branch 選択前にその方針を参照する関係を明確にする。
+    - 変更したファイルに対応する `/home/atty/.agents/skills/develop-repository/` 配下の target だけを個別適用する。
+    
+  - A: main の clean workspace と origin/main の一致を確認し、code と notes を fetch した。owner policy に Branch selection を追加し、profile 適用を generic workflow の中で行う文言に修正した。skill 本体で branch 判断前の Repository profile 適用と、該当 branch 方針がない場合の既存規則への fallback を明確化した。2ファイルの scoped mise check、reference graph、git diff --check、targeted chezmoi diff/dry-run が成功した。独立 reviewer は actionable finding なし。fresh agent が4隔離 repositoryで実際に README を修正し、各 branch 選択が期待どおりであることを親 agent も検証した。承認済み2 target を require_escalated で個別適用し、source と byte 一致、空 diff を確認した。review snapshot と commit 対象が一致し、9098d60 を main に commit した。clean state で再fetchと pull --rebase を行い、ssh remoteへmainをnon-force pushし、remote HEAD の一致を確認した。complete local runtime session history を全件 parse して4件の human messageと3件の自動注入を識別し、cycle開始から最新依頼まで照合した。
