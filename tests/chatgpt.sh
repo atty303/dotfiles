@@ -23,6 +23,11 @@ chmod +x "$test_home/.local/bin/chatgpt" "$test_home/.local/libexec/chatgpt-upda
 bash -n "$test_home/.local/bin/chatgpt"
 bash -n "$test_home/.local/libexec/chatgpt-update"
 
+set_pinned_version() {
+  sed -i "s/^pinned_version=.*/pinned_version=\"$1\"/" "$test_home/.local/libexec/chatgpt-update"
+}
+set_pinned_version ""
+
 printf 'rpm payload\n' >"$fixture/chatgpt-test.rpm"
 rpm_sha=$(sha256sum "$fixture/chatgpt-test.rpm" | awk '{print $1}')
 cat >"$fixture/primary.xml" <<EOF
@@ -79,8 +84,14 @@ cat >"$fake_bin/rpmkeys" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
 if [[ $* == *--checksig* ]]; then
+  [[ ${FAKE_BAD_SIGNATURE:-false} != true ]] || exit 1
   printf '%s: digests signatures OK\n' "${*: -1}"
 fi
+EOF
+
+cat >"$fake_bin/rpm" <<'EOF'
+#!/usr/bin/env bash
+printf 'chatgpt %s x86_64' "${FAKE_RPM_VERSION:-99.1-1}"
 EOF
 
 cat >"$fake_bin/rpm2cpio" <<'EOF'
@@ -98,7 +109,7 @@ printf '%s\n' "${CODEX_SPARKLE_ENABLED:-unset}" >"$FAKE_APP_LOG"
 printf '%s\n' "$@" >>"$FAKE_APP_LOG"
 APP
 chmod +x usr/lib/chatgpt/ChatGPT
-printf '{"version":"99.1"}\n' >usr/lib/chatgpt/resources/linux-package-metadata.json
+printf '{"version":"%s"}\n' "${FAKE_PACKAGE_VERSION:-99.1}" >usr/lib/chatgpt/resources/linux-package-metadata.json
 printf 'icon\n' >usr/share/pixmaps/chatgpt.png
 EOF
 chmod +x "$fake_bin"/*
@@ -134,6 +145,38 @@ if FAKE_BAD_FINGERPRINT=true run_chatgpt --update >/dev/null 2>&1; then
   printf 'ChatGPT updater accepted an unexpected signing key\n' >&2
   exit 1
 fi
+[[ $(readlink "$test_home/.local/opt/chatgpt/current") == versions/99.1-1 ]]
+
+cp "$fixture/chatgpt-test.rpm" "$fixture/chatgpt-99.0-1.x86_64.rpm"
+set_pinned_version "99.0-1"
+printf '%s success\n' "$(date +%s)" >"$test_home/.local/state/chatgpt/last-check"
+requests=$(wc -l <"$temporary/curl.log")
+FAKE_PACKAGE_VERSION=99.0 FAKE_RPM_VERSION=99.0-1 run_chatgpt pinned
+[[ $(readlink "$test_home/.local/opt/chatgpt/current") == versions/99.0-1 ]]
+[[ $(wc -l <"$temporary/curl.log") -eq $((requests + 1)) ]]
+[[ $(tail -n 1 "$temporary/curl.log") == chatgpt-99.0-1.x86_64.rpm ]]
+requests=$(wc -l <"$temporary/curl.log")
+FAKE_CURL_FAIL=true run_chatgpt pinned-offline
+FAKE_CURL_FAIL=true run_chatgpt --update
+[[ $(wc -l <"$temporary/curl.log") -eq $requests ]]
+[[ $(readlink "$test_home/.local/opt/chatgpt/current") == versions/99.0-1 ]]
+
+cp "$fixture/chatgpt-test.rpm" "$fixture/chatgpt-98.0-1.x86_64.rpm"
+set_pinned_version "98.0-1"
+if FAKE_BAD_SIGNATURE=true run_chatgpt --update >/dev/null 2>&1; then
+  printf 'ChatGPT updater accepted an unsigned pinned package\n' >&2
+  exit 1
+fi
+[[ $(readlink "$test_home/.local/opt/chatgpt/current") == versions/99.0-1 ]]
+
+if FAKE_PACKAGE_VERSION=98.0 FAKE_RPM_VERSION=98.0-2 run_chatgpt --update >/dev/null 2>&1; then
+  printf 'ChatGPT updater accepted a different RPM release than the pin\n' >&2
+  exit 1
+fi
+[[ $(readlink "$test_home/.local/opt/chatgpt/current") == versions/99.0-1 ]]
+
+set_pinned_version ""
+run_chatgpt --update
 [[ $(readlink "$test_home/.local/opt/chatgpt/current") == versions/99.1-1 ]]
 
 desktop="$temporary/chatgpt.desktop"

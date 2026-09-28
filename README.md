@@ -84,6 +84,14 @@ future design rather than part of the current validation guarantee.
 Roles are fixed during `chezmoi init` and stored in the chezmoi config. A normal apply
 does not inspect the current session or infer roles again.
 
+## Portable ChatGPT on Linux
+
+The launcher's update check uses `pinned_version` near the top of
+[`chatgpt-update`](home/dot_local/libexec/executable_chatgpt-update). Set it to an
+RPM version-release to keep that version, or leave it empty to follow the latest
+release. Both normal launches and `chatgpt --update` respect the pin. Pinned
+downloads use the official repository's RPM signing key.
+
 ## Exclusive game CPU partition
 
 The `infinitas` host reserves logical CPUs `0-3,12-15` for one foreground game process
