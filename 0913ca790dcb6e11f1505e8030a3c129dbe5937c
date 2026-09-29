@@ -1,0 +1,14 @@
+Task: Map INFINITAS E1-E4 chord to Win+G and import real-machine preset into chezmoi
+Anchor: 0913ca790dcb6e11f1505e8030a3c129dbe5937c
+Base: e1be6a5a6bf481df4cc67ddce32f84d53c272807
+Branch: main
+Commits: 0913ca790dcb6e11f1505e8030a3c129dbe5937c imports the real-machine chord and changes its output to Super_L + G
+Guidance: Repository AGENTS.md; develop-repository; Git task evidence; atty303 engineering policy
+Conditions: chezmoi source on local main; live preset on infinitas.lan; origin for fetch and ssh for push
+## Evidence
+- Live preset had 12 mappings; new E4+E1+E2+E3 emitted g. Existing SDVX preset uses Super_L + G.
+- jq mapping check, git diff --check, and mise run check on changed file passed.
+Authority: User request and repository AGENTS.md
+## Transcript
+- U1: 実機にe1-e4同時押しのpresetを追加した。今はg入力になっているがwindows+gキーになるようにしてchezmoiに反映
+  - A: Inspected live and managed presets, fetched remote Git state, copied the live preset to source, changed only new chord output to Super_L + G, validated JSON and repository checks, and committed 0913ca7. Remote synchronization and live apply follow.
