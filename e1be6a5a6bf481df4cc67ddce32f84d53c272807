@@ -1,0 +1,21 @@
+Task: Diagnose INFINITAS E4 Escape and trial a longer macro press
+Anchor: e1be6a5a6bf481df4cc67ddce32f84d53c272807
+Base: 9098d60c1fff920534b7b38f45391f62b5ebfe9f
+Branch: main
+Commits: e1be6a5 fix: hold INFINITAS E4 Escape for 50 ms
+Guidance: repository AGENTS.md; investigate-problem; develop-repository; design-program-observability applicability checked
+Conditions: target infinitas.lan; user authorized input-remapper reload while game was running; one-field source and target change; in-game result pending
+## Evidence
+- User reported physical Escape and E4+1 recognized in INFINITAS, but E4 alone was not, while Ghostty received the generated Escape.
+- Installed Input Remapper 2.2.1 uses macro_key_sleep_ms default 0; KeyTask sends key down, sleeps for this interval, then key up. The E4-alone mapping lacked an override.
+- Set macro_key_sleep_ms to 50 on only the E4-alone mapping. All eleven mappings parsed on target, targeted checks and dry run passed, target chezmoi diff became empty, and service log confirmed INFINITAS 1P reloaded. No physical post-change game observation yet.
+Authority: user instructions and repository AGENTS.md govern source, host apply, and synchronization
+## Transcript
+- U1: E4でghosttyにはescapeが入力されるがinfinitasが認識しない。なんでだろ
+  - A: Investigated target config and runtime, asked whether physical Escape works, identified short macro pulse and Gamescope focus as hypotheses, and confirmed the official game guide assigns Escape to exit.
+- U2: まだ試していない
+  - A: Continued read-only investigation and asked for physical Escape and E4+1 comparisons in the same game screen.
+- U3: escは反応するし、E4+1も反応する。E4単体だけ反応しない
+  - A: Narrowed the failure to the E4-alone macro; observed its zero millisecond key pause in the installed Input Remapper code. Added a 50 ms pause to that mapping only, validated it, committed and pushed the source, fast-forwarded the target checkout, and applied the single named target file. Asked whether runtime reload was safe while the game was running.
+- U4: 今再読み込みしてよい
+  - A: Reloaded input-remapper autoload on infinitas with user approval; service log showed INFINITAS 1P loaded and injection started. Asked the user to test E4 alone in game; result had not arrived at this checkpoint.
