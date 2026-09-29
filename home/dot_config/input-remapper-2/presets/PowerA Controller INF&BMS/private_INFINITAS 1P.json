@@ -9,9 +9,9 @@
         ],
         "target_uinput": "keyboard",
         "output_symbol": "if_single(key(KEY_ESC),)",
-        "macro_key_sleep_ms": 50,
         "name": "E4",
-        "mapping_type": "key_macro"
+        "mapping_type": "key_macro",
+        "macro_key_sleep_ms": 50
     },
     {
         "input_combination": [
@@ -191,6 +191,34 @@
         "target_uinput": "keyboard",
         "output_symbol": "KEY_KP0",
         "name": "E4+E3",
+        "mapping_type": "key_macro"
+    },
+    {
+        "input_combination": [
+            {
+                "type": 1,
+                "code": 299,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            },
+            {
+                "type": 1,
+                "code": 296,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            },
+            {
+                "type": 1,
+                "code": 297,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            },
+            {
+                "type": 1,
+                "code": 298,
+                "origin_hash": "6627646108c66d9d0d61b25f535ae19a"
+            }
+        ],
+        "target_uinput": "keyboard",
+        "output_symbol": "Super_L + G",
+        "name": "E4+E1+E2+E3",
         "mapping_type": "key_macro"
     }
 ]
