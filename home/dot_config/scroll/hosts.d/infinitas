@@ -55,7 +55,7 @@ for_window [app_id="^com[.]obsproject[.]Studio$"] {
     set_size h 0.5
 }
 
-for_window [app_id="^com[.]mitchellh[.]ghostty$" title="^Chatuino$"] {
+for_window [app_id="^io[.]github[.]atty303[.]chatuino$"] {
     move container to workspace dashboard
     set_size h 0.25
 }
