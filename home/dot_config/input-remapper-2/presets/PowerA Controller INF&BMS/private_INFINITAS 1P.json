@@ -9,6 +9,7 @@
         ],
         "target_uinput": "keyboard",
         "output_symbol": "if_single(key(KEY_ESC),)",
+        "macro_key_sleep_ms": 50,
         "name": "E4",
         "mapping_type": "key_macro"
     },
