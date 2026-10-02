@@ -28,7 +28,10 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 - Module等の移動・分割・責務再配置では、対象の実装本体を新しい場所へ移し、内部参照も新経路へ更新する。旧経路のre-export等は確認済みの公開互換性契約に必要な場合だけ残す。実装本体を移せなければ移動完了とせず、理由と残作業を報告する。
 - Program経路を追加・変更する前に `$design-program-observability` で適用判定する。対象なら [program observability contract](../../references/agent-computer-interface-observability.md) に従い、変更経路と再利用される共有境界だけを準拠させる。
 - 不具合修正は先に `$investigate-problem` で原因とoracleを確定する。[failure oracle and causal verification](../../references/failure-oracle-and-causal-verification.md) に従い、既存証拠でfailure段階を識別できなければproduct fixより先に最小観測経路を作る。
-- Public behavior、CLI、設定または公開APIを変えた場合は関連documentationも同じ変更で更新する。
+- READMEはsoftwareの利用者向けとし、公開APIを使う開発者も利用者に含める。Repositoryを変更する開発者向けのbuild、test、検証情報やtaskへの案内はREADMEに置かない。Public behavior、CLI、設定または公開APIを変えた場合は、影響する利用者向け文書を同じ変更で更新する。
+- Architectureの俯瞰文書は責務、境界および主要なdata flowを表し、関係する変更に合わせて更新する。関数単位の処理手順や実装の言い換えは書かない。
+- 実装の詳細、内部の意図および不変条件はcode、型、comment、testを原典とする。実行方法とその意図はmise taskなどの実行可能な原典に置き、AGENTS.mdには原典から読み取れない抽象的な行動原則だけを書く。場面別のtask選択や起動手順を転記しない。
+- 実装やtaskを説明するだけの文書は作らない。実装変更で古くなる既存の該当記述は、その変更に関係する箇所を削除する。
 
 ## Verify causally
 
