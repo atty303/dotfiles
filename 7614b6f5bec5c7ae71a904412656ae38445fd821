@@ -1,0 +1,75 @@
+Task: Define source-owned documentation boundaries in shared agent guidance
+Anchor: 7614b6f5bec5c7ae71a904412656ae38445fd821
+Base: 17950b5318c8d7fe16557882d91dfe1f74a08ab7
+Branch: main
+Commits: 7614b6f5bec5c7ae71a904412656ae38445fd821 docs: keep implementation details in source
+Guidance: common AGENTS, develop-repository, maintain-agent-guidance, chezmoi repository AGENTS
+Conditions: Codex Desktop; chezmoi source only; no individual repository edits or target apply; main matched origin/main at start
+Authority: user implementation request and adopted chezmoi-managed guidance
+## Transcript
+- U1: # 実装依頼
+    
+    ## 依頼
+    
+    `/var/home/atty/.local/share/chezmoi` で管理されている共通 agent guidance を更新し、実装を説明するだけの文書や開発手順を README などへ追加しない方針を定めてください。個別リポジトリは編集しないでください。
+    
+    ## 目的
+    
+    - 実装と文書の重複を減らし、コードや mise task を原典にする。
+    - README をソフトウェアの利用者向けに保ち、リポジトリ開発者向けの詳細説明が増えることを防ぐ。
+    
+    ## 成功条件
+    
+    - 共通 guidance が、README の読者をソフトウェアの利用者と定義している。API を利用する開発者は利用者に含め、リポジトリを変更する開発者向けのビルド・テスト・検証情報は README に載せない。
+    - 利用者向け文書と、責務・境界・主要な流れを示すアーキテクチャの俯瞰は、関係する変更に合わせて保守する。
+    - 実装の処理を言い換える文書や、開発手順の詳細説明を新たに作らない。実装変更で古くなる既存の該当記述は、その変更に関係する箇所に限って削除する。
+    - 実行方法とその意図は mise task などの原典が所有する。`AGENTS.md` には、原典から読み取れない抽象的な agent の振る舞いだけを置き、「この場合はこの task を実行する」といった個別手順を書かない。
+    - chezmoi 管理の共通 guidance 内に、上記と矛盾する文書方針や重複した規則が残らない。
+    
+    ## 決定事項
+    
+    - 方針は個人の全リポジトリに対する共通の既定値とする。
+      - 理由: 作業先によらず、実装説明の文書を勝手に増やす振る舞いを抑えるため。
+      - 主な棄却案: chezmoi または `atty303` のリポジトリ群だけに限定する案。対象が狭すぎる。
+    - README はソフトウェアの利用者向けに限定する。
+      - 理由: リポジトリ開発者向けの記述が詳細な開発手順へ膨らむことを防ぐため。
+      - 主な棄却案: README に短い開発概要や mise task への案内を残す案。開発者向け記述の置き場を再び作る。
+    - アーキテクチャ文書には、責務・境界・主要なデータの流れという俯瞰を残す。
+      - 理由: システム全体を理解するための役割がある。
+      - 主な棄却案: コードから読み取れる構造を一切書かない案。俯瞰文書の役割を失う。
+    - 実装の詳細と内部の意図・不変条件は、コード、型、コメント、テストを原典にする。
+      - 理由: 詳細な設計資料と実装の二重管理を避けるため。
+      - 主な棄却案: 領域別の詳細設計資料に内部事項を維持する案。実装説明が蓄積しやすい。
+    - 開発手順は mise task などの実行可能な原典に置き、`AGENTS.md` は抽象的な行動原則に限る。
+      - 理由: task の起動方法や処理を別文書へ写さないため。
+      - 主な棄却案: `AGENTS.md` に場面別の task 選択や手順を書く案。原典との重複になる。
+    - 既存の実装説明は、関係する実装変更で古くなった箇所を削除する。
+      - 理由: 古い説明を残さず、整理範囲を変更箇所に限定するため。
+      - 主な棄却案: 新規追記だけを止める案は古い説明を残し、全リポジトリの一括整理は今回の範囲を超える。
+    - 個別リポジトリの規則は今回は変更せず、そのリポジトリで適用する。整合は後続のメンテナンスで扱う。
+      - 理由: 今回の変更対象を chezmoi 管理の共通 guidance に限定するため。
+      - 主な棄却案: 共通 guidance に個別規則との衝突処理を書き込む案。固有規則を共通方針へ持ち込む。
+    
+    ## 制約
+    
+    - 編集対象は chezmoi 管理の guidance source のみとする。個別リポジトリの `AGENTS.md`、README、その他の文書は編集しない。
+    - 明示的に依頼された文書作成や、個別リポジトリで適用される固有規則を、今回の共通方針で上書きしない。
+    - 共通 guidance の既存規則を調べ、追記による重複より統合・置換を優先する。
+    
+    ## 対象外
+    
+    - 既存文書の全件監査・一括削除。
+    - 個別リポジトリの guidance の整合化。
+    - chezmoi target への live apply。
+    
+    ## 未検証の前提
+    
+    - 実装開始時点の chezmoi source と対象 guidance の内容・管理対応関係。変更前に再確認する。
+    
+    ## 実装時の指示
+    
+    - 候補の主な確認先は、chezmoi source の `home/dot_codex/AGENTS.md`、`home/dot_agents/skills/develop-repository/SKILL.md`、`home/dot_agents/skills/develop-repository/references/atty303-engineering-policy.md`。共通原則と開発時の判断規則をそれぞれ最も近い原典に置き、同じ規則を重複させない。
+    - 判断例として、CLI の利用方法の変更では利用者向け文書を更新し、モジュールの責務変更ではアーキテクチャの俯瞰を更新する。一方、内部関数の変更を説明する文書は追加しない。API を使う開発者向けの利用案内を、リポジトリ開発者向け手順と混同しない。
+    - 提案する guidance の差分について、追加する規則、置換・削除する既存規則、上記の正例と境界例、個別リポジトリの規則に踏み込む前に止める条件を確認してから確定する。
+    
+  - A: Confirmed managed source paths and clean main, fetched origin code and notes, replaced the broad documentation rule in develop-repository, removed conflicting atty303 documentation rules, verified targeted check and chezmoi diff/dry-run, and committed 7614b6f. No individual repository or live target was changed.
