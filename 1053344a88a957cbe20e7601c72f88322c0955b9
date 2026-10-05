@@ -1,0 +1,70 @@
+Task: Add release-aware Conventional Commit and bump-approval guidance to the chezmoi-managed develop-repository skill
+Anchor: 1053344a88a957cbe20e7601c72f88322c0955b9
+Base: 2be4c1eb576e2e2fb1f0d93cbc65a9636b661645
+Branch: main
+Commits: 1053344a88a957cbe20e7601c72f88322c0955b9 (develop-repository skill only)
+Guidance: AGENTS.md, develop-repository, author-skills, maintain-agent-guidance, review, Git task evidence, data handling
+Conditions: Chezmoi source path verified; unrelated updater edit became a separate pre-existing user commit 8cf9d7f during the task; no release workflow in this dotfiles repo; no live chezmoi apply
+Authority: User implementation request and repository AGENTS.md, with the chezmoi source skill as canonical change target
+## Transcript
+- U1: # 実装依頼
+    
+    ## 依頼
+    
+    chezmoi 管理の `develop-repository` スキルに、Conventional Commits とリリース影響の提案・承認に関する合意済みの規則を反映してください。
+    
+    ## 目的
+    
+    - リリースに使うコミットが、利用者の承認していない version bump を起こしたり、必要なリリースを抑えたりしないようにする。
+    - 承認待ちによって、コミットなしで進められる作業を止めない。
+    - 通常のタスク開始時に release rules を調べ直すコストを避ける。
+    
+    ## 成功条件
+    
+    - 変更タスクの開始時に release workflow を軽く確認する規則がある。対象は `atty303/repository-template/.github/actions/release@...` の参照先と、semantic-release を直接使うリポジトリの両方とする。
+    - 対象リポジトリでは Conventional Commits を必須とし、その他では推奨する。明示されたリポジトリ固有の慣習との関係も明確にする。
+    - 対象が SemVer を使う場合、タスク開始時に「リリースが必要か」と「このタスクで作るコミットによる bump の上限」を提案する。`repository-template` action が `versioning: calver` の場合は、リリース要否だけを提案する。既に利用者が明示した判断は再承認を求めない。
+    - 提案への回答を待つ間も、コミットなしで実施できる承認済みの実装、文書、検証、レビューなどをすべて進める。回答がない場合、または完成した変更が承認範囲と合わない場合はコミットを保留し、残作業を明示する。
+    - 複数コミットを作る場合も、承認対象は件数や個々の type ではなく、タスクで作るコミット全体のリリース要否と最大影響とする。リリースが必要なら、リリースを起こさない type だけで終えない。既存の未リリースコミットによる次回リリース全体の影響は、この上限とは区別する。
+    - スキルに現行の判定表を明記する。`feat` は minor、`fix`・`perf`・`revert` は patch、`docs`・`test`・`ci`・`build`・`chore`・通常の `refactor` はリリースなし、`!` または `BREAKING CHANGE:` は major。通常は規則を調べ直さず、リポジトリ固有の `releaseRules` が判明した場合はそれを優先する。
+    - 現在のリリースが 0.x の場合、破壊的変更だけを理由に major 記法を使わない。破壊的な修正でも `fix` は `fix` のまま patch とし、`feat` は minor とする。1.x への移行は利用者の明示的な指示または承認がある場合だけ許す。0.x の基準リリースを確認できない場合は、コミットなしでできる作業を終えたうえで、リリース影響を確定できないコミットを保留する。
+    
+    ## 決定事項
+    
+    - 変更の原典は chezmoi 側の `develop-repository` スキルとする。
+      - 理由: 複数リポジトリに適用する agent の開発手順であるため。
+      - 主な棄却案: `repository-template` の `AGENTS.md` や生成先のファイルを変更する案。今回の適用先ではない。
+    - 対象判定は release workflow の参照を軽く確認する。
+      - 理由: 呼び出し側には `semantic-release` という文字列がなく、`repository-template` action の `uses:` だけがある場合も拾えるため。
+      - 主な棄却案: 毎回 workflow の稼働状況や semantic-release の内部規則まで調べる案。開始時のコストが高い。
+    - SemVer ではリリース要否と bump 上限、CalVer ではリリース要否を承認対象とする。
+      - 理由: CalVer のバージョン番号は日付に基づき、commit type による SemVer bump 上限は承認対象として適切でないため。
+      - 主な棄却案: commit type、scope、コミット件数をタスク開始時に固定する案。
+    - 0.x では破壊的変更を自動的に major 扱いしない。
+      - 理由: semantic-release は 0.x を特別扱いせず、major 判定が意図しない 1.x 移行につながるため。
+      - 主な棄却案: 破壊的変更へ常に `!`／`BREAKING CHANGE:` を付ける案、および patch の修正を minor にするため `feat` と記す案。
+    
+    ## 制約
+    
+    - `repository-template` 本体、生成先リポジトリ、release workflow、CI、semantic-release 設定は変更しない。
+    - 既存の push、release、deploy の権限境界を変更しない。bump の承認を、それらの実行承認と同一視しない。
+    - chezmoi 管理元を確認して編集し、対象ファイルに無関係な変更を混ぜない。
+    
+    ## 対象外
+    
+    - commit message の機械的な CI 検査や hook の追加。
+    - semantic-release または `repository-template` action の動作変更。
+    - 利用者による過去の `.` コミットの修正・評価。
+    
+    ## 未検証の前提
+    
+    - 実装時点の chezmoi source path、Git 作業状態、および既存スキルの文言は再確認する。
+    - 判定表が実装時点の `repository-template` release action と semantic-release の既定規則に整合することを確認する。独自の `releaseRules` があるリポジトリでは、その規則が優先される。
+    
+    ## 実装時の指示
+    
+    - タスク開始時の提案、回答待ち中の作業、コミット前の承認確認を、既存の手順へ重複なく統合する。
+    - `repository-template` action の参照と semantic-release の直接利用を、軽い workflow 確認の具体例として記す。
+    - 規則の正常例として「0.x の破壊的な `fix` は patch」、避けるべき例として「リリースが必要な修正を `chore` にして抑える」を使い、停止条件を明確にする。
+    
+  - A: Confirmed the managed source and Git state, checked the repository-template action and semantic-release defaults, edited only the source skill, and verified the target diff, dry run, file-scoped mise check, and independent review. Fixed the review finding limiting unknown-baseline holds to SemVer, then committed 1053344.
