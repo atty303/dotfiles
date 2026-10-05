@@ -20,6 +20,15 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 - Branchの作成・切り替えを判断する前にRepository profileを適用する。適用されるbranch方針がなければ、指定branchまたは依頼に対応する既存branchを優先する。無関係な変更から新しい作業を派生させず、rewrite、既存branch移動または未確定変更を伴う切替は確認する。
 - 現在のsourceやliving documentationだけでは判断できない意図、未完了範囲またはmigrationがある場合は、関連path、schema、featureまたはcommitに限定してGit logとnotesを調べる。履歴はdescriptiveであり現在の原典を上書きしない。
 - 開発、build、test環境は現在のrepositoryのsource、task、build process、適用guidanceまたはユーザーの明示指定から確定する。承認済みcommand、memory、過去task、toolの存在または別用途のcontainer・runtimeだけを根拠に転用しない。
+- 変更taskの開始時にrelease workflowの参照を軽く確認する。`uses: atty303/repository-template/.github/actions/release@...` とsemantic-releaseの直接実行・action参照を対象とし、前者は`versioning`入力で`semver`か`calver`かを分ける。通常はworkflowの稼働状況やrelease実装の内部を追わない。
+
+## Agree on commit release impact
+
+- 上記のrelease workflowを使うrepositoryではConventional Commitsを必須とする。Repository固有のtype、scope、文体など両立する慣習にも従い、release判定と矛盾する慣習があればcommit前に確認する。その他のrepositoryではConventional Commitsを推奨し、明示されたrepository慣習を優先する。
+- 対象repositoryではtask開始時に、このtaskで作るcommit全体のrelease要否を提案し、SemVerなら最大bump（`major`/`minor`/`patch`/`none`）も利用者に承認してもらう。`versioning: calver`のactionではrelease要否だけを提案する。既に利用者が明示した判断は再確認しない。複数commitのtype、scope、件数はこの承認範囲内で決める。既存の未リリースcommitが次回release全体に与える影響と、このtaskの上限は区別する。
+- 現行の標準判定は、`feat`→minor、`fix`・`perf`・`revert`→patch、`docs`・`test`・`ci`・`build`・`chore`・通常の`refactor`→releaseなし、認識された`!`またはfooterの`BREAKING CHANGE:`→majorとする。通常taskでこの表を調べ直さない。判明しているrepository固有の`releaseRules`、preset、parser設定は優先する。`repository-template` actionは`revert:`と`!`を認識するが、semantic-releaseの直接利用では既定parserが`revert:`や`!`だけをrelease要因として認識するとは限らない。直接利用でそれらを使う場合は設定を確認し、必要なreleaseが確実に起きる記法を選ぶ。
+- 現在の基準releaseが0.xなら、破壊的変更だけを理由にmajor記法を付けない。破壊的な`fix`も`fix`のままpatch、`feat`はminorとし、変更の実態と異なるtypeでbumpを調整しない。1.xへの移行は利用者の明示的な指示・承認がある場合だけ許す。0.xの基準releaseを確認できずrelease影響を確定できない場合は、そのcommitを保留する。
+- 提案の回答待ちでも、commitなしで実施できる承認済みの実装、文書、検証、reviewなどをすべて進める。Releaseが必要なら少なくとも一つのcommitでreleaseを起こし、必要な修正を`chore`として抑えない。完成した変更が承認されたrelease要否・上限と合わなければ、残る作業を進めたうえで差を示し、commitを保留して判断を求める。
 
 ## Implement the smallest durable change
 
@@ -53,8 +62,8 @@ Closed-set triggerは成果物種別による次の除外より優先する。Tr
 
 ## Commit and preserve task evidence
 
-- Commit前に元の依頼とclosed setを読み直し、各項目を証拠、明示的な対象外または残作業へ対応付ける。Git stateとdiffを再確認し、自分の変更だけを明示的にstageして論理単位でcommitする。未確定のまま残す明示指示がなければ、完了した変更はlocal commitへ確定する。
-- Commit messageはrepository慣習に従い、目的、主要理由、範囲、user-visible effect、migrationおよび主要検証を自足的に記す。慣習不明なら英語のConventional Commitsを使い、Codex co-author trailerを付ける。
+- Commit前に元の依頼とclosed setを読み直し、各項目を証拠、明示的な対象外または残作業へ対応付ける。Git stateとdiffを再確認し、release対象ではtask全体の承認済みrelease要否・上限と予定するcommit群の影響を照合する。未承認、SemVerで基準releaseを確認できず影響が確定しない場合、または範囲外ならcommitを保留して残作業と必要な判断を示す。Commitできる場合は自分の変更だけを明示的にstageして論理単位でcommitする。未確定のまま残す明示指示がなければ、完了した変更はlocal commitへ確定する。
+- Commit messageは上記のrelease規則とrepository慣習に従い、目的、主要理由、範囲、user-visible effect、migrationおよび主要検証を自足的に記す。Release対象以外で慣習不明なら英語のConventional Commitsを使い、Codex co-author trailerを付ける。
 - Commitを作ったtaskは [Git task evidence](../../references/git-task-evidence.md) をすべて読み、最終commitをanchorに標準noteを保存する。Codexではcomplete thread履歴の取得・照合が必須で、不能ならtaskを未完了とする。他runtimeは同等capabilityがなければskipと境界を明示できる。
 - Agentが既存noteを読み、semantic conflictを解消し、分類・redaction・要約済みのnormalized bodyを作る。既存blob IDまたは`absent`を指定して `scripts/update-git-task-note.ts` を使い、schemaまたはCAS conflictでは上書きせず停止する。Helperへraw threadを渡さない。
 
