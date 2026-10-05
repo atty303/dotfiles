@@ -32,6 +32,7 @@
 ## Version control
 
 - Repository操作は `$develop-repository` に従って通常のGit commandだけを使い、他VCSのmetadataを操作しない。
+- 現在のcheckoutで作業する。Git worktreeの新規作成および別の既存worktreeへの移動は、ユーザーが明示的に依頼または承認した場合だけ行う。開始時からworktree内にいる場合は、その場所で作業してよい。隔離が必要な場合は理由を示して確認し、承認までは現在のcheckoutで可能な調査だけを続ける。
 - Push、remote ref更新およびPR作成は、明示依頼または適用guidanceのstanding authorizationがある場合だけ行う。
 
 ## Task completion
