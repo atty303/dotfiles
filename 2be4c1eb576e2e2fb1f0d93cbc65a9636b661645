@@ -1,0 +1,71 @@
+Task: Require explicit authorization for worktree creation and moves
+Anchor: 2be4c1eb576e2e2fb1f0d93cbc65a9636b661645
+Base: 7614b6f5bec5c7ae71a904412656ae38445fd821
+Branch: main
+Commits: 2be4c1eb576e2e2fb1f0d93cbc65a9636b661645 adds the agreed shared Version control rule
+Guidance: repository AGENTS.md; global AGENTS.md; maintain-agent-guidance; develop-repository; atty303 engineering policy; dig for design; Git task evidence
+Conditions: macOS; chezmoi-managed source; Git metadata writes required sandbox escalation; source-only change; no live apply; standing authorization for main and notes synchronization
+Authority: Explicit user implementation request and four design selections; repository main synchronization standing authorization
+## Transcript
+- U1: Codexがタスクを実装するときgit worktreeを作成する指示があるか？
+  - A: Inspected current global/repository guidance and develop-repository profile; no mandatory worktree creation rule existed, and atty303 policy preserves main when starting there.
+- U2: 選んだ意図はないのに勝手にworktreeを作って作業はじめるんだよね…
+  - A: Explained that discretionary creation remained allowed and proposed an explicit-user-authorization rule.
+- U3: [$dig](/Users/a13400/.agents/skills/dig/SKILL.md) 追加
+  - A: Used dig to ask whether both new worktrees and moves to existing worktrees should require authorization; made no edits.
+- U4: A
+  - A: Recorded approval for both creation and moves, with initial worktree usage allowed; asked whether all agents reading common guidance should be covered.
+- U5: A
+  - A: Recorded all-agent scope, inspected managed common source and maintain-agent-guidance, and asked how necessary isolation should be handled.
+- U6: A
+  - A: Recorded confirmation-first isolation policy; inspected runtime guidance and proposed exact Version control wording with no cleanup or distribution changes.
+- U7: A
+  - A: Recorded common-understanding confirmation and returned the complete implementation prompt.
+- U8: # 実装依頼
+    
+    ## 依頼
+    /Users/a13400/.local/share/chezmoi/home/dot_codex/AGENTS.md の `Version control` 節に、Git worktreeの作成・移動をユーザーの明示依頼または承認に限定する共通ルールを追加してください。
+    
+    ## 目的
+    - Agentが意図せずworktreeを作成したり別のworktreeへ移動したりすることを防ぎ、ユーザーが選んだ作業場所を維持する。
+    
+    ## 成功条件
+    - 共通ルールに次の内容が明記されている。
+      - 現在のcheckoutで作業する。
+      - Git worktreeの新規作成および別の既存worktreeへの移動は、ユーザーが明示的に依頼または承認した場合だけ行う。
+      - 開始時からworktree内にいる場合は、その場所で作業してよい。
+      - 隔離が必要な場合は理由を示して確認し、承認までは現在のcheckoutで可能な調査だけを続ける。
+    - この共通ルールを読むすべてのagentに適用される表現になっている。
+    - 既存のbranch方針と矛盾せず、無関係な指示に変更がない。
+    
+    ## 決定事項
+    - 新規作成と既存worktreeへの移動の両方を明示依頼または承認に限定する。
+      - 理由: 新規作成だけの制限では、意図しない既存worktreeの再利用が残るため。
+      - 主な棄却案: 新規作成だけを制限する案。
+    - Codex固有の規則ではなく共通ルールに置く。
+      - 理由: 共通指示を読むすべてのagentで、作業場所を選ぶ権限をユーザーに揃えるため。
+      - 主な棄却案: Codexだけに限定する案。
+    - 安全な隔離を理由とする自動作成・移動の例外を設けない。
+      - 理由: 必要性の判断と作業場所を変更する承認を分けるため。
+      - 主な棄却案: Agentが隔離の必要性を判断した場合の自動作成・移動を許す案。
+    - 開始時からworktree内にいる場合は、その場所で作業できる。
+      - 理由: ユーザーが最初に選んだ作業場所での実装を妨げないため。
+      - 主な棄却案: なし。
+    
+    ## 制約
+    - 共通ルールのchezmoi source stateを変更する。
+    - 今回の実装でもworktreeを自動作成したり別のworktreeへ移動したりしない。
+    - 変更は既存の `Version control` 節へ簡潔に統合する。
+    
+    ## 対象外
+    - 既存worktreeの削除。
+    - 他のruntimeへの新しい共通ルール配布経路の追加。
+    - 既存のbranch方針の変更。
+    - 無関係なagent guidanceの整理。
+    
+    ## 未検証の前提
+    - なし。
+    
+    ## 実装時の指示
+    - なし。
+  - A: Applied maintain-agent-guidance and develop-repository in the existing main checkout. Verified source mapping and clean state; fetched code and standard notes with sandbox escalation. Base equaled origin/main. Added one Version control item. git diff --check, targeted chezmoi diff and targeted apply dry run passed. No live apply or worktree operation. Committed only this source file as 2be4c1eb576e2e2fb1f0d93cbc65a9636b661645. Retrieved complete local thread JSONL and compared all eight human messages against the conversation. Normalized task evidence prepared before remote sync.
