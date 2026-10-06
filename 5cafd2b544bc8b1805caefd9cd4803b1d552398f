@@ -1,0 +1,11 @@
+Task: Make the release-impact proposal immediate after workflow detection
+Anchor: 5cafd2b544bc8b1805caefd9cd4803b1d552398f
+Base: 1053344a88a957cbe20e7601c72f88322c0955b9
+Branch: main
+Commits: 5cafd2b544bc8b1805caefd9cd4803b1d552398f (develop-repository skill only)
+Guidance: AGENTS.md, develop-repository, investigate-problem, author-skills, maintain-agent-guidance, review, Git task evidence, data handling
+Conditions: Chezmoi source path confirmed; main clean at start; no release workflow in dotfiles repository; source only, no live apply
+Authority: User correction and repository AGENTS.md, with the chezmoi source skill as canonical owner
+## Transcript
+- U1: タスク開始直後の提案がなく、コミット直前に停止してはじめて提案された
+  - A: Inspected the existing release guidance and Git state, tightened the instruction to send an explicit approval request immediately after workflow detection, kept independent work running while awaiting an answer, and added a pre-commit sent-proposal check. Verified with file-scoped mise check, chezmoi diff and dry run, fresh review, and forward scenarios, then committed 5cafd2b.
