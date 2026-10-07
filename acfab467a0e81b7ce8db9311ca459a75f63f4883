@@ -8,7 +8,8 @@ Conditions: Linux desktop role on amd64; source change only, no live chezmoi app
 ## Evidence
 GitHub latest release v1.4.222 included orca-linux.AppImage for x64; upstream electron-builder Linux config names the desktop entry orca-ide.desktop. URL resolved with HTTP 200.
 mise run check home/.chezmoidata/linux.toml, mise run test:appimages, rendered-template bash -n, and chezmoi dry run passed. Live installation was not performed.
+CI run 37602823433 failed in test:chatgpt with pinned_version: unbound variable after test:appimages passed; parent run 37396783522 failed at the same step and error.
 Authority: User request; repository AGENTS.md; upstream stablyai/orca release and builder config.
 ## Transcript
 - U1: [https://github.com/stablyai/orca/releases/latest/download/orca-linux.AppImage](https://github.com/stablyai/orca/releases/latest/download/orca-linux.AppImage) これをappimage管理に追加したい
-  - A: Inspected clean main and fetched origin and notes; verified upstream release asset and desktop identity; added the desktop-role amd64 Orca entry using StaticFileUpdater; validated TOML, rendered script, AppImage lifecycle tests, and chezmoi dry run; committed acfab46. No live apply was requested.
+  - A: Inspected clean main and fetched origin and notes; verified upstream release asset and desktop identity; added the desktop-role amd64 Orca entry using StaticFileUpdater; validated TOML, rendered script, AppImage lifecycle tests, and chezmoi dry run; committed and pushed acfab46. Confirmed CI failure was present on the parent commit in test:chatgpt. No live apply was requested.
