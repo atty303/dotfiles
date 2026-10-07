@@ -1,0 +1,40 @@
+Task: Update selected managed tools and Noctalia image
+Anchor: 460763d85116bc8e7ab34006111b2d06dcc08da0
+Base: 86006f63d5c428fad4f2fa359f83abe0c896d3c4
+Branch: main
+Commits: 460763d85116bc8e7ab34006111b2d06dcc08da0 chore: update managed tools and Noctalia image
+Guidance: repository AGENTS.md; upgrade-tool-versions; develop-repository; design-program-observability; review; openai-docs
+Conditions: commit and push only; no live apply; Nushell excluded after interactive Tab failure; UniClipboard deferred
+## Evidence
+Isolated Nushell 0.116.1 failed to invoke custom menu source on Tab, while 0.115.1 worked; all Nushell changes were removed.
+Nine locked stubs, targeted chezmoi diffs, dry run, isolated runtime checks, and independent diff review passed.
+Authority: latest user instruction commit/push only; repository AGENTS.md and applicable development and upgrade skills
+## Transcript
+- U1: update tools
+  - A: Inventoried 45 managed stubs and presented cargo-binstall.
+- U2: A
+  - A: Approved cargo-binstall 1.25.1 and presented gh.
+- U3: A
+  - A: Approved gh 2.102.0 and presented carapace.
+- U4: A
+  - A: Approved carapace 1.8.0 and presented Claude Code.
+- U5: A
+  - A: Approved Claude Code 2.1.291 and presented delta.
+- U6: A
+  - A: Approved delta 0.20.1 and presented gum.
+- U7: A
+  - A: Approved gum 2.0.2 and presented Nushell.
+- U8: A
+  - A: Approved Nushell 0.116.1 with completion migration and presented TermPDF.
+- U9: A
+  - A: Approved TermPDF 0.5.0 and presented usage.
+- U10: A
+  - A: Approved usage 6.12.1 and presented UniClipboard.
+- U11: B
+  - A: Deferred UniClipboard and presented Noctalia.
+- U12: A
+  - A: Approved Noctalia immutable image and presented Codex CLI.
+- U13: A
+  - A: Approved Codex CLI 0.160.1; regenerated selected sources. Removed Nushell after isolated interactive Tab failure. Lock, dry-run, isolated runtime, and independent review checks passed. Asked about unavailable elevated live apply.
+- U14: commit/push only
+  - A: Restricted work to commit and push. Did not apply targets. Fetched origin main and notes, verified no divergence, staged selected source files, and committed 460763d.
