@@ -1,36 +1,36 @@
 #!/usr/bin/env -S mise tool-stub
 
 tool = "carapace"
-version = "1.7.3"
+version = "1.8.0"
 
 [lock]
 
 [lock.platforms]
 
 [lock.platforms.linux-arm64]
-url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.7.3/carapace-bin_1.7.3_linux_arm64.tar.gz"
-checksum = "sha256:b2456cb09d77004db87de2567d6d7588a61ceb4724522c463e2b1c1f87b4d4b9"
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.8.0/carapace-bin_1.8.0_linux_arm64.tar.gz"
+checksum = "sha256:d501dfb17f3d1fe32d71e2a3704ef92572fc407f90fa9684d07c64f50d9d2fe4"
 
 [lock.platforms.linux-arm64-musl]
-url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.7.3/carapace-bin_1.7.3_linux_arm64.tar.gz"
-checksum = "sha256:b2456cb09d77004db87de2567d6d7588a61ceb4724522c463e2b1c1f87b4d4b9"
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.8.0/carapace-bin_1.8.0_linux_arm64.tar.gz"
+checksum = "sha256:d501dfb17f3d1fe32d71e2a3704ef92572fc407f90fa9684d07c64f50d9d2fe4"
 
 [lock.platforms.linux-x64]
-url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.7.3/carapace-bin_1.7.3_linux_amd64.tar.gz"
-checksum = "sha256:35ab52bfe7bdd8296d90c3687660bde80497599badde840ab615d2f421f5f053"
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.8.0/carapace-bin_1.8.0_linux_amd64.tar.gz"
+checksum = "sha256:6883bb61fe88a8f56c7b74bc9ff68445791ee22697f705b59a063443d8ffc8ad"
 
 [lock.platforms.linux-x64-musl]
-url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.7.3/carapace-bin_1.7.3_linux_amd64.tar.gz"
-checksum = "sha256:35ab52bfe7bdd8296d90c3687660bde80497599badde840ab615d2f421f5f053"
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.8.0/carapace-bin_1.8.0_linux_amd64.tar.gz"
+checksum = "sha256:6883bb61fe88a8f56c7b74bc9ff68445791ee22697f705b59a063443d8ffc8ad"
 
 [lock.platforms.macos-arm64]
-url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.7.3/carapace-bin_1.7.3_darwin_arm64.tar.gz"
-checksum = "sha256:a7e79d8787ffc63c26568e8d8256d12df91f5cda0d9dc83d50e90b8567028a9d"
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.8.0/carapace-bin_1.8.0_darwin_arm64.tar.gz"
+checksum = "sha256:91b4dbce26c4a53dd9a4e5a78259d0c6cd25744d8efa84a2419724f64f33597a"
 
 [lock.platforms.macos-x64]
-url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.7.3/carapace-bin_1.7.3_darwin_amd64.tar.gz"
-checksum = "sha256:23649b6a52bd68d00e8b88e95afadac09e9450fa49b49a95fcabd81b387de4b6"
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.8.0/carapace-bin_1.8.0_darwin_amd64.tar.gz"
+checksum = "sha256:edb9b0d5b472bd13ca8b3460c3bf0a5bdaa19759c5172b3d9894b73c96a6dd4c"
 
 [lock.platforms.windows-x64]
-url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.7.3/carapace-bin_1.7.3_windows_amd64.zip"
-checksum = "sha256:c25e6f88bcb13ab44cb977db07f2b878bf140c397a3fd5582ce5bfb4d2143303"
+url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.8.0/carapace-bin_1.8.0_windows_amd64.zip"
+checksum = "sha256:ee5ba25180a8929e34c5b7f4aa20f898369c31c5e5939f68819cda0da1959762"
