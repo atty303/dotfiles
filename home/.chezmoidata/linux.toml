@@ -5,7 +5,16 @@ entries = [
 ]
 
 [appimages]
-apps = []
+
+[[appimages.apps]]
+id = "orca"
+roles = ["desktop"]
+arches = ["amd64"]
+state = "present"
+desktop_id = "orca-ide.desktop"
+download_url = "https://github.com/stablyai/orca/releases/latest/download/orca-linux.AppImage"
+update_manager = "StaticFileUpdater"
+update_options = { url = "https://github.com/stablyai/orca/releases/latest/download/orca-linux.AppImage" }
 
 [[chrome_web_apps.apps]]
 key = "x"
