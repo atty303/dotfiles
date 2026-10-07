@@ -8,7 +8,8 @@ Conditions: Existing desktop-role amd64 AppImage definition; user reported live 
 ## Evidence
 User-reported Gear Lever integration installed /home/atty/AppImages/orca.appimage, then the script rejected absent orca-ide.desktop and rolled back. Gear Lever source names the desktop entry after the installed AppImage stem, so this path yields orca.desktop.
 Target Gear Lever list-installed --json showed no Orca after rollback. Rendered chezmoi script contains orca.desktop; TOML check, bash -n, targeted dry run, and mise run test:appimages passed. Actual live reapply remains unverified.
+CI run 37604861581 passed test:appimages and failed in the unchanged test:chatgpt pinned_version unbound-variable path, matching parent run 37602823433.
 Authority: User error report and original request; repository AGENTS.md; current Gear Lever provider source.
 ## Transcript
 - U1: /home/atty/AppImages/orca.appimage was integrated successfully Gear Lever did not publish the expected desktop entry for orca: orca-ide.desktop /home/atty/AppImages/orca.appimage was removed sucessfully chezmoi: .chezmoiscripts/linux/z\_gearlever\_appimages.sh: exit status 1
-  - A: Inspected the reported failed apply and Gear Lever provider naming logic; identified the desktop ID mismatch; changed only the Orca entry to orca.desktop, validated the render and existing AppImage tests, and committed 86006f6. Did not perform live reapply.
+  - A: Inspected the reported failed apply and Gear Lever provider naming logic; identified the desktop ID mismatch; changed only the Orca entry to orca.desktop, validated the render and existing AppImage tests, and committed and pushed 86006f6; confirmed CI reached and passed test:appimages before the preexisting test:chatgpt failure. Did not perform live reapply.
