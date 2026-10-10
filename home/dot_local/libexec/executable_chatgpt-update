@@ -4,7 +4,7 @@ set -euo pipefail
 export LC_ALL=C
 
 # Set to an RPM version-release; leave empty to follow the latest release.
-#pinned_version="26.915.31945-1"
+pinned_version=""
 
 repo_base=https://persistent.oaistatic.com/codex-app-prod/linux/rpm/x86_64
 key="$HOME/.local/share/chatgpt/codex-linux-repository.asc"
