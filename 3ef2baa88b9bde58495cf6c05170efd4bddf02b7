@@ -1,0 +1,11 @@
+Task: Add Arcane Codex pet to chezmoi alongside Koyori
+Anchor: 3ef2baa88b9bde58495cf6c05170efd4bddf02b7
+Base: 181e854b01d505ecaba8b62cee84ebc1b7c2fab6
+Branch: main
+Commits: 3ef2baa88b9bde58495cf6c05170efd4bddf02b7 feat: add Arcane Codex pet
+Guidance: User common rules; dotfiles AGENTS.md; home/dot_codex/AGENTS.md; develop-repository and atty303 profile; investigate-problem; Git task evidence
+Conditions: Existing unrelated executable_chatgpt-update modification retained; main initially ahead 1; no release workflow; complete local Codex session history retrieved and compared; local commit only, live apply not requested, automatic sync skipped because working tree remains dirty
+Authority: User request to add Arcane like Koyori; repository guidance authorizes focused local commit and gates automatic sync on a clean working tree
+## Transcript
+- U1: koyoriと同じようにchezmoi管理に加えて
+  - A: Inspected chezmoi source mapping and Koyori pet schema, fetched code and standard remote notes, and preserved existing unrelated changes. Added home/dot_codex/pets/arcane/pet.json and lossless spritesheet.webp only. Initial encoding changed RGB under fully transparent pixels; diagnosed with exact RGBA comparison and corrected using exact=True. Final WebP preserves every RGBA pixel from validated 1536x2288 v2 PNG. Targeted chezmoi diff/dry-run and mise check passed. Created focused commit 3ef2baa88b9bde58495cf6c05170efd4bddf02b7; no live apply or push performed. Retrieved the complete local thread, verified previous successful pet-creation cycle boundary and every human message in this one-message cycle, then prepared normalized note without credentials or signed URLs.
