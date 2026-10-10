@@ -128,6 +128,12 @@ branch = "stable"
 
 [[flatpak.apps]]
 roles = ["desktop"]
+id = "org.kde.kdenlive"
+remote = "flathub"
+branch = "stable"
+
+[[flatpak.apps]]
+roles = ["desktop"]
 id = "org.virt_manager.virt-manager"
 remote = "flathub"
 branch = "stable"
