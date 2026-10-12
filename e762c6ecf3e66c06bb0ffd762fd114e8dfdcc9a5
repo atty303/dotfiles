@@ -1,0 +1,22 @@
+Task: Make bootstrap verbosity explicit and preserve detailed E2E failure logs
+Anchor: e762c6ecf3e66c06bb0ffd762fd114e8dfdcc9a5
+Base: f6114563f7d1b697dbedaec162fa381c18ca9b2c
+Branch: main
+Commits: e762c6ecf3e66c06bb0ffd762fd114e8dfdcc9a5 (installer defaults, E2E invocation verbosity, argument tests, owner documentation)
+Guidance: repository AGENTS.md; develop-repository; design-program-observability; review; git-task-evidence
+Conditions: macOS host; source-state edits approved; existing VSCode and Ruby changes preserved; no automatic push because worktree is dirty; runtime complete root JSONL retrieved and all eleven human requests checked; this cycle covers the four requests after the prior push cycle closed
+## Evidence
+Scoped mise check passed, including Deno format, lint and type checks and shellcheck. E2E harness: 7 passed, 0 failed.
+The existing installer argument fixture section from tests/roles.sh was executed directly in disposable fixture directories. Both role-selection branches omitted --verbose by default and forwarded it when supplied.
+Standard Linux E2E stopped before image build at the unconfigured host Podman shim. No container or volume create step was reached. Native PowerShell runtime is unavailable. The known whole-role-test macOS/Linux default mismatch is outside this change.
+A fresh independent read-only reviewer found no actionable issues in the seven-file diff. Commit excludes all existing user changes and remains local.
+Authority: user-approved proposal and repository AGENTS.md define scope; installed development, observability, review and Git-evidence guidance define workflow.
+## Transcript
+- U1: 動いた。applyがverboseになっているか？
+  - A: Inspected install.sh and confirmed both branches invoked chezmoi init --apply --verbose.
+- U2: 通常はnon-verbose、repo内test経由で実行するときにverboseにできるか？ test failedの調査のためにverboseにしている
+  - A: Inspected shell and PowerShell installer forwarding and Linux/macOS E2E invocation paths. Fetched code and Git notes; no source edits were made before the request for an implementation proposal.
+- U3: 実装方法を提案して
+  - A: Proposed removing hardcoded --verbose from both wrappers, using their existing argument forwarding, explicitly enabling verbosity for E2E initial installs, second applies and failed-test retries, and testing default/explicit arguments with the existing fake chezmoi. No custom environment variable or test mode proposed.
+- U4: 進めて
+  - A: Reconfirmed source-state Git status and remote code/notes. Implemented the approved changes in seven files and retained existing VSCode/Ruby edits. Updated owner bootstrap documentation. Scoped static checks and all seven E2E harness tests passed. Executed the updated shell installer fixture section independently to confirm normal and prompted non-verbose defaults plus explicit forwarding. Standard Linux E2E remained blocked by the unconfigured Podman shim; PowerShell execution remains unverified. Fresh independent review had no findings. Created the focused local commit e762c6ecf3e66c06bb0ffd762fd114e8dfdcc9a5; no push was attempted due unrelated dirty working-tree state.
