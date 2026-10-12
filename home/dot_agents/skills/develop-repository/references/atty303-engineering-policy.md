@@ -15,20 +15,20 @@ Apply these repository-specific preferences within the generic `develop-reposito
 ### Comments
 
 - コメントより先に、型、名前およびコード構造で意図を表現する。
-- コメントには、コードから導出できない設計意図、制約、不変条件および外部事情だけを記録し、動作の言い換えは書かない。
+- 局所的な設計意図、制約、不変条件および外部事情は、コードから導出できず必要な場合だけ該当コードの近くにコメントで記録し、動作の言い換えは書かない。
 - 公開APIのdocumentation
   commentには、型で表現できない契約、副作用、エラー条件および単位だけを記録する。
 
 ### Documentation
 
 - Git repositoryのcurrent treeには、その時点で有効なcode、test、設定、契約、制約、実行手順および未完了planだけを置く。過去の実装、判断、比較、棄却案およびpoint-in-timeの検証結果はGit historyに置き、履歴保存だけを目的とする文書、互換処理、codeまたはtestを残さない。
-- ドキュメントの言語は既存の慣習と想定読者に合わせ、判断できない場合は英語を使う。
+- 必要な文書の言語は既存の慣習と対象読者に合わせ、判断できない場合は英語を使う。
 - CHANGELOG、release noteおよびmigration guideは、現在の利用者がupgrade、migrationまたは互換性判断に必要とする明示的なrelease contractがある期間だけcurrent treeへ置き、その責任が終われば削除する。通常の変更履歴はcommit message、Git noteまたは外部release noteが所有する。
 
 ### Single Source of Truth
 
 - 各概念には可能な限り一つの原典を定め、型、設定、コードなどの別表現は原典から導出する。
-- 重複排除で複雑性や結合が大きく増える場合は重複を許容し、乖離リスクがあれば静的検査または自動検証で同期を保証する。
+- 実装上の重複排除で複雑性や結合が大きく増える場合は重複を許容し、乖離リスクがあれば静的検査または自動検証で同期を保証する。
 - Reproducibilityでコミット対象とするlockfileを除き、生成物は原則としてコミットせず、`mise`
   経由で再生成できるようにする。
 

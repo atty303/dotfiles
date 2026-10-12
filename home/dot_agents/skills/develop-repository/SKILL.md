@@ -37,10 +37,11 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 - Module等の移動・分割・責務再配置では、対象の実装本体を新しい場所へ移し、内部参照も新経路へ更新する。旧経路のre-export等は確認済みの公開互換性契約に必要な場合だけ残す。実装本体を移せなければ移動完了とせず、理由と残作業を報告する。
 - Program経路を追加・変更する前に `$design-program-observability` で適用判定する。対象なら [program observability contract](../../references/agent-computer-interface-observability.md) に従い、変更経路と再利用される共有境界だけを準拠させる。
 - 不具合修正は先に `$investigate-problem` で原因とoracleを確定する。[failure oracle and causal verification](../../references/failure-oracle-and-causal-verification.md) に従い、既存証拠でfailure段階を識別できなければproduct fixより先に最小観測経路を作る。
-- READMEはsoftwareの利用者向けとし、公開APIを使う開発者も利用者に含める。Repositoryを変更する開発者向けのbuild、test、検証情報やtaskへの案内はREADMEに置かない。Public behavior、CLI、設定または公開APIを変えた場合は、影響する利用者向け文書を同じ変更で更新する。
-- Architectureの俯瞰文書は責務、境界および主要なdata flowを表し、関係する変更に合わせて更新する。関数単位の処理手順や実装の言い換えは書かない。
-- 実装の詳細、内部の意図および不変条件はcode、型、comment、testを原典とする。実行方法とその意図はmise taskなどの実行可能な原典に置き、AGENTS.mdには原典から読み取れない抽象的な行動原則だけを書く。場面別のtask選択や起動手順を転記しない。
-- 実装やtaskを説明するだけの文書は作らない。実装変更で古くなる既存の該当記述は、その変更に関係する箇所を削除する。
+- 文書の新設・更新前に、projectの性質と文書の目的から対象読者と用途を判断する。曖昧なrepo READMEは製品の導入・利用者向けを既定とし、既存の開発情報の混在を追記の根拠にしない。公開APIを使う開発者も製品利用者であり、repoを変更する開発者とは区別する。
+- 利用者向け文書は、実装知識なしで導入、操作、設定および公開APIの利用に必要な説明を置く。Repoのbuild、test、検証手順を製品利用者向けREADMEに混ぜない。
+- Repo開発者向け文書は、責務、境界、主要なdata flowなど全体観を素早く把握する地図とし、codeを横断する独立した説明が必要なものだけを置く。設計意図・制約も俯瞰に必要なものだけを文書に置き、局所的なものはcodeの近くのcommentに置く。内部仕様・処理手順などの詳細はcodeをSSOTとし、別文書でも再説明しない。
+- 実装taskでも文書の読者・目的・粒度を維持し、その読者の理解・操作・判断に不足や誤りが生じる場合だけ必要な箇所を更新する。実装変更、変更file数、網羅性、念押し、成果の可視化は文書を書く理由にしない。必要性が曖昧なら書かず、文書変更なしを正常な完了とする。変更に関係する不要・重複記述は追記せず削る。
+- 実行方法とその意図はmise taskなどの実行可能な原典に置き、AGENTS.mdには原典から読み取れない抽象的な行動原則だけを書く。場面別のtask選択や起動手順を転記しない。
 
 ## Verify causally
 
