@@ -8,7 +8,7 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 ## Frame the work
 
 - 変更は明示されたrepository内に限定する。依頼、適用guidance、sourceおよび実環境から目的、observableな成功条件、hard constraint、明示された手段、non-goalおよび未検証の前提をclosed setとして保持する。
-- 同じcontractとauthority内では、repo変更なし、削除、簡略化、既存機構、既存成果物の変更、新規成果物の順に、継続的な保守コストが低い案を選ぶ。前提崩壊により主要contractを変える必要があれば停止して確認する。
+- 設計・成果物の選択は共通guidanceの基本判断原則に従う。同じcontractとauthority内で、repo変更なし、削除、簡略化、既存機構の利用、既存成果物の変更、新規成果物を比較し、列挙順を固定順位にしない。前提崩壊により主要contractを変える必要があれば停止して確認する。
 - 成果物の段階とcontrol domainは [artifact profile and control domain](../../references/artifact-profile-and-control-domain.md) で確定する。Repositoryへ残す変更は明示的なspike contractがない限り`durable`とする。
 - 新規library、開発toolまたはtest packageは全repositoryで事前承認を必要とする。必要性、主要代替、保守・security・配布への影響を示し、承認前に追加も独自実装による迂回もしない。
 - Repository固有の互換性方針を優先する。利用者によるmigration、data変換または選択が必要な破壊的変更は、影響と移行方法を示して実装前に確認する。
@@ -30,7 +30,7 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 - 現在の基準releaseが0.xなら、破壊的変更だけを理由にmajor記法を付けない。破壊的な`fix`も`fix`のままpatch、`feat`はminorとし、変更の実態と異なるtypeでbumpを調整しない。1.xへの移行は利用者の明示的な指示・承認がある場合だけ許す。0.xの基準releaseを確認できずrelease影響を確定できない場合は、そのcommitを保留する。
 - 開始時の提案を送った後は回答待ちでも、commitなしで実施できる承認済みの実装、文書、検証、reviewなどをすべて進める。Releaseが必要なら少なくとも一つのcommitでreleaseを起こし、必要な修正を`chore`として抑えない。完成した変更が承認されたrelease要否・上限と合わなければ、残る作業を進めたうえで差を示し、commitを保留して判断を求める。
 
-## Implement the smallest durable change
+## Implement the selected durable change
 
 - 既存format、生成元およびrepositoryの標準taskを使う。Generated fileとlockfileはownerを特定して正規手順で更新し、推測で手編集しない。
 - 補助toolの設定はupstream標準をbaselineとし、依頼に必要な最小差分だけを持つ。成果物を経緯から切り離して読み、不要なcompatibility layer、旧経路、alias、分岐、commentおよびdocumentを残さない。
@@ -40,7 +40,7 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 - 文書の新設・更新前に、projectの性質と文書の目的から対象読者と用途を判断する。曖昧なrepo READMEは製品の導入・利用者向けを既定とし、既存の開発情報の混在を追記の根拠にしない。公開APIを使う開発者も製品利用者であり、repoを変更する開発者とは区別する。
 - 利用者向け文書は、実装知識なしで導入、操作、設定および公開APIの利用に必要な説明を置く。Repoのbuild、test、検証手順を製品利用者向けREADMEに混ぜない。
 - Repo開発者向け文書は、責務、境界、主要なdata flowなど全体観を素早く把握する地図とし、codeを横断する独立した説明が必要なものだけを置く。設計意図・制約も俯瞰に必要なものだけを文書に置き、局所的なものはcodeの近くのcommentに置く。内部仕様・処理手順などの詳細はcodeをSSOTとし、別文書でも再説明しない。
-- 実装taskでも文書の読者・目的・粒度を維持し、その読者の理解・操作・判断に不足や誤りが生じる場合だけ必要な箇所を更新する。実装変更、変更file数、網羅性、念押し、成果の可視化は文書を書く理由にしない。必要性が曖昧なら書かず、文書変更なしを正常な完了とする。変更に関係する不要・重複記述は追記せず削る。
+- 実装taskでも基本判断原則に従い、文書の読者・目的・粒度を維持し、その読者の理解・操作・判断に不足や誤りが生じる場合だけ必要な箇所を更新する。実装変更、変更file数、網羅性、念押し、成果の可視化は文書を書く理由にしない。必要性が曖昧なら書かず、文書変更なしを正常な完了とする。変更に関係する不要・重複記述は追記せず削る。
 - 実行方法とその意図はmise taskなどの実行可能な原典に置き、AGENTS.mdには原典から読み取れない抽象的な行動原則だけを書く。場面別のtask選択や起動手順を転記しない。
 
 ## Verify causally

@@ -1,5 +1,11 @@
 # Common Rules
 
+## 基本判断原則
+
+- 目的・成功条件・authority・安全性などの制約を満たす範囲で、初期作業と将来の保守を合わせた総負担を、設計・成果物選択の第一基準とする。
+- Repoに残すcode・doc・test・設定は、将来の読解・変更・検証・整合性維持・依存更新の継続負担を生む。今すぐ生成・commitできることを残す理由にせず、維持負担に見合う必要性があるものだけを残す。
+- 行数・file数・変更量の少なさを保守の安さと同一視しない。必要なら初期実装を増やして将来の変更負担を減らす。以下の設計・実装・文書化規則は、この原則の具体化として適用する。
+
 ## Authority and execution
 
 - 承認が必要なcommandは必要最小限かつ再利用可能な単位で早めに求める。sandbox外実行の許可を、操作内容、外部影響または権限拡張の承認とみなさない。
@@ -10,7 +16,7 @@
 ## Task interpretation
 
 - 指示を目的、observableな成功条件、hard constraint、明示された手段および未検証の前提へ分ける。目的、authority、外部影響および受け入れ可能な結果はユーザーが決める。
-- 同じscope、authority、外部影響、互換性、保存data、dependency approvalおよび主要contract内では、目的を同等以上に満たす単純で保守コストの低い内部設計を自律的に選べる。
+- 同じscope、authority、外部影響、互換性、保存data、dependency approvalおよび主要contract内では、基本判断原則に沿って目的を同等以上に満たす内部設計を自律的に選べる。
 - User-visible contract、scope、migration、dependency、権限、外部影響または確認済みの技術選択を変える必要がある場合は、根拠、影響および推奨案を示して確認する。効果が僅かな好みや根拠のない改善案のために再交渉しない。
 
 ## Data safety
