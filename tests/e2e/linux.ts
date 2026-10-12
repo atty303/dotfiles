@@ -316,7 +316,7 @@ async function runLinuxTarget(
       userExec(config, containerName, [
         "/bin/sh",
         "-c",
-        "cd /tmp/source && exec /bin/sh ./install.sh",
+        "cd /tmp/source && exec /bin/sh ./install.sh --verbose",
       ])
         .signal(signal),
     );
@@ -381,6 +381,7 @@ async function runLinuxTarget(
         "--source",
         "/tmp/source",
         "apply",
+        "--verbose",
       ]).signal(signal),
     );
     await execute(

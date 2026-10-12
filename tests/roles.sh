@@ -84,13 +84,18 @@ log="$temporary/installer-cwd.log"
   HOME="$installer_home" FAKE_CWD_LOG="$log.cwd" run_install "$log"
 )
 [[ $(<"$log.cwd") == "$installer_home" ]]
+if grep -Fxq -- '--verbose' "$log"; then
+  printf 'installer enabled verbose output by default\n' >&2
+  exit 1
+fi
 
 log="$temporary/linux-headless.log"
 FAKE_UNAME=Linux CODESPACES=true REMOTE_CONTAINERS_IPC=test \
-  XDG_CURRENT_DESKTOP=Test WAYLAND_DISPLAY=wayland-0 run_install "$log" --depth 1
+  XDG_CURRENT_DESKTOP=Test WAYLAND_DISPLAY=wayland-0 run_install "$log" --depth 1 --verbose
 grep -Fxq 'Roles=development/secrets' "$log"
 grep -Fxq -- '--depth' "$log"
 grep -Fxq '1' "$log"
+grep -Fxq -- '--verbose' "$log"
 
 log="$temporary/linux-desktop.log"
 FAKE_UNAME=Linux FAKE_DESKTOP_SESSION_DEFINITION=true run_install "$log"
@@ -110,6 +115,15 @@ if grep -Fxq -- '--no-tty' "$log" || grep -Fq -- '--promptMultichoice' "$log"; t
   printf 'interactive role selection was suppressed by installer arguments\n' >&2
   exit 1
 fi
+
+if grep -Fxq -- '--verbose' "$log"; then
+  printf 'interactive installer enabled verbose output by default\n' >&2
+  exit 1
+fi
+
+log="$temporary/prompt-verbose.log"
+FAKE_UNAME=Linux run_install "$log" --prompt-roles --verbose
+grep -Fxq -- '--verbose' "$log"
 
 desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"bazzite","idLike":"fedora"}}}'
 fedora_desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"fedora","idLike":""}}}'

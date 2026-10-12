@@ -37,7 +37,7 @@ if ($promptRoles) {
 $source = $PSScriptRoot
 Push-Location $HOME
 try {
-    & $chezmoiPath init --apply --verbose @roleArguments "--source=$source" @ChezmoiArguments
+    & $chezmoiPath init --apply @roleArguments "--source=$source" @ChezmoiArguments
     $chezmoiExitCode = $LASTEXITCODE
 } finally {
     Pop-Location

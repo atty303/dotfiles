@@ -158,6 +158,8 @@ In an interactive terminal, the wrapper presents the same role picker. In a non-
 environment, it supplies platform defaults: `development` and `secrets`, plus `desktop` on
 macOS or when Linux has an installed desktop-session definition. Use
 `./install.sh --prompt-roles` only when an environment's terminal detection is unreliable.
+Pass `--verbose` to either wrapper for detailed apply output; repository E2E tests enable it
+explicitly.
 
 On Windows 11 24H2 or later:
 

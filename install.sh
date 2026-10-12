@@ -45,10 +45,10 @@ cd "$HOME"
 if [ "$prompt_roles" = true ]; then
   CHEZMOI_ROLE_DEFAULTS=$roles
   export CHEZMOI_ROLE_DEFAULTS
-  exec "$chezmoi" init --apply --verbose "--source=$script_dir" "$@"
+  exec "$chezmoi" init --apply "--source=$script_dir" "$@"
 fi
 
 role_values=$(printf '%s\n' "$roles" | tr ',' '/')
-exec "$chezmoi" init --apply --verbose --no-tty \
+exec "$chezmoi" init --apply --no-tty \
   --promptMultichoice "Roles=$role_values" \
   "--source=$script_dir" "$@"

@@ -83,14 +83,14 @@ export function retainedResourceReport(options: RetainedResourceReportOptions): 
     );
     if (options.sourcePrepared) {
       lines.push(
-        `  retry install: podman exec --user ${options.user} ${options.containerName} /bin/sh -c 'if test -x ${options.home}/.local/bin/mise; then ${options.home}/.local/bin/mise trust /tmp/source/mise.toml; fi; cd /tmp/source && exec /bin/sh ./install.sh'`,
+        `  retry install: podman exec --user ${options.user} ${options.containerName} /bin/sh -c 'if test -x ${options.home}/.local/bin/mise; then ${options.home}/.local/bin/mise trust /tmp/source/mise.toml; fi; cd /tmp/source && exec /bin/sh ./install.sh --verbose'`,
       );
     } else if (options.archiveCopied) {
       lines.push(
         `  prepare source: podman exec ${options.containerName} /bin/sh -c 'mkdir -p /tmp/source && tar -xf /tmp/source.tar -C /tmp/source && chown -R ${options.user}:${options.user} /tmp/source ${options.home}${
           options.privilegedSystemd ? " /usr/local/secrets/CHEZMOI_AGE_KEY" : ""
         }'`,
-        `  retry install after preparation: podman exec --user ${options.user} ${options.containerName} /bin/sh -c 'if test -x ${options.home}/.local/bin/mise; then ${options.home}/.local/bin/mise trust /tmp/source/mise.toml; fi; cd /tmp/source && exec /bin/sh ./install.sh'`,
+        `  retry install after preparation: podman exec --user ${options.user} ${options.containerName} /bin/sh -c 'if test -x ${options.home}/.local/bin/mise; then ${options.home}/.local/bin/mise trust /tmp/source/mise.toml; fi; cd /tmp/source && exec /bin/sh ./install.sh --verbose'`,
       );
     } else {
       lines.push("  source archive: not copied; inspect the logs before retrying");

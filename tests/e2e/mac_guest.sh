@@ -34,7 +34,7 @@ echo "step: trust source directory"
 
 cd "$source_directory"
 echo "step: bootstrap with install.sh"
-/bin/sh ./install.sh
+/bin/sh ./install.sh --verbose
 
 echo "verify: chezmoi state"
 if ! "$chezmoi" --source "$source_directory" verify; then
@@ -101,6 +101,6 @@ done
 echo "verify: idempotence"
 test -z "$("$chezmoi" --source "$source_directory" status)"
 "$chezmoi" --source "$source_directory" apply --dry-run --verbose
-"$chezmoi" --source "$source_directory" apply
+"$chezmoi" --source "$source_directory" apply --verbose
 "$chezmoi" --source "$source_directory" verify
 test -z "$("$chezmoi" --source "$source_directory" status)"
