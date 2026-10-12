@@ -1,0 +1,111 @@
+Task: Preserve documentation audience and overview scope; omit unnecessary prose
+Anchor: f89c1b80a19bb175ad8a47504d416127fb265cfc
+Base: 2d3f6dbbd88ac42c6ed30592ea60dac5b85025a5
+Branch: main
+Commits: f89c1b80a19bb175ad8a47504d416127fb265cfc documents reader-based updates and source ownership
+Guidance: common and repository AGENTS; maintain-agent-guidance; dig during decisions; develop-repository; author-skills; review; Git task evidence; data handling
+Conditions: Linux chezmoi source checkout; current main; source-only Markdown changes; no live apply; repository standing authorization for clean main sync; complete local Codex session read
+Authority: Latest implementation request and confirmed decisions; applicable common/repository AGENTS and skill contracts
+## Transcript
+- U1:
+    [$maintain-agent-guidance](/var/home/atty/.agents/skills/maintain-agent-guidance/SKILL.md) [$dig](/var/home/atty/.agents/skills/dig/SKILL.md) まじでcodexが様々なタスクで実装詳細の説明のようなdocをやたらと書くのがストレス。内部docであっても実装でわかるようなことを書いてしまうとdocとcodeの二重メンテになる。READMEなどは対象読者をまったく考えずにタスクで変更したポイントを脳死で追記する。
+    
+  - A: Applied maintain-agent-guidance and dig read-only. Consulted the memory index and verified current develop-repository documentation rules. Asked Q1 about reader needs versus internal overview and explicit-request-only documentation.
+- U2:
+    読者の推定ができていない。例えばrepo READMEだとそのアプリの利用者とrepoでの開発者を区別できず、開発手順の変更を全部READMEに書こうとする。
+    
+  - A: Identified reader classification as the preceding decision; asked Q2 whether README audience should follow purpose, fixed defaults, or explicit declarations.
+- U3:
+    B. あいまいならAを既定とする
+    
+  - A: Accepted purpose-based audience inference with product-user default when ambiguous; asked Q3 about developer-document scope and implementation duplication.
+- U4:
+    B. docの目的は全体観の素早い把握だ。architecture docなどに各componentの枝葉の仕様まで書いてしまう。整理を指示した直後は全体観になるが、その後個別の実装タスクを指示すると、そのタスクで変更した仕様の細部をdocに書く。タスクの成果としてdocを書くことが決められているかのようだ
+    
+  - A: Accepted cross-code overview documents and preservation of their purpose and granularity across tasks; asked Q4 about reader-impact-only updates versus mandatory reporting or approval.
+- U5:
+    A. 僕はとにかくcodeを読めばわかることをdocで再説明することが大嫌いだ。SSOTの原則に反する。アプリ利用者が実装の知識がないから利用者向けのdocは必要だと思っている。repo開発者はdocで全体観を把握して地図とし、詳細はコードをSSOTとする。この意図に確実に従ってほしい
+    
+  - A: Accepted reader-impact-only updates and implementation details owned by code. Proposed replacing existing common guidance; asked Q5 for shared understanding.
+- U6:
+    B. 設計意図なども俯瞰が必要なものはdocだがlocalなものはコードのコメントでいい。とにかくdocはcodeを温暖することが必須のものだけにする
+    
+  - A: Interpreted the typo as cross-code, distinguished overview-level intent from local comments, and asked Q6 to confirm this ownership boundary.
+- U7:
+    A
+    
+  - A: Produced a standalone implementation request covering audience, overview, local comments, code SSOT, targeted source-only changes, and representative acceptance cases.
+- U8:
+    さらに無駄な文章を書くより書かないほうがマシ。これも意図をくんでくれ
+    
+  - A: Accepted omission over unnecessary prose, no completeness or outcome-visibility justification, and concise integration of existing guidance.
+- U9:
+    指示を書いて
+    
+  - A: Produced the revised implementation request including the preference to omit prose when reader value is unclear.
+- U10:
+    # 実装依頼
+    
+    ## 依頼
+    chezmoiで管理する `develop-repository/SKILL.md` と、その `references/atty303-engineering-policy.md` の文書化・コメント・SSOT関連規定を修正してください。既存規定を統合・置換し、以下の意図を通常の実装タスクでも維持できる、簡潔で一貫した指示にしてください。
+    
+    ## 目的
+    - 実装タスクの変更点をREADMEやarchitecture docへ機械的に追記する挙動を止める。
+    - 利用者向けdocは実装を知らずに製品を使うための説明、repo開発者向けdocは全体観を素早く把握する地図とする。
+    - 詳細はコードをSSOTとし、docとの二重メンテを防ぐ。
+    - 必要性のない文章を書くより、書かないことを優先する。
+    
+    ## 成功条件
+    - 文書変更前に、対象読者・目的と、その変更によって説明が必要になる理由を判断する規定がある。
+    - 文書の目的と粒度が、後続の個別実装タスクでも維持される。
+    - コードから分かる内部仕様・処理手順をdocで再説明せず、文書変更なしを正常な完了として扱う。
+    - 次のケースを一貫して判断できる。
+      - component内部のretry処理変更だけではarchitecture docを更新しない。
+      - component間の責務・境界・主要なデータフローが変われば、全体観に必要な記述を更新する。
+      - 利用者の設定方法が変われば、影響する利用案内を更新する。
+      - repoのbuild・test手順変更を、製品利用者向けREADMEへ追記しない。
+      - 局所的な設計理由は、必要なら該当コードの近くのコメントに置く。
+      - 複数ファイルの変更、網羅性、念押し、成果の可視化だけではdocを追加・更新しない。
+    - 関連規定との矛盾・重複がなく、対象sourceの差分と適切な検証結果を確認できる。
+    
+    ## 決定事項
+    - 対象読者・用途は、プロジェクトの性質と文書の目的から判定する。曖昧なrepo READMEは製品の導入・利用者向けを既定とする。
+      - 理由: 製品の利用者とrepoを変更する開発者の混同を防ぐため。既存の開発情報の混在は、追記を正当化する根拠にしない。
+      - 主な棄却案: READMEの用途を一律に固定すること、曖昧な場合に毎回確認すること。
+    - 利用者向けdocには、実装知識なしで導入・操作・設定・公開APIの利用などを行うために必要な説明を書く。
+      - 理由: 利用者がコードを読むことは前提にできないため。公開APIを使う開発者も製品利用者に含め、repo自体を変更する開発者と区別する。
+      - 主な棄却案: コードから分かるという理由で利用案内まで省くこと。
+    - repo開発者向けdocは、全体観のためにコードを横断する独立した説明が必要なものに限定する。詳細のSSOTはコードとする。
+      - 理由: docは責務・境界・主要なデータフローなどを把握する地図であり、componentの枝葉の仕様を所有するものではないため。
+      - 主な棄却案: 内部仕様の列挙、実装の言い換え、複数ファイルに関係するだけで横断的説明とみなすこと。
+    - 設計意図・制約も範囲で所有先を決める。俯瞰に必要なものはdoc、局所的なものはコードの近くのコメントに置く。コメントでもコードから分かる動作を再説明しない。
+      - 理由: 「設計意図」「制約」という名目で、局所的な知識を実装から離して二重メンテにすることを防ぐため。
+      - 主な棄却案: コードから導出できない情報をすべてdocへ集約すること。
+    - 文書は、その読者が行う理解・操作・判断に不足や誤りが生じる場合だけ更新する。必要性が曖昧なら書かない。
+      - 理由: 不要な文章は読む負担と保守負担を生むため。実装変更やタスク完了そのものは文書を書く理由にならない。
+      - 主な棄却案: 毎回docを成果物にすること、念のため説明を足すこと、文書更新の要否を毎回報告・確認すること。
+    
+    ## 制約
+    - 変更はchezmoiで管理する共通guidanceに限定する。各repoのdoc・コード、memoryは変更しない。
+    - live targetへのchezmoi applyは含めない。
+    - 文書新設の承認フローや、更新要否を毎回報告する義務は追加しない。
+    - 実装説明を別の内部docへ移すことを解決策にしない。
+    - 今回のguidance自体にも「不要な文章を書くより書かない」を適用する。禁止事項や例外を積み重ねず、既存規定を簡潔に統合する。
+    
+    ## 対象外
+    - 過去セッションの横断監査。
+    - 各repoの既存docの整理。
+    - 文書生成・同期の仕組みの新設。
+    
+    ## 未検証の前提
+    - 対象live fileに対応するchezmoi source pathと、編集時点のsource・live差分。
+    - 対象sourceに適用される追加guidance。
+    - 関連規定の全体を踏まえた統合・置換箇所と検証方法。
+    
+    ## 実装時の指示
+    - 現行の機械的な文書更新を促しうる表現を、読者・目的への影響を条件とする判断へ置き換える。
+    - 「関数単位の説明は禁止」のような粒度だけの制限にせず、情報の所有先を明確にする。
+    - 修正案を成功条件のケースに当てはめ、不要な追記を促す解釈と、必要な利用案内を省く解釈の両方が残っていないか確認する。
+    - 完了報告は変更した判断基準と検証結果を簡潔に示す。今回の経緯を説明するdocは作らない。
+    
+  - A: Implemented the authorized source-only changes in the current main checkout. Applied develop-repository and author-skills, verified chezmoi mappings and initial empty target diffs, and confirmed no relevant release workflow. Origin code fetch succeeded; initially divergent Git notes were fetched without overwriting and merged without conflicts. Replaced four documentation rules with five reader/purpose/ownership rules; narrowed local comments and implementation-duplication exception in the profile. Targeted mise checks, git diff --check, reference graph validation, and target-limited chezmoi diff and dry run passed. Fresh independent review reported no findings; a separate fresh agent correctly interpreted nine forward cases including required user docs and omission cases. No live apply, downstream repository changes, or memory changes. Committed only the two approved paths as f89c1b8; hooks passed, committed diff matched reviewed snapshot SHA256 24ab92337d4d220b6b1faa8a9f590f5a8bba780d44ce888fe94c59b206fbdd90. Re-fetched origin and pulled/rebased main successfully; workspace clean. Retrieved this complete session JSONL, excluded injected context, and checked all ten human messages in order against the observed conversation before composing the note.
