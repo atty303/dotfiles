@@ -1,0 +1,95 @@
+Task: Make total lifetime burden the first design and artifact-selection criterion
+Anchor: 3069402a7e614a121d827a2a40f9c97b848f9b80
+Base: f89c1b80a19bb175ad8a47504d416127fb265cfc
+Branch: main
+Commits: 3069402a7e614a121d827a2a40f9c97b848f9b80 establishes the opening principle and connects existing choice points
+Guidance: common and repository AGENTS; dig during decisions; maintain-agent-guidance; develop-repository; author-skills; independent review; Git task evidence; data handling
+Conditions: Linux chezmoi source checkout; current main; source-only Markdown changes; no live apply; standing authorization for clean main sync; complete Codex history read across two session segments
+Authority: Latest implementation request and confirmed decisions; applicable common/repository AGENTS and skills
+## Transcript
+- U1:
+    codeだろうとdocだろうとrepoにcommitした時点で将来に渡っての永続的な保守コストが発生することをagentは認識しているか？ 今この瞬間はcommitのコストがゼロだとしても、それが将来に渡っての負債となり、開発速度を低下させることになる。agentがこのコストを判断軸に加えればさらによくなると思う。この基本原則はあるか？ [$dig](/var/home/atty/.agents/skills/dig/SKILL.md) 
+    
+  - A: Applied dig read-only. Searched the memory index without relevant maintenance-principle evidence and checked current source. Found existing continuous-maintenance and durable-artifact rules but no explicit lifetime-burden framing; asked Q7 about initial effort plus future upkeep versus future-only or initial-effort-first choices.
+- U2:
+    A. この判断はトップレベルに重要なものとしたい。他の規則は残すが、基本ここから導かれるものが多い
+    
+  - A: Confirmed total-burden choice as the top-level design principle while retaining other rules. Verified common AGENTS ownership and existing rule locations. Proposed a short opening principle and connected existing choices; asked Q8 for agreement.
+- U3:
+    B. AGENTSをよんだのに従わないことがあり「見落とした、適用しなかった」と言っていた。防ぎたい
+    
+  - A: Discussed reading versus applying instructions and proposed same-agent decision checks or an added independent-review requirement in Q9. No guidance was changed.
+- U4:
+    B
+    
+  - A: The recorded selection was followed by turn_aborted, with no intervening assistant reply. Subsequent clarification and final implementation constraints superseded adding review obligations.
+- U5:
+    もちろんLLMの仕組みから完璧は無理だと思うが、コンテキストに埋もれにくくする記述ができるのでは？
+  - A: Refocused on instruction placement and wording rather than new verification procedures. Applied OpenAI Docs, searched and opened official prompt-engineering guidance about logical boundaries and hierarchy. Proposed a short opening principle, concrete choice language and connections from existing choice points without repeated full text; asked Q10. Explicitly did not claim measured improvement or perfect adherence.
+- U6:
+    A
+    
+  - A: Produced a standalone implementation request for source-only common AGENTS and development-skill alignment, retaining other rules and forbidding new reviews, reports, checklists or approval flows.
+- U7:
+    # 実装依頼
+    
+    ## 依頼
+    chezmoiの共通AGENTSに、初期作業と将来の保守を合わせた総負担を、設計・成果物選択の第一基準とする原則を置いてください。既存の関連規定を、この原則に基づいて判断する形へ統合・置換してください。
+    
+    対象は `home/dot_codex/AGENTS.md` と `home/dot_agents/skills/develop-repository/SKILL.md` です。同skillの `references/atty303-engineering-policy.md` は、整合に必要な場合だけ変更してください。
+    
+    ## 目的
+    - 今すぐ生成・commitできることを、成果物を残す理由にしない。
+    - Code・doc・test・設定などを残す判断に、将来の読解・変更・検証・整合性維持・依存更新の負担を含める。
+    - 原則をコンテキスト内の一項目に埋めず、個別の判断で使う起点として明確にする。
+    
+    ## 成功条件
+    - 共通AGENTSの冒頭に、独立した短い基本原則がある。
+    - 目的・成功条件・制約を満たす案の中で、初期作業と将来の保守を合わせた総負担を第一基準として選ぶ。
+    - 残す成果物には、維持負担を引き受けるだけの必要性を求める。
+    - 行数・ファイル数・今回の変更量を、保守コストの代用にしない。必要なら初期実装を増やして将来の変更負担を減らせる。
+    - 既存の最小変更・既存機構利用などの判断箇所が、この原則へ明確につながっている。
+    - 削除・簡略化・既存機構利用・新規追加などの順序を、総負担を判断する指針として扱い、機械的な順位にしない。
+    - 次のケースを一貫して判断できる。
+      - 簡単に生成できても、必要性のない実装説明docは残さない。
+      - コード量が増えても、型や構造によって将来の変更・検証負担が減るなら採用できる。
+      - 小さい差分でも、独立した設定・重複・互換経路を残す負担が大きければ、別案を選べる。
+    - 関連規定との矛盾・重複がなく、対象sourceの差分と適切な検証結果を確認できる。
+    
+    ## 決定事項
+    - 総負担の判断を、設計・成果物選択の最上位の基本原則とする。
+      - 理由: Repoに残すものは、その作成時だけでなく将来の開発速度にも影響するため。
+      - 主な棄却案: 今回の作業量だけを最小にすること、将来の保守だけを見て初期コストを無視すること。
+    - 他の規則は維持し、関連する設計・実装・文書化規則を原則の具体化として接続する。
+      - 理由: 個別規則だけでは、判断の根拠と優先関係が埋もれるため。
+      - 主な棄却案: 原則ですべての規則を置き換えること、原則の本文を各所へ重複させること。
+    - 適用漏れへの対策は、指示の配置・簡潔さ・優先順位・判断箇所への接続で行う。
+      - 理由: コンテキスト内でも判断の起点として使いやすくするため。
+      - 主な棄却案: 「必ず」「最重要」の反復、説明の長文化、新しいreview義務・報告・承認手順の追加。
+    
+    ## 制約
+    - 変更はchezmoiの共通guidance sourceに限定し、liveへのapply、他repoやmemoryの変更は行わない。
+    - 基本原則は、目的・成功条件・authority・安全性などの既存制約を守る範囲で適用する。
+    - 直前に整備した、文書の読者・目的・粒度とコードSSOTの規定を維持する。
+    - 今回のguidance自体にも総負担の原則を適用し、短く統合する。
+    - 数値採点、チェックリスト文書、毎回の判断報告、新しい検証・承認フローを作らない。
+    
+    ## 対象外
+    - 既存repoの成果物や過去セッションの横断監査。
+    - 各skillへの同文の一括追加。
+    - Codexのコンテキスト投入機構の変更。
+    - 指示遵守の完全保証。
+    
+    ## 未検証の前提
+    - 編集時点の対象source・live差分と、追加の適用guidance。
+    - 関連規定を整合させるために必要な最小の変更範囲。
+    - 配置・表現の変更による効果。冒頭へ置くだけで適用漏れがなくなるとは仮定しない。
+    
+    ## 実装時の指示
+    - 原則を独立した短い見出しの下に置き、優先順位と実際の選択基準を明記する。
+    - 既存の保守コスト規定を統合・置換し、理念の追記だけで終わらせない。
+    - 実装前の選択箇所など、原則を使う既存の箇所へ短く接続する。原則全文は繰り返さない。
+    - 修正案を成功条件のケースで確認し、原則を読むだけで選択に適用しない解釈や、少ない行数を機械的に優先する解釈が残っていないか検証する。
+    - 完了報告は変更した判断基準と検証結果を簡潔に示す。今回の経緯を説明するdocは作らない。
+    
+  - A: Implemented the authorized two-file source-only change on clean main. Verified current chezmoi source mappings and initially empty target diffs; fetched code and standard Git notes; no relevant release workflow. Added three opening principle bullets, replaced the existing internal-design rule with a reference to the principle, changed fixed alternative ordering to comparison, renamed the smallest-change heading, and connected the documentation decision point. Engineering profile required no change. Targeted mise checks and git diff --check passed; target-limited chezmoi diff and dry run passed. Fresh independent review reported no findings; separate fresh-agent forward tests correctly chose all eight cases, including larger type-based implementation, omitting unnecessary docs, reusing configuration, avoiding speculative framework work, updating a stale architecture map and respecting approval boundaries. Committed only the two approved files; hooks passed; committed diff matched reviewed SHA256 3715e514abc15de118f577ae9840f38f87f37ed35cb2156e3b30f155c3f1003d. Origin fetch and clean-main pull/rebase succeeded. No live apply, downstream repo changes, memory changes or new recurring workflow requirements. Retrieved both complete local thread segments, parsed every line, identified the cycle after the prior completed task, and compared all seven human messages and their order including the aborted selection. Classified task-relevant dialogue for the repository-note sink and prepared this normalized body without raw injected context or unrelated identity fields.
