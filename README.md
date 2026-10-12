@@ -130,6 +130,8 @@ desktop continues on the normal CPU set.
 The default `secrets` role requires access to the repository's age identity or the
 passphrase used to decrypt the committed identity. The first apply stores that identity
 at `~/.config/chezmoi/age/identity.txt`, so later applies do not require it again.
+In Linux Devsy workspaces, attaching `CHEZMOI_AGE_KEY` to the context also provisions
+the identity from Devsy's private secret mount during dotfiles installation.
 These commands are for the repository owner.
 
 On a new physical Linux or macOS machine, use chezmoi's standard remote bootstrap entrypoint:

@@ -12,6 +12,8 @@ if [ ! -s "$identity" ]; then
     cp /usr/local/secrets/CHEZMOI_AGE_KEY "$identity"
   elif [ -n "${CHEZMOI_AGE_KEY:-}" ]; then
     printf '%s\n' "$CHEZMOI_AGE_KEY" > "$identity"
+  elif [ -s "/run/devsy/secrets-env/CHEZMOI_AGE_KEY" ]; then
+    cp /run/devsy/secrets-env/CHEZMOI_AGE_KEY "$identity"
   else
     chezmoi age decrypt --output "$identity" --passphrase "{{ .chezmoi.config.sourceDir }}/key.txt.age"
   fi
