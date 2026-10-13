@@ -38,7 +38,8 @@ chezmoi execute-template --source "$repository" --override-data "$data" \
 chmod 755 "$test_home/.local/bin/restic-home"
 
 restic_bin=$(command -v restic)
-ln -s "$restic_bin" "$test_home/.local/bin/restic"
+mkdir -p "$test_home/.local/share/mise/shims"
+ln -s "$restic_bin" "$test_home/.local/share/mise/shims/restic"
 cat >"$config_dir/b2.env" <<EOF
 AWS_ACCESS_KEY_ID=fixture-access
 AWS_SECRET_ACCESS_KEY=fixture-secret

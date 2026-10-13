@@ -12,7 +12,7 @@ readonly repository_id="$host"
 readonly config_dir="${RESTIC_HOME_CONFIG_DIR:-$HOME/.config/restic}"
 readonly configuration_file="$config_dir/b2.env"
 readonly exclude_file="$config_dir/excludes"
-readonly restic_bin="${RESTIC_HOME_RESTIC_BIN:-$HOME/.local/bin/restic}"
+readonly restic_bin="${RESTIC_HOME_RESTIC_BIN:-$HOME/.local/share/mise/shims/restic}"
 
 {{ includeTemplate "restic-load-configuration.bash" . }}
 {{ includeTemplate "restic-home-add-host.bash" . }}

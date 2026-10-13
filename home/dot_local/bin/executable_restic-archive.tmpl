@@ -5,7 +5,7 @@ set -euo pipefail
 readonly config_dir="${RESTIC_ARCHIVE_CONFIG_DIR:-$HOME/.config/restic}"
 readonly repository_id=manual-archives
 readonly configuration_file="$config_dir/b2.env"
-readonly restic_bin="${RESTIC_ARCHIVE_RESTIC_BIN:-$HOME/.local/bin/restic}"
+readonly restic_bin="${RESTIC_ARCHIVE_RESTIC_BIN:-restic}"
 readonly state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/restic-archive"
 readonly success_limit={{ .restic.archive.record_success_limit }}
 readonly failure_limit={{ .restic.archive.record_failure_limit }}

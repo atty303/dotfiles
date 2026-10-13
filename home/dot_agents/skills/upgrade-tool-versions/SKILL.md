@@ -1,6 +1,6 @@
 ---
 name: upgrade-tool-versions
-description: dotfilesで管理するmise tool stubとimmutable Distrobox imageの最新版、変更価値、破壊的変更を調査し、選択された更新と必要な移行を反映するときに使用する。
+description: dotfilesで管理するグローバルmise tool定義とlock、およびimmutable Distrobox imageの最新版、変更価値、破壊的変更を調査し、選択された更新と必要な移行を反映するときに使用する。
 ---
 
 # Tool Version Upgrades
@@ -11,14 +11,14 @@ description: dotfilesで管理するmise tool stubとimmutable Distrobox image�
 - For home-directory targets, run `chezmoi source-path` with a path under `~` or `/home`; edit the returned source state, never the target file.
 - Accept zero or more tool or Distrobox names. With no names, inventory every supported source. With names, limit network research and changes to those names.
 - Support these sources:
-  - Executable files whose first line is `#!/usr/bin/env -S mise tool-stub`.
+  - Tools declared in the chezmoi-managed global mise configuration, including OS-specific configuration files, with their adjacent `mise.lock`.
   - Distrobox manifests pinned to immutable images published by `atty303/distrobox-image`.
 - Report symbolic versions and floating image references as reproducibility risks, but do not rewrite them automatically.
 
 ## Check version differences before research
 
 - The parent agent performs a lightweight version comparison for every in-scope source before dispatching research. Use `mise latest <tool>` for tool versions and published image metadata for immutable references. Record the current and newest available versions or references, plus any obvious lock inconsistency. Do not perform release-by-release research or edit sources in this pass.
-- An exact mise stub with embedded lock URLs for another version remains a candidate for regeneration even without a version bump. Report declared, locked, and installed versions separately when investigating it.
+- An exact mise declaration with a missing or inconsistent lock remains a candidate for regeneration even without a version bump. Report declared, locked, and installed versions separately when investigating it. Locate declarations and locks through chezmoi source mapping; repository-local development tools are outside this inventory.
 - For Distrobox, compare available published immutable references with the current manifest and check the latest upstream application release separately. If upstream is newer but no newer immutable image is available, report that briefly; do not start a subagent solely for that gap.
 - Dispatch each candidate with an available version, lock, or immutable-reference change to its own read-only subagent. Run these investigations concurrently up to the available agent slots; queue the remainder. Give each subagent the source, current and candidate versions or references, and the research requirements below. The parent owns user decisions and all mutations.
 
@@ -26,12 +26,13 @@ description: dotfilesで管理するmise tool stubとimmutable Distrobox image�
 
 Each candidate subagent completes the applicable checks below before returning a decision-ready report. If subagent execution is unavailable, stop and report which candidates remain uninvestigated; do not silently switch to a lighter investigation.
 
-### Mise tool stubs
+### Global mise tools
 
-- Read `tool` and `version` from each source stub. Treat the stub filename as the command name; do not assume it matches the mise tool identifier.
-- Verify the latest stable release with `mise latest <tool>`. Do not constrain the major version.
+- Read each tool identifier and version request from the global configuration. Resolve command names from registry metadata, `lazy_bins`, and installed executables; do not assume a command name matches the tool identifier. Retain OS and architecture conditions when comparing entries across configuration files.
+- Verify the latest stable release with `mise latest <tool>`. Require a non-empty concrete version; exit status alone does not establish successful discovery. Do not constrain the major version.
 - When the current version is a prerelease, also identify the newest release in the same prerelease channel, but keep the latest stable release as the primary candidate.
-- For an inconsistent exact stub, research changes from the oldest artifact that a fresh installation could resolve through the candidate version.
+- For HTTP tools, inspect their version-discovery options and first-party distribution source. If `mise latest` cannot discover versions, establish the newest release from that source or mark the candidate unavailable. Treat symbolic channels separately from exact release versions.
+- For an inconsistent exact declaration, research changes from the oldest artifact that a fresh installation could resolve through the candidate version.
 
 ### Distrobox images
 
@@ -84,15 +85,13 @@ Each candidate subagent completes the applicable checks below before returning a
 
 - After every candidate choice is settled, group selected updates by dependency. Edit the selected source changes together, including necessary configuration or invocation migrations. Do not separate dependent candidates when later isolating failures.
 
-### Mise tool stubs
+### Global mise tools
 
-- Regenerate the source stub atomically with:
-
-  ```sh
-  mise generate tool-stub <source-path> --lock --version <exact-version>
-  ```
-
-- Do not hand-edit generated lock URLs or checksums. Confirm the declared version, every embedded versioned URL, and the resolved lock agree.
+- Update only the selected tool's version declaration in the managed source configuration. Preserve `lazy`, `lazy_bins`, backend selection, OS and architecture conditions, installation options, and platform-specific distribution constraints.
+- For HTTP declarations, update any version-specific URL, checksum, or size from the first-party artifact evidence. These are source options, not generated lock fields. Do not retain a previous release's checksum for a new version or silently substitute another distribution.
+- Stage the managed global configuration and existing lock as ordinary `config.toml`, OS-specific config files, and `mise.lock` in a temporary global mise profile. Keep its HOME, XDG, mise cache, data, and state directories isolated, and run outside the repository. Regenerate only the selected tools with `mise lock --global <tool>...`, retaining the lock's platform coverage. This command does not install tools; do not use `--include-lazy` to prepare an update.
+- Preserve platform variants as well as OS and architecture. For aqua tools whose musl artifacts require explicit libc selection, generate those targets in a separate `MISE_LIBC=musl` lock invocation; do not let a gnu artifact replace a musl entry. Verify the resolved artifact against the intended target before accepting the lock.
+- Copy the generated lock back to its managed source path. Do not hand-edit generated URLs or checksums. Confirm declarations, version-specific source options, and resolved locks agree, and compare unselected entries with the baseline to exclude unrelated version or lock changes.
 - Apply every required configuration or invocation migration in the same logical change. Do not retain compatibility aliases or old branches unless the current requirements need them.
 
 ### Distrobox images
@@ -105,11 +104,10 @@ Each candidate subagent completes the applicable checks below before returning a
 
 - Run one final verification phase after editing all selected updates. Within it, run the cheapest relevant static and repository checks first, then the necessary runtime checks for each affected tool or image. Fix and recheck affected work within this same phase; one phase does not mean one test command.
 - Run `chezmoi diff <target>` before applying. For each exact target, request approval and run `chezmoi apply <target>` with elevated sandbox permission; never request a permanent approval or apply without a target.
-- After applying a tool stub, determine a version flag that does not intentionally initialize or migrate user state, run it from a temporary working directory outside the source repository with temporary `HOME` and XDG directories, and confirm it reports the selected version. A repository-local `mise.toml` can otherwise require trust in the temporary profile and fail before the tool executes; do not mutate trust state merely to make the check pass. If the tool has no isolatable version check, report that runtime verification as unavailable instead of executing it against the real profile.
+- For tool verification, stage the updated global configuration and lock in an isolated temporary profile outside the repository. Run `mise install` to generate bootstrap shims without eagerly installing lazy tools. Determine a version flag that does not intentionally initialize or migrate user state, invoke the selected tool's shim, and confirm the selected version and that unrelated lazy tools remain uninstalled. Retain normal auto-install behavior for required dependencies. A bare temporary HOME without the global declarations cannot resolve a shim, and repository-local config must not influence this check. If the tool has no isolatable version check, report that runtime verification as unavailable instead of executing it against the real profile.
 - After applying a Distrobox update, inspect the container image reference, lifecycle state files, and associated user service. Treat pending, rollback, failed, or inactive states distinctly.
 - Confirm `chezmoi diff <target>` is empty after application. If a candidate still fails verification, remove the entire dependent group, including its migrations, from this commit. Restore or preserve each affected previous working target/container under the existing recovery path, then recheck the surviving changes. Report the observed state and recovery path; continue verifying independent selected updates.
-- After verification, inspect the complete surviving source diff once. A fresh independent review is not required when that complete diff is limited to one mise tool stub regenerated with the required `mise generate tool-stub ... --lock --version <exact-version>` command. Still complete every static, lock-consistency, chezmoi, and isolated runtime verification required by this skill.
-- Follow the repository's independent-review requirements when the surviving change also includes a configuration or invocation migration, another source file, a hand-edited generated field, or a Distrobox image update. If required, perform one independent review of the complete surviving diff before committing.
+- After verification, inspect the complete surviving source diff once, including shared global declarations and locks. Follow the repository's independent-review requirements and perform one independent review before committing when required.
 - Commit all verified updates together in one commit under the repository's version-control requirements. If none pass, make no commit and report the state and problems. After committing passing updates, separately ask the user how to handle excluded candidates. Never push without an explicit request.
 
 ## Stop conditions
