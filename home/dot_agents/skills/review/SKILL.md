@@ -18,7 +18,9 @@ description: 明示的に依頼された変更、またはsecurity、authority�
 - Reviewerには元要求、中立なacceptance criteria、artifact/control-domain情報、working directory、比較対象、範囲、適用規約、current source、exact diffおよび生の検証結果だけを渡す。実装計画、設計の正当化、途中推論、疑わしい箇所または期待する指摘は渡さない。
 - Terminal reviewerとして再委譲せず1 turnで範囲全体を調査し、日本語のactionableな指摘だけを一つの最終報告へ集約させる。規模とclosed-set riskに応じて追加reviewerを使う。
 
-各指摘には重大度、fileとline、影響する挙動、到達可能な失敗条件、controlまたはoperational-safety条件、source・test上の根拠、および最小修正を含める。Data findingは値の能力または明示contractと実際のsinkを示す。型や既存validationで排除済みの問題、根拠のない将来懸念、style選好、確認済みtrade-offの再審議は除く。
+- 成果物を対象読者の立場で読み、用途に必要な情報の不足と、不要な情報による認知負荷の両方を確認する。READMEなどの文書、code commentおよびPR説明では、変更された説明のまとまりを既存記述も含めて確認し、実装会話を知らない読者にも必要かを判断する。不要な経緯・比較・念押し・重複・詳細は削除・統合を指摘し、必要な比較、制約および理由は保持する。経緯を伝える報告・記録はその用途で判断し、無関係な箇所の全面整理は求めない。
+
+各指摘には重大度、fileとlineまたは説明の位置、影響、根拠、および最小修正を含める。挙動の指摘には到達可能な失敗条件、関係するcontrolまたはoperational-safety条件、source・test上の根拠を示す。読者向け情報の指摘には対象読者、用途および理解・操作・判断への具体的な不足または負荷を示し、実行時障害を要件にしない。Data findingは値の能力または明示contractと実際のsinkを示す。型や既存validationで排除済みの問題、根拠のない将来懸念、style選好、確認済みtrade-offの再審議は除く。読者と用途を根拠とする情報の過不足はstyle選好と区別する。
 
 不具合修正では、変更後も元oracleがfailする反例と、変更で新しく到達するdownstream state、意味変換、retry、re-entryおよび逆操作を確認する。Cross-processまたはresource変更では、境界両側のdata/control flow、failure、timeout、signal、cleanup ownershipおよび残留状態を追う。
 
