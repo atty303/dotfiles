@@ -98,8 +98,7 @@ This repository is synchronized across multiple machines. Codex is authorized to
 from `origin/main`, then push the resulting `main` to `ssh` with direct Git commands. At the start
 of a modifying task, fetch `origin`, inspect the branch, upstream, index and working tree, and run
 `git pull --rebase origin main` only when the clean workspace is behind `origin/main`. After the
-commit, recheck the same state before `git push ssh main`; push `refs/notes/commits` separately when
-the task updated its Git note.
+commit, recheck the same state before `git push ssh main`.
 
 The clean-workspace requirement applies only to automatic pull/rebase/push, not ordinary editing,
 validation, or a commit limited to Codex's own paths. If the workspace is dirty, the current line is

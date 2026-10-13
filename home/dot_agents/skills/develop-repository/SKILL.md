@@ -16,9 +16,9 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 ## Establish repository state
 
 - 通常のGit commandだけを使う。Git repositoryでなければ停止し、別VCSを解釈、操作または初期化しない。
-- 変更前にremoteがあればcodeと標準notes refをfetchし、branch、upstream、HEADと親、index、working tree、default branchおよび必要なdiffを確認する。Remoteにnotes refが未作成なら正常な空状態とし、network、権限、競合または破損によるfailureと区別する。Code fetch失敗時はremote情報の陳腐化を明示し、notes fetch・merge失敗時はlocalまたはremote noteを暗黙に置換しない。
+- 変更前にremoteがあればcodeをfetchし、branch、upstream、HEADと親、index、working tree、default branchおよび必要なdiffを確認する。Fetch失敗時はremote情報の陳腐化を明示する。
 - Branchの作成・切り替えを判断する前にRepository profileを適用する。適用されるbranch方針がなければ、指定branchまたは依頼に対応する既存branchを優先する。無関係な変更から新しい作業を派生させず、rewrite、既存branch移動または未確定変更を伴う切替は確認する。
-- 現在のsourceやliving documentationだけでは判断できない意図、未完了範囲またはmigrationがある場合は、関連path、schema、featureまたはcommitに限定してGit logとnotesを調べる。履歴はdescriptiveであり現在の原典を上書きしない。
+- 現在のsourceやliving documentationだけでは判断できない意図、未完了範囲またはmigrationがある場合は、関連path、schema、featureまたはcommitに限定してGit logと既存notesを調べる。履歴はdescriptiveであり現在の原典を上書きしない。
 - 開発、build、test環境は現在のrepositoryのsource、task、build process、適用guidanceまたはユーザーの明示指定から確定する。承認済みcommand、memory、過去task、toolの存在または別用途のcontainer・runtimeだけを根拠に転用しない。
 - 変更taskの開始時にrelease workflowの参照を軽く確認する。`uses: atty303/repository-template/.github/actions/release@...` とsemantic-releaseの直接実行・action参照を対象とし、前者は`versioning`入力で`semver`か`calver`かを分ける。通常はworkflowの稼働状況やrelease実装の内部を追わない。
 
@@ -65,13 +65,12 @@ Closed-set triggerは成果物種別による次の除外より優先する。Tr
 
 - Commit前に元の依頼とclosed setを読み直し、各項目を証拠、明示的な対象外または残作業へ対応付ける。Git stateとdiffを再確認し、release対象では開始時の提案が送信済みであることと、task全体の承認済みrelease要否・上限と予定するcommit群の影響を照合する。提案の送信漏れが判明したら直ちに送り、commitなしでできる残作業を進める。未承認、SemVerで基準releaseを確認できず影響が確定しない場合、または範囲外ならcommitを保留して残作業と必要な判断を示す。Commitできる場合は自分の変更だけを明示的にstageして論理単位でcommitする。未確定のまま残す明示指示がなければ、完了した変更はlocal commitへ確定する。
 - Commit messageは上記のrelease規則とrepository慣習に従い、目的、主要理由、範囲、user-visible effect、migrationおよび主要検証を自足的に記す。Release対象以外で慣習不明なら英語のConventional Commitsを使い、Codex co-author trailerを付ける。
-- Commitを作ったtaskは [Git task evidence](../../references/git-task-evidence.md) をすべて読み、最終commitをanchorに標準noteを保存する。Codexではcomplete thread履歴の取得・照合が必須で、不能ならtaskを未完了とする。他runtimeは同等capabilityがなければskipと境界を明示できる。
-- Agentが既存noteを読み、semantic conflictを解消し、分類・redaction・要約済みのnormalized bodyを作る。既存blob IDまたは`absent`を指定して `scripts/update-git-task-note.ts` を使い、schemaまたはCAS conflictでは上書きせず停止する。Helperへraw threadを渡さない。
+- Commitを作るtaskは最終commit前に [Git task evidence](../../references/git-task-evidence.md) をすべて読み、task全体のtranscriptを最終commit messageへ保存する。Codexではcomplete thread履歴の取得・照合が必須で、不能なら最終commitを保留しtaskを未完了とする。他runtimeは同等capabilityがなければskipと境界を明示できる。
 
 ## Remote writes and completion
 
 - Push、remote ref更新およびPR作成は、ユーザーの明示依頼または対象refを含むrepository guidanceのstanding authorizationがある場合だけ行う。Authorizationだけでは実行を要求せず、guidanceが自動実行も指示する場合に実行する。ユーザーの明示的なno-pushまたは狭いscopeをstanding authorizationで上書きしない。PRは指定がなければready for reviewとする。
-- Push前にcodeとnotesをfetchしてstateを再確認する。Codeをnon-force pushした後、local notes refがあれば別のnon-force pushで送る。Notes競合は別refへfetchして意味を保持してmergeし、解消不能ならcodeとnotesのpartial stateをblocked handoffする。Code pushをrollbackまたはforceしない。
+- Push前にcodeをfetchしてstateを再確認し、non-force pushする。Code pushをrollbackまたはforceしない。
 - 成功条件とconstraintがすべて証拠付きで満たされた場合だけ完了する。未達が解消不能ならpartialまたはblockedとして、確認済み範囲、未確認結果、理由および必要な次のactionを示す。
 
 ## Repository profile

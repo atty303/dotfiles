@@ -23,7 +23,7 @@ Apply these repository-specific preferences within the generic `develop-reposito
 
 - Git repositoryのcurrent treeには、その時点で有効なcode、test、設定、契約、制約、実行手順および未完了planだけを置く。過去の実装、判断、比較、棄却案およびpoint-in-timeの検証結果はGit historyに置き、履歴保存だけを目的とする文書、互換処理、codeまたはtestを残さない。
 - 必要な文書の言語は既存の慣習と対象読者に合わせ、判断できない場合は英語を使う。
-- CHANGELOG、release noteおよびmigration guideは、現在の利用者がupgrade、migrationまたは互換性判断に必要とする明示的なrelease contractがある期間だけcurrent treeへ置き、その責任が終われば削除する。通常の変更履歴はcommit message、Git noteまたは外部release noteが所有する。
+- CHANGELOG、release noteおよびmigration guideは、現在の利用者がupgrade、migrationまたは互換性判断に必要とする明示的なrelease contractがある期間だけcurrent treeへ置き、その責任が終われば削除する。通常の変更履歴はcommit messageまたは外部release noteが所有し、過去のGit notesは必要時に参照する。
 
 ### Single Source of Truth
 
