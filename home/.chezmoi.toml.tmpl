@@ -68,6 +68,16 @@ encryption = "age"
     args = ["-NoLogo"]
 {{ end }}
 
+[[textconv]]
+    pattern = "**/orca-settings-diff-trigger"
+    command = "nu"
+    args = [
+        {{ joinPath .chezmoi.sourceDir ".chezmoitemplates/orca-settings-textconv.nu" | toToml }},
+        {{ joinPath .chezmoi.sourceDir ".chezmoitemplates/orca-settings.toml" | toToml }},
+        {{ joinPath .chezmoi.sourceDir ".chezmoitemplates/orca-settings-sqlite.ts" | toToml }},
+        {{ .chezmoi.os | toToml }},
+    ]
+
 # Run scripts after initializing the source state and before applying the state.
 [hooks.read-source-state.pre]
 {{ if eq .chezmoi.os "darwin" }}
