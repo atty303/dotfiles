@@ -1,5 +1,5 @@
 github.com:
-    git_protocol: ssh
+    git_protocol: https
     users:
         atty303:
     user: atty303
