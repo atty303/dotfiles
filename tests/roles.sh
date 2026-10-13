@@ -214,7 +214,7 @@ for data in "$baseline_data" "$desktop_data"; do
   managed="$(chezmoi --config "$managed_config" managed --source "$repository" \
     --override-data "$data")"
   grep -Fxq '.config/atuin/config.toml' <<<"$managed"
-  if grep -Eq '^(\.wakatime\.cfg|\.local/share/atuin/key)$' <<<"$managed"; then
+  if grep -Eq '^(\.wakatime\.cfg|\.local/share/atuin/key|\.ssh/git_signing_ed25519(\.pub)?)$' <<<"$managed"; then
     printf 'non-secrets role rendered encrypted bootstrap artifacts\n' >&2
     exit 1
   fi
@@ -223,6 +223,55 @@ secrets_managed="$(chezmoi --config "$managed_config" managed --source "$reposit
   --override-data "$secrets_data")"
 grep -Fxq '.wakatime.cfg' <<<"$secrets_managed"
 grep -Fxq '.local/share/atuin/key' <<<"$secrets_managed"
+grep -Fxq '.ssh/git_signing_ed25519' <<<"$secrets_managed"
+grep -Fxq '.ssh/git_signing_ed25519.pub' <<<"$secrets_managed"
+
+for platform in linux darwin windows wsl; do
+  os=$platform
+  wsl=false
+  if [[ $platform == wsl ]]; then
+    os=linux
+    wsl=true
+  fi
+  for secrets in true false; do
+    roles='[]'
+    if [[ $secrets == true ]]; then
+      roles='["secrets"]'
+    fi
+    data="{\"roles\":$roles,\"wsl\":$wsl,\"chezmoi\":{\"os\":\"$os\"}}"
+    config="$temporary/git-$platform-$secrets.config"
+    chezmoi execute-template --source "$repository" --override-data "$data" \
+      <"$repository/home/dot_config/git/config.tmpl" >"$config"
+    [[ $(git config --file "$config" --bool commit.gpgsign) == "$secrets" ]]
+    [[ $(git config --file "$config" gpg.format) == ssh ]]
+    if [[ $secrets == true ]]; then
+      [[ $(git config --file "$config" --path user.signingkey) == "$HOME/.ssh/git_signing_ed25519" ]]
+    elif git config --file "$config" user.signingkey >/dev/null; then
+      printf 'non-secrets Git configuration selected a signing key\n' >&2
+      exit 1
+    fi
+    if [[ $platform == windows && $secrets == true ]]; then
+      [[ $(git config --file "$config" gpg.ssh.program) == 'C:/Windows/System32/OpenSSH/ssh-keygen.exe' ]]
+    elif git config --file "$config" gpg.ssh.program >/dev/null; then
+      printf 'Git configuration overrode the default SSH signer\n' >&2
+      exit 1
+    fi
+  done
+done
+
+for secrets in true false; do
+  roles='[]'
+  if [[ $secrets == true ]]; then
+    roles='["secrets"]'
+  fi
+  permissions="$temporary/git-key-permissions-$secrets.ps1"
+  chezmoi execute-template --source "$repository" --override-data "{\"roles\":$roles}" \
+    <"$repository/home/.chezmoiscripts/windows/run_after_git-signing-key-permissions.ps1.tmpl" >"$permissions"
+  if command -v pwsh >/dev/null 2>&1; then
+    pwsh -NoLogo -NoProfile -Command \
+      "\$errors = \$null; [void][System.Management.Automation.Language.Parser]::ParseFile('$permissions', [ref]\$null, [ref]\$errors); if (\$errors.Count) { throw \$errors[0] }"
+  fi
+done
 
 set +e
 FAKE_CHEZMOI_STATUS=42 run_install "$temporary/failure.log"

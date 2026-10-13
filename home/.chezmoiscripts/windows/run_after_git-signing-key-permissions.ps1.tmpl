@@ -1,0 +1,13 @@
+{{ if has "secrets" .roles -}}
+$ErrorActionPreference = 'Stop'
+$KeyPath = Join-Path $HOME '.ssh/git_signing_ed25519'
+$Owner = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
+$Acl = New-Object System.Security.AccessControl.FileSecurity
+$Acl.SetOwner($Owner)
+$Acl.SetAccessRuleProtection($true, $false)
+$Rule = New-Object System.Security.AccessControl.FileSystemAccessRule($Owner, 'FullControl', 'Allow')
+$Acl.AddAccessRule($Rule)
+Set-Acl -LiteralPath $KeyPath -AclObject $Acl
+{{ else -}}
+exit 0
+{{ end -}}

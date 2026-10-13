@@ -24,27 +24,20 @@
 [user]
   name = Koji AGAWA
   email = atty303@gmail.com
-  signingkey = ~/.ssh/atty303.pub
+{{ if has "secrets" .roles }}
+  signingkey = ~/.ssh/git_signing_ed25519
+{{ end }}
 
 [gpg]
   format = ssh
 
+{{ if and (eq .chezmoi.os "windows") (has "secrets" .roles) }}
 [gpg "ssh"]
-{{ if eq .chezmoi.os "windows" -}}
-  program = "C:/Users/atty/AppData/Local/1Password/app/8/op-ssh-sign.exe"
-{{- end }}
-{{ if eq .chezmoi.os "darwin" -}}
-  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
-{{- end }}
-{{ if (and (eq .chezmoi.os "linux") (not .wsl)) }}
-  program = "{{ .chezmoi.destDir }}/.local/bin/ssh-keygen-force-agent"
-{{- end }}
-{{ if (and (eq .chezmoi.os "linux") .wsl) }}
-  program = "/mnt/c/Users/atty/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
-{{- end }}
+  program = "C:/Windows/System32/OpenSSH/ssh-keygen.exe"
+{{ end }}
 
 [commit]
-  gpgsign = true
+  gpgsign = {{ has "secrets" .roles }}
 
 [interactive]
   diffFilter = delta --color-only
