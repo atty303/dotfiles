@@ -62,6 +62,9 @@ encryption = "age"
 [github]
     refreshPeriod = "12h"
 
+[diff]
+    exclude = ["scripts"]
+
 {{ if eq .chezmoi.os "windows" }}
 [interpreters.ps1]
     command = {{ joinPath (env "PROGRAMFILES") "PowerShell/7/pwsh.exe" | toToml }}
