@@ -6,6 +6,13 @@ HK_STASH = "none"
 [settings]
 activate_aggressive = true
 experimental = true
+lockfile_platforms = [
+  "linux-x64",
+  "linux-arm64",
+  "macos-x64",
+  "macos-arm64",
+  "windows-x64",
+]
 windows_default_file_shell_args = "pwsh.exe -NoLogo -NoProfile -ExecutionPolicy Bypass"
 windows_default_inline_shell_args = "pwsh.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command"
 windows_shim_mode = "symlink"
