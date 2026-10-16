@@ -1,7 +1,7 @@
 # Agent-Computer Interface program observability contract
 
 Status: Living Standard  
-Last updated: 2026-09-22
+Last updated: 2026-10-16
 
 ## Scope and dependencies
 
@@ -48,6 +48,16 @@ Do not turn public stdout, stderr, API responses, or UI into agent diagnostic tr
 - **Artifact** references evidence too large or unsuitable for attributes: screenshot, video, DOM or state snapshot, structured test result, redacted shape, generated output, or core dump. Associate kind, producer operation, time, location, schema/format, retention, and classification. Artifact existence alone is not success.
 - **Attribute** is an allowlisted structured value with defined meaning, unit, cardinality, necessity, and classification. Reuse conventions and avoid synonyms.
 
+## Diagnostic sufficiency
+
+For applicable paths, normal-run records MUST retain enough evidence to narrow the first divergence between expected and actual behavior within the observed path. An exit code, final status, stage names, or counts alone do not satisfy this requirement when different inputs or decisions remain indistinguishable. Cover successful and no-op runs as well as detected failures; requiring a rerun with added logs or an opt-in detail mode does not satisfy normal-run recording.
+
+- Record behavior-affecting inputs actually consulted, including CLI arguments, environment variables, and configuration, as individually classified fields with safe effective values and their sources. Distinguish unset, empty, and defaulted values, including precedence and resolution or normalization when they affect behavior. Omitting an input as diagnostically unnecessary requires a reason in the observation design.
+- For important branches, target selection, transformations, skips, fallbacks, retries, and state transitions, retain the values used, condition or rule applied, and decision or transformation result, connected to the preceding and following operations. Preserve enough evidence to distinguish plausible alternatives, including why work was not performed; a count without the selection or exclusion basis may be insufficient.
+- Choose granularity by diagnostic value, not function boundaries. Do not dump the whole environment or record every function or variable. Reuse shared boundary instrumentation and bounded artifacts where appropriate; aggregation or truncation MUST expose the resulting diagnostic gaps rather than imply full coverage.
+
+Apply the data and privacy rules below to every value. Evidence narrows divergence only within its recorded coverage; it does not prove causality or guarantee exact reproduction involving unobserved external state or timing.
+
 ## Error and causal contract
 
 Telemetry never replaces typed errors, Results, exception causes, exit status, or caller contracts. Lower layers preserve cause. The operation owner records a failure and error type once. Do not duplicate the same exception across layers. A recovered retry or fallback is not final failure; intentional cancellation is neither error nor timeout; recording failure is not product-operation failure.
@@ -69,7 +79,7 @@ Each application defines and exposes enablement/opt-out, store and permissions, 
 
 Apply [data handling](data-handling.md) at instrumentation time through source allowlists; downstream filtering is defense in depth, not a replacement. Raw or recoverable credentials never enter records or artifacts. Credential kind, key ID, or expiry may be allowlisted when it cannot recover or test the value.
 
-Record bodies, clipboard, input text, conversations, screens, personal files, full URLs, command lines, environment, exceptions, or stack traces only as individually classified fields whose necessity and safe representation are defined. Authorized local diagnostics may retain necessary operational identifiers; remote export and public artifacts minimize unnecessary person- or host-specific values. Stored records and artifacts are user data with least permission, bounded retention, and deletion. Agents read only runs needed for the authorized investigation and do not send them to unrelated services.
+Record bodies, clipboard, input text, conversations, screens, personal files, full URLs, command lines, environment, exceptions, or stack traces only as individually classified fields whose necessity and safe representation are defined. A path, argument, or environment variable is not grounds for redaction by its form alone; retain safe operational values needed for authorized local diagnosis. When a value cannot be retained, preserve permitted surrounding evidence such as presence, source, and decision result, and make the diagnostic gap explicit. These representations MUST also be classified; they are not automatically safe. Remote export and public artifacts minimize unnecessary person- or host-specific values. Stored records and artifacts are user data with least permission, bounded retention, and deletion. Agents read only runs needed for the authorized investigation and do not send them to unrelated services.
 
 ## Non-interference and bounds
 
@@ -84,13 +94,14 @@ Test only scenarios reachable from the changed path, but cover each applicable c
 
 - program-detected failure can be retrieved by run, resource, failed operation/stage, error type, and artifact;
 - a user-reported success run retains completeness, operation tree, final status, artifacts, and the fact the program saw no failure;
+- runs with the same exit status but different consulted inputs or internal decisions retain evidence that distinguishes them and narrows the first divergence, including a successful skip or no-op where reachable;
 - opt-out preserves public behavior and effects while saving no record;
 - recording/export failure or absent consumer does not change the product operation;
 - partial/drop exposes degradation, reason, and known missing range;
 - no configured remote means no remote diagnostic transmission;
 - async/retry preserves parent, link, attempt, and final-result distinctions;
 - timeout, cancellation, and crash are distinct, with pre-crash buffer retained when practical;
-- classified fixtures contain no raw/recoverable secret and obey destination-specific allowlists and minimization;
+- classified fixtures preserve diagnostically necessary safe paths and environment values alongside excluded secret fields, contain no raw/recoverable secret, expose permitted evidence and gaps for excluded values, and obey destination-specific allowlists and minimization;
 - an excluded deterministic path satisfies every exclusion condition; and
 - an instrumented library leaves provider, consumer, exporter, and storage ownership to its host.
 

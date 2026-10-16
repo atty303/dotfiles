@@ -47,6 +47,7 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 ## Verify causally
 
 - [failure oracle and causal verification](../../references/failure-oracle-and-causal-verification.md) を完了判定に使う。Command開始だけでdownstreamの永続化や副作用を断定せず、contractが終わるboundaryをagent自身が観測する。
+- 観測契約が適用される変更では、[program observability contract](../../references/agent-computer-interface-observability.md) のDiagnostic sufficiencyとconformanceを、source上の入力・判断・境界と実際の通常runの保持済み記録の対応から検証する。Instrumentationの存在だけで完了とせず、切り分け不能な欠落や過剰な秘匿を修正し、未検証boundaryを明示する。独立review不要の変更でもこの検証は省かない。
 - Formatter、lint、型検査、対象test、runtime observation、build、標準check、最終出力の順に安価な検証から進める。`mise run check`が自動修正を示した場合は対象を限定した`mise run fix`後に再checkする。Suppression、型検査無効化またはtest skipで通さない。
 - 状態を変える検証は隔離した使い捨て環境で行う。実dataまたは通常profileでしか検証できない場合は対象、変更、riskおよび復旧方法を示して承認を得る。CLI後にGUIだけ未確認なら、利用可能と仮定せず `$verify-with-computer-use` を使う。
 - 必須testやoracleが予期せず失敗、timeoutまたはflakyになったら、workaroundや根拠のない再試行の前に `$investigate-problem` を使う。Repository-controlledな原因は依頼範囲内で最も近い原典を修正し、外因または未確認boundaryは証拠とともに分けて報告する。

@@ -13,6 +13,7 @@ description: 非自明な開発対象programの経路について、実装前に
 ## Inspect before designing
 
 - 結果面、操作面、telemetry、structured log、state query、artifact、recording、retention、利用者control、およびapplication/library ownershipをsourceとruntimeから確認する。
+- 適用経路のsourceから、実際に参照する入力、重要な判断・変換、および処理境界を洗い出し、契約のDiagnostic sufficiencyに照らして既存記録と対応付ける。各項目の記録先、安全な表現、診断上不要として省く理由、または残る欠落を実装前に確定する。Data handlingを項目別に適用し、容器の種類だけで秘匿しない。
 - 不具合修正では `$investigate-problem` が固定したoracle、保持済みrun、記録完全性および未確認boundaryを入力にする。既存証拠で原因と修正確認に必要な段階を識別できるなら新しいinstrumentationを追加しない。
 
 ## Define the smallest observation surface
@@ -20,7 +21,7 @@ description: 非自明な開発対象programの経路について、実装前に
 - 利用者操作に対応するDiagnostic RunとResource、およびfailureを区別する最小のOperation、Event、Status、Error Type、Context・Link、Artifactを定める。
 - 結果面、操作面、out-of-bandな観測面とdiagnostic IDを分離する。通常code pathを観測し、public stdout、stderr、API responseまたはUIをagent向けtransportにしない。
 - Instrumentationと有界local recordingを既定有効・opt-out可能、remote exportを既定無効・明示opt-inとする。正常runの猶予保持、failure優先保持、retention、削除、safe export、recording healthおよびresource上限を定める。
-- Attributeとartifactをsource allowlistで最小化し、観測failureの非干渉性と記録完全性を定める。Libraryはhostのprovider、contextまたはsinkを使い、SDK、global provider、exporterまたは保存先を所有しない。
+- Attributeとartifactは診断充足性を満たすsource allowlistで選び、観測failureの非干渉性と記録完全性を定める。Libraryはhostのprovider、contextまたはsinkを使い、SDK、global provider、exporterまたは保存先を所有しない。
 - 既存標準面、runtimeのidiomatic機構、OTel互換API、小さなdiagnostic sinkの順で最小実装を選ぶ。OTel SDK、OTLPまたはCollector自体を目的にせず、新規dependencyは`$develop-repository`の事前承認gateへ戻す。
 
 ## Implement and verify
@@ -28,6 +29,7 @@ description: 非自明な開発対象programの経路について、実装前に
 - 観測不足ならproduct fixより先の論理変更として最小経路を実装し、同じfailureで必要な段階と完全性を取得してから修正する。新機能では結果・操作面と同じ最初の実装に含める。
 - Operation ownerがcauseを保持したfailureを一度記録し、handled failure、retry、cancel、timeoutおよびfinal resultを区別する。
 - 変更経路に到達可能なconformance scenarioだけを選び、有効・無効時のpublic behavior、local保持、remote未送信、recording failure、partial・dropped、privacy fixture、retention、削除およびownershipを比例的に検証する。
+- 入力・判断と記録の対応を実際の通常runで検証し、同じ終了結果になる異なる経路を保持済み記録で区別できるか確認する。追加ログや詳細modeでの再実行を充足の証拠とせず、区別できない箇所は欠落として修正または報告する。
 
 ## Hand back or stop
 

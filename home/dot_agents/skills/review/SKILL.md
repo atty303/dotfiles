@@ -24,6 +24,8 @@ description: 明示的に依頼された変更、またはsecurity、authority�
 
 不具合修正では、変更後も元oracleがfailする反例と、変更で新しく到達するdownstream state、意味変換、retry、re-entryおよび逆操作を確認する。Cross-processまたはresource変更では、境界両側のdata/control flow、failure、timeout、signal、cleanup ownershipおよび残留状態を追う。
 
+Program経路のreviewでは [program observability contract](../../references/agent-computer-interface-observability.md) を読み適用判定する。対象なら実装者のログ項目一覧だけに依存せず、変更経路と再利用される共有境界のsourceから入力・重要な判断・処理境界を追い、記録の実装と通常runの保持済み証拠に照合してDiagnostic sufficiencyとconformanceを確認する。正常終了・無処理や同じ終了結果になる別経路も調べ、漏えいと過剰な秘匿の両方にdata handlingを適用する。到達可能な状況で何と何を区別できず、どの情報が欠けるかを示せる不足は契約上の欠陥として指摘する。必要なrun証拠がなければ充足と断定せず未検証として報告する。診断上の効果を説明できない詳細記録は要求せず、適用除外の条件も確認する。
+
 ## Adjudicate findings
 
 - Reviewerの最終報告まで修正を始めない。Main agentが各候補をsource、型、実行経路、validationおよびtestで検証する。
