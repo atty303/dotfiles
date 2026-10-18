@@ -19,8 +19,6 @@ output $out_middle {
     position 1728,1220
     scale 1
     allow_tearing yes
-#    adaptive_sync on
-#    subpixel none
     render_bit_depth 10
     hdr on
     layout_type horizontal
@@ -28,11 +26,10 @@ output $out_middle {
     layout_default_height 1
 }
 output $out_right {
-    resolution 3840x2160
+    resolution 2560x1440@239.970Hz
     position 6848,0
-    scale 1.25
+    scale 1
     transform 90
-    subpixel rgb
     layout_type vertical
     layout_default_width 1
     layout_default_height 0.5
