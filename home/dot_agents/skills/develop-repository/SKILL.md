@@ -37,11 +37,7 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 - Module等の移動・分割・責務再配置では、対象の実装本体を新しい場所へ移し、内部参照も新経路へ更新する。旧経路のre-export等は確認済みの公開互換性契約に必要な場合だけ残す。実装本体を移せなければ移動完了とせず、理由と残作業を報告する。
 - Program経路を追加・変更する前に `$design-program-observability` で適用判定する。対象なら [program observability contract](../../references/agent-computer-interface-observability.md) に従い、変更経路と再利用される共有境界だけを準拠させる。
 - 不具合修正は先に `$investigate-problem` で原因とoracleを確定する。[failure oracle and causal verification](../../references/failure-oracle-and-causal-verification.md) に従い、既存証拠でfailure段階を識別できなければproduct fixより先に最小観測経路を作る。
-- 文書の新設・更新前に、projectの性質と文書の目的から対象読者と用途を判断する。曖昧なrepo READMEは製品の導入・利用者向けを既定とし、既存の開発情報の混在を追記の根拠にしない。公開APIを使う開発者も製品利用者であり、repoを変更する開発者とは区別する。
-- 利用者向け文書は、実装知識なしで導入、操作、設定および公開APIの利用に必要な説明を置く。Repoのbuild、test、検証手順を製品利用者向けREADMEに混ぜない。
-- Repo開発者向け文書は、責務、境界、主要なdata flowなど全体観を素早く把握する地図とし、codeを横断する独立した説明が必要なものだけを置く。設計意図・制約も俯瞰に必要なものだけを文書に置き、局所的なものはcodeの近くのcommentに置く。内部仕様・処理手順などの詳細はcodeをSSOTとし、別文書でも再説明しない。
-- READMEなどの文書、code commentおよびPR説明は、基本判断原則に従い読者・用途・粒度から構成する。更新する説明のまとまりを既存記述も含めて読み直し、追記を既定にせず、不要な経緯・比較・念押し・重複・詳細を削除・統合・書き換えで整理する。読者に必要な比較、制約および理由は残す。実装変更、変更file数、網羅性および成果の可視化は記述を増やす理由にしない。必要性が曖昧なら書かず、文書変更なしを正常な完了とする。無関係な箇所の全面整理へ広げない。
-- PR説明は最終的な問題、変更後の挙動、判断に必要な理由および検証をreviewerへ自足的に伝える。実装中の経緯を知らないreviewerの判断に必要かで情報を選ぶ。
+- 共通guidanceのDocumentation方針で必要性が成立した説明だけを、既存の適切なownerへ統合・置換する。曖昧なREADMEは製品利用者向けと判断し、repoのbuild・test手順を混ぜない。PR説明も実装会話を知らないreviewerの判断に必要な内容だけにする。
 - 実行方法とその意図はmise taskなどの実行可能な原典に置き、AGENTS.mdには原典から読み取れない抽象的な行動原則だけを書く。場面別のtask選択や起動手順を転記しない。
 
 ## Verify causally
@@ -54,14 +50,18 @@ description: 開発、修正、リファクタリング、レビュー対応な�
 
 ## Decide independent review
 
-Fresh independent reviewは次のclosed setに該当するときだけ必須とする。
+独立code reviewは従来どおり、次のclosed setに該当するときだけ必須とする。Doc reviewの必須条件とは別に判定する。
 
 - ユーザー、repositoryまたは適用skillが明示的に要求する。
 - Security、secret、privacy、authority、identity、permissionまたはtrust boundaryを変更する。
 - 破壊的・不可逆操作、migration、data loss、公開API・protocol・永続format・compatibilityを変更する。
 - Concurrency、async、cross-process、resource lifecycle、retry、recovery、releaseまたはdeploy workflowを変更する。
 
-Closed-set triggerは成果物種別による次の除外より優先する。Triggerに該当しない既存contract内の局所修正、documentation、単純な設定および決定的生成物は、他のguidanceが要求しない限りfresh review不要である。必須時はcommit前に [$review](../review/SKILL.md) をすべて読み、比較対象とexact diffを固定してfresh subagentまたは同等の独立agentに渡す。利用不能なら自己reviewで代替せずblockedとする。
+Closed-set triggerに該当しない既存contract内の局所修正、doc、単純な設定および決定的生成物は独立code review不要である。
+
+独立doc reviewは、共通guidanceのdocに当たる新設・更新・削除すべてで必須とする。Docだけ、code commentだけ、PR説明だけの変更も対象であり、拡張子やcode reviewの要否で免除しない。PR説明などrepo外の文面も変更前後をsnapshotに含め、公開・更新前にreviewする。
+
+いずれかが必須なら [$review](../review/SKILL.md) をすべて読み、比較対象とexact diffを固定してcommitまたは文面の公開・更新前に実施する。両方が必要なら同じ変更時点のsnapshotを別々のfresh reviewerへ渡して並行起動し、同一reviewerに兼任させない。利用不能な必須reviewは自己reviewで代替せずblockedとする。
 
 ## Commit and preserve task evidence
 

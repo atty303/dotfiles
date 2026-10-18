@@ -1,7 +1,7 @@
 interface:
-  display_name: "独立コードレビュー"
-  short_description: "fresh subagentで実装履歴から独立してコード変更をレビューする"
-  default_prompt: "$review を使って、現在のコード変更を独立した観点でレビューしてください。"
+  display_name: "独立レビュー"
+  short_description: "docとcodeの独立reviewを分離し、必要なreviewerを起動する"
+  default_prompt: "$review を使って、現在の変更に必要な独立doc reviewと独立code reviewを実施してください。"
 
 policy:
   allow_implicit_invocation: false
