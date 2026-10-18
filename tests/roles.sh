@@ -126,6 +126,23 @@ FAKE_UNAME=Linux run_install "$log" --prompt-roles --verbose
 grep -Fxq -- '--verbose' "$log"
 
 desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"bazzite","idLike":"fedora"}}}'
+for os in linux darwin windows; do
+  extension="sh"
+  if [[ $os == windows ]]; then
+    extension=ps1
+  fi
+  font_script=".chezmoiscripts/$os/install-fonts.$extension"
+  for roles in '[]' '["development","secrets"]' '["desktop"]'; do
+    scripts="$(chezmoi --config "$managed_config" managed --include scripts --source "$repository" \
+      --override-data "{\"roles\":$roles,\"chezmoi\":{\"os\":\"$os\"}}")"
+    if [[ $roles == '["desktop"]' ]]; then
+      grep -Fxq "$font_script" <<<"$scripts"
+    elif grep -Fxq "$font_script" <<<"$scripts"; then
+      printf 'non-desktop roles selected font installation on %s\n' "$os" >&2
+      exit 1
+    fi
+  done
+done
 fedora_desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"fedora","idLike":""}}}'
 ubuntu_desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"ubuntu","idLike":"debian"}}}'
 baseline_data='{"roles":[],"chezmoi":{"osRelease":{"id":"bazzite","idLike":"fedora"}}}'

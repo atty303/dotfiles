@@ -135,6 +135,9 @@ src/
 .var/app/com.obsproject.Studio/
 {{ end }}
 {{ if not (has "desktop" .roles) }}
+.chezmoiscripts/linux/install-fonts.sh
+.chezmoiscripts/darwin/install-fonts.sh
+.chezmoiscripts/windows/install-fonts.ps1
 .config/chrome-web-apps/
 .local/bin/chrome-web-app
 .local/bin/open-in-default-browser
