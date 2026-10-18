@@ -27,7 +27,7 @@ oauth_export_env = ""
 
 [tools]
 age = { version = "1.3.2", lazy = true }
-"atuin" = { "version" = "18.23.0", "lazy" = true, "os" = [
+"atuin" = { "version" = "18.24.1", "lazy" = true, "os" = [
   "linux/arm64",
   "linux/x64",
   "macos/arm64",
@@ -46,7 +46,7 @@ age = { version = "1.3.2", lazy = true }
   "macos/arm64",
   "macos/x64",
 ] }
-"bun" = { "version" = "1.4.2", "lazy" = true, "os" = [
+"bun" = { "version" = "1.4.3", "lazy" = true, "os" = [
   "linux/arm64",
   "linux/x64",
   "macos/arm64",
@@ -60,7 +60,7 @@ age = { version = "1.3.2", lazy = true }
   "macos/x64",
   "windows/x64",
 ] }
-"cargo-binstall" = { "version" = "1.25.1", "lazy" = true, "os" = [
+"cargo-binstall" = { "version" = "1.25.3", "lazy" = true, "os" = [
   "linux/arm64",
   "linux/x64",
   "macos/arm64",
@@ -76,14 +76,14 @@ age = { version = "1.3.2", lazy = true }
   "macos/x64",
   "windows/x64",
 ] }
-"claude" = { "version" = "2.1.291", "lazy" = true, "os" = [
+"claude" = { "version" = "2.1.302", "lazy" = true, "os" = [
   "linux/arm64",
   "linux/x64",
   "macos/arm64",
   "macos/x64",
   "windows/x64",
 ] }
-"codex" = { "version" = "0.160.1", "lazy" = true, "os" = [
+"codex" = { "version" = "0.163.0", "lazy" = true, "os" = [
   "linux/arm64",
   "linux/x64",
   "macos/arm64",
@@ -111,7 +111,7 @@ age = { version = "1.3.2", lazy = true }
   "macos/x64",
   "windows/x64",
 ] }
-"fzf" = { "version" = "0.74.4", "lazy" = true, "os" = [
+"fzf" = { "version" = "0.74.5", "lazy" = true, "os" = [
   "linux/arm64",
   "linux/x64",
   "macos/arm64",
@@ -139,29 +139,20 @@ age = { version = "1.3.2", lazy = true }
   "macos/x64",
   "windows/x64",
 ] }
-"jj" = { "version" = "0.45.1", "lazy" = true, "os" = [
+"jj" = { "version" = "0.46.0", "lazy" = true, "os" = [
   "linux/arm64",
   "linux/x64",
   "macos/arm64",
   "macos/x64",
   "windows/x64",
 ] }
-"github:dmmulroy/jj-starship" = { "version" = "0.7.4", "lazy" = true, "lazy_bins" = [
-  "jj-starship",
-], "os" = [
-  "linux/arm64",
-  "linux/x64",
-  "macos/arm64",
-  "macos/x64",
-  "windows/x64",
-], "postinstall" = "chmod a+x ${MISE_TOOL_INSTALL_PATH}/jj-starship" }
 "github:atty303/konamate" = { "version" = "4.0.0", "lazy" = true, "lazy_bins" = [
   "konamate",
 ], "os" = [
   "linux/arm64",
   "linux/x64",
 ] }
-"node" = { "version" = "26.10.0", "lazy" = true, "os" = [
+"node" = { "version" = "26.12.0", "lazy" = true, "os" = [
   "linux/arm64",
   "linux/x64",
   "macos/arm64",
@@ -266,16 +257,16 @@ age = { version = "1.3.2", lazy = true }
   "macos/x64",
   "windows/x64",
 ] }
-"github:UniClipboard/UniClipboard" = { "version" = "0.19.4", "lazy" = true, "lazy_bins" = [
+"github:UniClipboard/UniClipboard" = { "version" = "1.1.2", "lazy" = true, "lazy_bins" = [
   "uniclip",
-], "os" = [
+], "matching" = "uniclipboard-cli-", "os" = [
   "linux/arm64",
   "linux/x64",
   "macos/arm64",
   "macos/x64",
   "windows/x64",
 ] }
-"usage" = { "version" = "6.12.1", "lazy" = true, "os" = [
+"usage" = { "version" = "7.0.2", "lazy" = true, "os" = [
   "linux/arm64",
   "linux/x64",
   "macos/arm64",
@@ -347,7 +338,7 @@ bin = "ona"
 "windows-arm64" = { "url" = "https://app.gitpod.io/releases/cli/stable/gitpod-windows-arm64.exe" }
 
 [tools."http:onefetch"]
-version = "2.28.1"
+version = "3.0.0"
 lazy = true
 lazy_bins = ["onefetch"]
 os = ["linux/x64", "macos/arm64", "windows/x64"]
@@ -356,6 +347,6 @@ version_json_path = ".[].tag_name"
 version_order = "semver"
 
 [tools."http:onefetch".platforms]
-"linux-x64" = { "url" = "https://github.com/o2sh/onefetch/releases/download/{{ version }}/onefetch-linux.tar.gz", "checksum" = "sha256:ddf1b1b9f057cdbf71172324de24074e4615fcefd70ce09ab782e9ad5fe41b66", "size" = 6432551 }
-"macos-arm64" = { "url" = "https://github.com/o2sh/onefetch/releases/download/{{ version }}/onefetch-mac.tar.gz", "checksum" = "sha256:f0e2938c504534c7525e66ea5624489745802f0c53eb02d866103505b305640a", "size" = 5911126 }
-"windows-x64" = { "url" = "https://github.com/o2sh/onefetch/releases/download/{{ version }}/onefetch-win.tar.gz", "checksum" = "sha256:f896cca9736d5b277025d28d30862577bc30c155dc22670ace63f2ec432f3359", "size" = 6001726 }
+"linux-x64" = { "url" = "https://github.com/o2sh/onefetch/releases/download/{{ version }}/onefetch-linux.tar.gz", "checksum" = "sha256:ae5bbdcb44201b17b75ab76f1cfca103972bf168f06897466385c09a05a9e954", "size" = 6431563 }
+"macos-arm64" = { "url" = "https://github.com/o2sh/onefetch/releases/download/{{ version }}/onefetch-mac.tar.gz", "checksum" = "sha256:594b0e8ab771e9cffec8e788324b46b4f859dbfb472586231af8ee38c7f554b3", "size" = 5881704 }
+"windows-x64" = { "url" = "https://github.com/o2sh/onefetch/releases/download/{{ version }}/onefetch-win.tar.gz", "checksum" = "sha256:b17143631ccd4381705c9e118dd675b209e40ceda4ab6de196a9d7edf558e714", "size" = 6014409 }

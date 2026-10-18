@@ -15,7 +15,11 @@ $username\
 [](fg:yellow bg:green)\
 $directory\
 [ ](fg:green bg:sapphire)\
-${custom.vcs_status}\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
 [](fg:sapphire bg:lavender)\
 $job\
 $cmd_duration\
@@ -218,21 +222,6 @@ format = '([+$added ]($added_style))([-$deleted ]($deleted_style))'
 disabled = false
 style = "bg:sapphire fg:crust"
 format = '([\[$all_status$ahead_behind\] ]($style))'
-
-[custom.jj]
-disabled = false
-symbol = ""
-style = "bg:sapphire fg:crust"
-format = '[$output]($style)'
-when = true
-shell = ["jj-starship", "--no-color"]
-
-[custom.vcs_status]
-when = true
-command = "jj root >/dev/null 2>&1; [[ $? -eq 0 ]] && starship module custom.jj || (starship module git_branch; starship module git_commit; starship module git_state; starship module git_metrics; starship module git_status )"
-style = "bg:sapphire fg:crust"
-format = "$output"
-shell = 'bash'
 
 # -------------------------------- level 6
 [cmd_duration]
