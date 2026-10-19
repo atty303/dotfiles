@@ -1,7 +1,7 @@
 # Agent-Computer Interface program observability contract
 
 Status: Living Standard  
-Last updated: 2026-10-16
+Last updated: 2026-10-20
 
 ## Scope and dependencies
 
@@ -46,13 +46,13 @@ Do not turn public stdout, stderr, API responses, or UI into agent diagnostic tr
 - **Status and Error Type** distinguish at least success, error, cancellation, and timeout. A stable machine-readable error type such as `permission_denied` or `schema_invalid` identifies class; messages, bodies, paths, inputs, and dynamic IDs do not. Reuse an applicable OTel convention.
 - **Context and Link** propagate run and operation identity across thread, async, queue, process, and runtime boundaries. Links represent retry, fan-out, batch, producer/consumer, and non-parental relationships. Context MUST NOT transport credentials or arbitrary user data.
 - **Artifact** references evidence too large or unsuitable for attributes: screenshot, video, DOM or state snapshot, structured test result, redacted shape, generated output, or core dump. Associate kind, producer operation, time, location, schema/format, retention, and classification. Artifact existence alone is not success.
-- **Attribute** is an allowlisted structured value with defined meaning, unit, cardinality, necessity, and classification. Reuse conventions and avoid synonyms.
+- **Attribute** is a structured value selected for diagnostic relevance with defined meaning, unit, and cardinality. Apply data handling to protected portions. Reuse conventions and avoid synonyms.
 
 ## Diagnostic sufficiency
 
 For applicable paths, normal-run records MUST retain enough evidence to narrow the first divergence between expected and actual behavior within the observed path. An exit code, final status, stage names, or counts alone do not satisfy this requirement when different inputs or decisions remain indistinguishable. Cover successful and no-op runs as well as detected failures; requiring a rerun with added logs or an opt-in detail mode does not satisfy normal-run recording.
 
-- Record behavior-affecting inputs actually consulted, including CLI arguments, environment variables, and configuration, as individually classified fields with safe effective values and their sources. Distinguish unset, empty, and defaulted values, including precedence and resolution or normalization when they affect behavior. Omitting an input as diagnostically unnecessary requires a reason in the observation design.
+- Record behavior-affecting inputs actually consulted, including CLI arguments, environment variables, and configuration, with effective values and their sources, masking identified protected portions under data handling. Distinguish unset, empty, and defaulted values, including precedence and resolution or normalization when they affect behavior. Omitting an input as diagnostically unnecessary requires a reason in the observation design.
 - For important branches, target selection, transformations, skips, fallbacks, retries, and state transitions, retain the values used, condition or rule applied, and decision or transformation result, connected to the preceding and following operations. Preserve enough evidence to distinguish plausible alternatives, including why work was not performed; a count without the selection or exclusion basis may be insufficient.
 - Choose granularity by diagnostic value, not function boundaries. Do not dump the whole environment or record every function or variable. Reuse shared boundary instrumentation and bounded artifacts where appropriate; aggregation or truncation MUST expose the resulting diagnostic gaps rather than imply full coverage.
 
@@ -77,9 +77,9 @@ Each application defines and exposes enablement/opt-out, store and permissions, 
 
 ## Data and privacy
 
-Apply [data handling](data-handling.md) at instrumentation time through source allowlists; downstream filtering is defense in depth, not a replacement. Raw or recoverable credentials never enter records or artifacts. Credential kind, key ID, or expiry may be allowlisted when it cannot recover or test the value.
+Apply [data handling](data-handling.md) at instrumentation time. Select sources for diagnostic relevance; source selection is not a safety allowlist that rejects unknown output. Mask identified protected portions before recording; downstream filtering is defense in depth, not a replacement. Raw or recoverable credentials never enter records or artifacts.
 
-Record bodies, clipboard, input text, conversations, screens, personal files, full URLs, command lines, environment, exceptions, or stack traces only as individually classified fields whose necessity and safe representation are defined. A path, argument, or environment variable is not grounds for redaction by its form alone; retain safe operational values needed for authorized local diagnosis. When a value cannot be retained, preserve permitted surrounding evidence such as presence, source, and decision result, and make the diagnostic gap explicit. These representations MUST also be classified; they are not automatically safe. Remote export and public artifacts minimize unnecessary person- or host-specific values. Stored records and artifacts are user data with least permission, bounded retention, and deletion. Agents read only runs needed for the authorized investigation and do not send them to unrelated services.
+Preserve necessary bodies, input text, stderr, exceptions, stack traces, and other diagnostic content under that default, including unstructured messages. Exhaustive classification or proof of safety is not a prerequisite to recording the rest of a message. When a protected portion must be omitted, retain the surrounding error, operation, input source, and decision evidence, and make the diagnostic gap explicit. Apply recipient-specific restrictions to actual third-party disclosure; remote placement alone is not such a boundary. Remote export still requires the explicit opt-in above, including export within the control domain. Stored records and artifacts are user data with least permission, bounded retention, and deletion. Agents read only runs needed for the authorized investigation and do not send them to unrelated services.
 
 ## Non-interference and bounds
 
@@ -101,7 +101,7 @@ Test only scenarios reachable from the changed path, but cover each applicable c
 - no configured remote means no remote diagnostic transmission;
 - async/retry preserves parent, link, attempt, and final-result distinctions;
 - timeout, cancellation, and crash are distinct, with pre-crash buffer retained when practical;
-- classified fixtures preserve diagnostically necessary safe paths and environment values alongside excluded secret fields, contain no raw/recoverable secret, expose permitted evidence and gaps for excluded values, and obey destination-specific allowlists and minimization;
+- privacy fixtures preserve unknown error text, necessary paths and environment values, and causal context beside masked secrets, including a secret and its error on the same line; they contain no raw/recoverable secret and apply actual recipient-specific restrictions without suppressing the remaining diagnostic content;
 - an excluded deterministic path satisfies every exclusion condition; and
 - an instrumented library leaves provider, consumer, exporter, and storage ownership to its host.
 

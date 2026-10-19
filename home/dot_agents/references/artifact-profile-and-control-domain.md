@@ -13,13 +13,13 @@ This portable reference defines review and verification scope. It depends on [da
 
 ## Control domain
 
-The default trusted domain is the personal computing environment owned and managed by one user. Without an explicit mutual-distrust or isolation contract, its accounts, UIDs, root, processes, services, filesystems, local IPC, containers, and VMs are in one domain.
+The default trusted domain is the computing environment owned and managed by one user, including user-managed cloud accounts and resources. Apply the recipient and access rules in [data handling](data-handling.md); remote placement or an external service provider alone does not create a third-party destination. Without an explicit mutual-distrust or isolation contract, its accounts, UIDs, root, processes, services, filesystems, local IPC, containers, and VMs are in one domain.
 
 Trust boundaries are:
 
 - network endpoints controlled by another subject;
 - externally controlled data or executable code accepted as input or an unverified payload, even after local storage;
-- accounts, credentials, or resources owned by another person, organization, or service;
+- accounts, credentials, or resources under another subject's control, and public access to otherwise user-managed resources;
 - explicit multi-tenant, mutual-distrust, or guaranteed isolation boundaries; and
 - a change in distribution or operating ownership that introduces a new controlling subject.
 
