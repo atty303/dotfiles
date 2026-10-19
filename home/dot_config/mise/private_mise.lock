@@ -642,6 +642,23 @@ specifiers = ["2.1"]
 checksum = "sha256:59e81ea9b72533c3ff548fb9bfd5c072134f3aacfde82298f86a41229e13c6ba"
 url = "https://github.com/vimpostor/blobdrop/releases/download/v2.1/blobdrop-2.1-x86_64-archlinux.pkg.tar.zst"
 
+[[tools."http:cyloud"]]
+version = "2.418.0"
+backend = "http:cyloud"
+specifiers = ["2.418.0"]
+
+[tools."http:cyloud"."platforms.linux-arm64"]
+url = "https://toolbox.cycloud.jp/assets/v1/cli/latest/cycloud_linux_arm64.tar.gz"
+
+[tools."http:cyloud"."platforms.linux-x64"]
+url = "https://toolbox.cycloud.jp/assets/v1/cli/latest/cycloud_linux_amd64.tar.gz"
+
+[tools."http:cyloud"."platforms.macos-arm64"]
+url = "https://toolbox.cycloud.jp/assets/v1/cli/latest/cycloud_darwin_arm64.tar.gz"
+
+[tools."http:cyloud"."platforms.windows-x64"]
+url = "https://toolbox.cycloud.jp/assets/v1/cli/latest/cycloud_windows_amd64.tar.gz"
+
 [[tools."http:ona"]]
 version = "stable"
 backend = "http:ona"

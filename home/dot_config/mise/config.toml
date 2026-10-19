@@ -315,6 +315,12 @@ version_order = "semver"
 [tools."http:blobdrop".platforms]
 "linux-x64" = { "url" = "https://github.com/vimpostor/blobdrop/releases/download/v{{ version }}/blobdrop-{{ version }}-x86_64-archlinux.pkg.tar.zst", "checksum" = "sha256:59e81ea9b72533c3ff548fb9bfd5c072134f3aacfde82298f86a41229e13c6ba", "size" = 141580 }
 
+[tools."http:cyloud"]
+version = "2.418.0"
+url = "https://toolbox.cycloud.jp/assets/v1/cli/latest/cycloud_{{os(macos=\"darwin\")}}_{{arch(x64=\"amd64\")}}.tar.gz"
+lazy = true
+lazy_bins = ["cycloud"]
+
 [tools."http:ona"]
 version = "stable"
 lazy = true
