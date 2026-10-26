@@ -17,10 +17,17 @@ render_config() {
 }
 
 grep -Fq 'roles = ["development", "desktop", "secrets"]' < <(render_config development/desktop/secrets)
-grep -Fq 'roles = ["development", "secrets"]' < <(
-  chezmoi execute-template --init --config "$empty_config" --config-format toml \
-    --source "$repository" <"$repository/home/.chezmoi.toml.tmpl"
-)
+for os in linux darwin windows; do
+  expected_roles='["development", "secrets"]'
+  if [[ $os != linux ]]; then
+    expected_roles='["development", "desktop", "secrets"]'
+  fi
+  grep -Fq "roles = $expected_roles" < <(
+    CHEZMOI_ROLE_DEFAULTS='' chezmoi execute-template --init --config "$empty_config" --config-format toml \
+      --source "$repository" --override-data "{\"chezmoi\":{\"os\":\"$os\",\"kernel\":{\"osrelease\":\"test\"}}}" \
+      <"$repository/home/.chezmoi.toml.tmpl"
+  )
+done
 grep -Fq 'roles = ["desktop", "gaming"]' < <(
   CHEZMOI_ROLE_DEFAULTS=development,secrets chezmoi execute-template --init --source "$repository" \
     --override-data '{"roles":["desktop","gaming"]}' <"$repository/home/.chezmoi.toml.tmpl"
@@ -125,7 +132,7 @@ log="$temporary/prompt-verbose.log"
 FAKE_UNAME=Linux run_install "$log" --prompt-roles --verbose
 grep -Fxq -- '--verbose' "$log"
 
-desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"bazzite","idLike":"fedora"}}}'
+desktop_data='{"roles":["desktop"],"chezmoi":{"os":"linux","arch":"amd64","osRelease":{"id":"bazzite","idLike":"fedora"}}}'
 for os in linux darwin windows; do
   extension="sh"
   if [[ $os == windows ]]; then
@@ -143,10 +150,10 @@ for os in linux darwin windows; do
     fi
   done
 done
-fedora_desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"fedora","idLike":""}}}'
-ubuntu_desktop_data='{"roles":["desktop"],"chezmoi":{"osRelease":{"id":"ubuntu","idLike":"debian"}}}'
-baseline_data='{"roles":[],"chezmoi":{"osRelease":{"id":"bazzite","idLike":"fedora"}}}'
-secrets_data='{"roles":["secrets"]}'
+fedora_desktop_data='{"roles":["desktop"],"chezmoi":{"os":"linux","arch":"amd64","osRelease":{"id":"fedora","idLike":""}}}'
+ubuntu_desktop_data='{"roles":["desktop"],"chezmoi":{"os":"linux","arch":"amd64","osRelease":{"id":"ubuntu","idLike":"debian"}}}'
+baseline_data='{"roles":[],"chezmoi":{"os":"linux","arch":"amd64","osRelease":{"id":"bazzite","idLike":"fedora"}}}'
+secrets_data='{"roles":["secrets"],"chezmoi":{"os":"linux"}}'
 desktop_managed="$(chezmoi --config "$managed_config" managed --source "$repository" \
   --override-data "$desktop_data")"
 baseline_managed="$(chezmoi --config "$managed_config" managed --source "$repository" \
@@ -262,7 +269,7 @@ for platform in linux darwin windows wsl; do
     [[ $(git config --file "$config" --bool commit.gpgsign) == "$secrets" ]]
     [[ $(git config --file "$config" gpg.format) == ssh ]]
     if [[ $secrets == true ]]; then
-      [[ $(git config --file "$config" --path user.signingkey) == "$HOME/.ssh/git_signing_ed25519" ]]
+      [[ $(git config --file "$config" user.signingkey) == "$HOME/.ssh/git_signing_ed25519" ]]
     elif git config --file "$config" user.signingkey >/dev/null; then
       printf 'non-secrets Git configuration selected a signing key\n' >&2
       exit 1

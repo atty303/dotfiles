@@ -25,7 +25,7 @@
   name = Koji AGAWA
   email = atty303@gmail.com
 {{ if has "secrets" .roles }}
-  signingkey = ~/.ssh/git_signing_ed25519
+  signingkey = {{ printf "%s/.ssh/git_signing_ed25519" .chezmoi.destDir | quote }}
 {{ end }}
 
 [gpg]
