@@ -25,12 +25,3 @@ Host *.gitpod.remote
 # GitHub Codespaces
 Match all
   Include ~/.ssh/codespaces/*
-
-# Ona CLI SSH Integration
-Include "gitpod/config"
-# End of Ona CLI SSH Integration
-
-## START Gitpod Flex VS Code INTEGRATION
-## This section is managed by Gitpod. Any manual changes will be lost.
-Include "code_gitpod_flex.d/config"
-## END Gitpod Flex VS Code INTEGRATION
