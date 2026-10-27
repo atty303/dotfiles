@@ -31,7 +31,7 @@ Resolve the question and selected label from the complete thread's actual questi
 
 ## Completeness and data handling
 
-Before saving, enumerate the cycle start, every user message, and the last user message and compare them with the runtime's complete thread history. Current context, compaction summaries, prior agent summaries, or the latest request alone are not substitutes. Do not impose a line or character limit or truncate long transcripts. The complete human messages support later analysis of how to reduce necessary interaction; agent work remains summarized.
+Before saving, enumerate the cycle start, every user message, and the last user message and compare them with the retrieved thread history under the runtime condition below. Current context, compaction summaries, prior agent summaries, or the latest request alone are not substitutes. Do not impose a line or character limit or truncate long transcripts. The complete human messages support later analysis of how to reduce necessary interaction; agent work remains summarized.
 
 Apply [data handling](data-handling.md) before verbatim preservation. Assume the message has the repository remote's visibility. Replace secrets, confidential content, and unnecessary privacy-sensitive data with typed placeholders while preserving properties needed for analysis. Operational identifiers are not redacted merely for being identifiers.
 
@@ -43,4 +43,4 @@ Create no new task notes and do not update, fetch, merge, or push notes refs for
 
 ## Runtime condition
 
-In Codex, complete thread retrieval and comparison are mandatory. If unavailable, do not infer missing content or save an incomplete transcript; defer the final commit and report the capability boundary. Another runtime without an equivalent capability may explicitly skip the transcript, report that boundary, and complete the task if every other condition is satisfied.
+In Codex, retrieve and compare the thread history using available means. If a dedicated tool is unavailable or cannot retrieve it, also look for an available session log; a missing tool alone does not make history unavailable. For example, use `CODEX_THREAD_ID` and `CODEX_HOME` to locate the corresponding local session log when available. Check the thread ID, successful reading and parsing, and consistency with the known cycle start, latest user message, and other known messages. If these checks pass and there are no concrete signs of missing or truncated history, treat the log as complete. If they fail, or such signs exist, seek another retrieval method; if the issue remains unresolved, do not infer missing content or save an incomplete transcript, and defer the final commit and report the capability boundary. Another runtime without an equivalent capability may explicitly skip the transcript, report that boundary, and complete the task if every other condition is satisfied.
