@@ -1,0 +1,31 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- $begin := "# BEGIN chezmoi managed SSH config\n" -}}
+{{- $end := "# END chezmoi managed SSH config\n" -}}
+{{- $input := .chezmoi.stdin -}}
+{{- $outside := "" -}}
+{{- if eq $input "" -}}
+{{- else if hasPrefix $begin $input -}}
+{{-   $parts := splitList $end $input -}}
+{{-   if or (ne (len $parts) 2) (ne (len (splitList $begin $input)) 2) -}}
+{{-     fail "SSH config has ambiguous chezmoi block markers; no changes made" -}}
+{{-   end -}}
+{{-   $outside = index $parts 1 -}}
+{{- else -}}
+{{-   $legacy := includeTemplate "ssh-config-legacy" . -}}
+{{-   $sections := splitList "# If the SSH agent is not forwarded" $legacy -}}
+{{-   $prefix := index $sections 0 -}}
+{{-   $suffix := printf "# If the SSH agent is not forwarded%s" (index $sections 1) | trimSuffix "\n" -}}
+{{-   if or (not (hasPrefix $prefix $input)) (ne (len (splitList $suffix $input)) 2) (contains $begin $input) (contains $end $input) -}}
+{{-     fail "SSH config cannot be safely migrated; no changes made" -}}
+{{-   end -}}
+{{-   $parts := splitList $suffix (trimPrefix $prefix $input) -}}
+{{-   $after := index $parts 1 -}}
+{{-   if and (ne $after "") (not (hasPrefix "\n" $after)) -}}
+{{-     fail "SSH config cannot be safely migrated; no changes made" -}}
+{{-   end -}}
+{{-   $outside = printf "%s%s" (index $parts 0) (trimPrefix "\n" $after) -}}
+{{- end -}}
+{{- $begin -}}
+{{- includeTemplate "ssh-config" . -}}
+{{- $end -}}
+{{- $outside -}}
