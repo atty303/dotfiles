@@ -37,9 +37,6 @@ There is no compilation step. Validate on the relevant operating system, especia
 
 - Inspect rendered changes with `chezmoi diff <target>` before applying them.
 - `mise generate tool-stub` may create an adjacent `.cmd` launcher. Treat that launcher as part of the generated stub and retain it in source state; do not delete it merely because earlier stubs did not include one.
-- Do not try `chezmoi apply <target>` inside the sandbox first. Request `require_escalated` approval
-  for every execution without using an existing persistent approval, requesting a `prefix_rule`, or
-  granting permanent write access to the chezmoi state database.
 - Apply only explicitly named targets and confirm their diffs are empty afterward. Never run an
   untargeted bulk `chezmoi apply`.
 - When a newly managed nested target has missing parent directories, include each required parent
