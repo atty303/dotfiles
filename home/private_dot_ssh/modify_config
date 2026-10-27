@@ -1,8 +1,6 @@
 {{- /* chezmoi:modify-template */ -}}
 {{- $begin := "# BEGIN chezmoi managed SSH config v2\n" -}}
 {{- $end := "# END chezmoi managed SSH config v2\n" -}}
-{{- $oldBegin := "# BEGIN chezmoi managed SSH config\n" -}}
-{{- $oldEnd := "# END chezmoi managed SSH config\n" -}}
 {{- $input := .chezmoi.stdin -}}
 {{- $outside := "" -}}
 {{- if eq $input "" -}}
@@ -12,35 +10,8 @@
 {{-     fail "SSH config has ambiguous chezmoi block markers; no changes made" -}}
 {{-   end -}}
 {{-   $outside = index $parts 1 -}}
-{{- else if hasPrefix $oldBegin $input -}}
-{{-   $parts := splitList $oldEnd $input -}}
-{{-   if or (ne (len $parts) 2) (ne (len (splitList $oldBegin $input)) 2) -}}
-{{-     fail "SSH config has ambiguous chezmoi block markers; no changes made" -}}
-{{-   end -}}
-{{-   $outside = index $parts 1 -}}
-{{-   $oldManaged := index $parts 0 -}}
-{{-   $boundary := "  Include ~/.ssh/codespaces/*\n" -}}
-{{-   $sections := splitList $boundary $oldManaged -}}
-{{-   if ne (len $sections) 2 -}}
-{{-     fail "SSH config has ambiguous managed content; no changes made" -}}
-{{-   end -}}
-{{-   $before := index $sections 0 -}}
-{{-   $legacyBefore := includeTemplate "ssh-config-legacy" . | splitList $boundary | first | printf "%s%s" $oldBegin -}}
-{{-   $currentBefore := includeTemplate "ssh-config" . | splitList $boundary | first | printf "%s%s" $oldBegin -}}
-{{-   if and (ne $before $legacyBefore) (ne $before $currentBefore) -}}
-{{-     fail "SSH config has ambiguous managed content; no changes made" -}}
-{{-   end -}}
-{{-   $outside = printf "%s%s" (index $sections 1) $outside -}}
 {{- else -}}
-{{-   $legacy := includeTemplate "ssh-config-legacy" . -}}
-{{-   $sections := splitList "# If the SSH agent is not forwarded" $legacy -}}
-{{-   $prefix := index $sections 0 -}}
-{{-   $suffix := printf "# If the SSH agent is not forwarded%s" (index $sections 1) | splitList "# Ona CLI SSH Integration\n" | first -}}
-{{-   if or (not (hasPrefix $prefix $input)) (ne (len (splitList $suffix $input)) 2) (contains $begin $input) (contains $end $input) (contains $oldBegin $input) (contains $oldEnd $input) -}}
-{{-     fail "SSH config cannot be safely migrated; no changes made" -}}
-{{-   end -}}
-{{-   $parts := splitList $suffix (trimPrefix $prefix $input) -}}
-{{-   $outside = printf "%s%s" (index $parts 0) (index $parts 1) -}}
+{{-   fail "SSH config has no managed block; no changes made" -}}
 {{- end -}}
 {{- $begin -}}
 {{- includeTemplate "ssh-config" . -}}
