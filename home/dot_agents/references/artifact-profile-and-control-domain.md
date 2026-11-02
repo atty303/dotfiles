@@ -8,7 +8,7 @@ This portable reference defines review and verification scope. It depends on [da
 
 - A **spike** is a bounded hypothesis test that will not itself be released, reused, routinely operated, or depended on. A repository change is durable unless the request or repository source defines the hypothesis, end condition, and promotion condition. Do not demote an existing durable path for implementation convenience.
 - A **durable** artifact is intended for release, reuse, routine operation, or operational dependence.
-- A spike must still prove its hypothesis while preventing unauthorized effects, unintended data loss, secret or confidential-data leakage outside the control domain, unnecessary privacy-sensitive or personal operational identifiers in public or unrelated sinks, and unowned temporary resources.
+- A spike must still prove its hypothesis while preventing unauthorized effects, unintended data loss, unowned temporary resources.
 - Promotion to durable requires reclassifying and revalidating the whole retained artifact, then applying the current mandatory-review triggers. Spike evidence does not satisfy a review that those triggers require.
 
 ## Control domain

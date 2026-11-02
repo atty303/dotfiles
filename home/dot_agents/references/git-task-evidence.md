@@ -2,7 +2,7 @@
 
 ## Scope and dependencies
 
-This portable reference owns task-cycle evidence in commit messages. It depends on [data handling](data-handling.md). `develop-repository` owns repository operations and runtime-specific capability checks.
+This portable reference owns task-cycle evidence in commit messages. `develop-repository` owns repository operations and runtime-specific capability checks.
 
 ## Cycle and checkpoint
 
@@ -25,15 +25,13 @@ Include important environment, constraints, decisions, operations, observations,
 
 ### Dig selections
 
-Only for a selection response to a dig question, supplement the original human message with `  - Selection: Q<n> / <label>` between its quoted text and the `  - A:` summary. Quote the selected option's body exactly as presented, including continuation lines, with the same `    > ` prefix. This is assistant-sourced context, not human speech; preserve the original response separately even when it is only `a` or `b`. Apply the same data handling to the copied option text.
+Only for a selection response to a dig question, supplement the original human message with `  - Selection: Q<n> / <label>` between its quoted text and the `  - A:` summary. Quote the selected option's body exactly as presented, including continuation lines, with the same `    > ` prefix. This is assistant-sourced context, not human speech; preserve the original response separately even when it is only `a` or `b`.
 
 Resolve the question and selected label from the complete thread's actual question and response. A reply with added qualifications still retains those qualifications in the original human message. Do not infer a selection from the recommendation, a similar option, or a missing question. If the correspondence is ambiguous or unavailable, preserve the response and describe that limitation in the agent summary instead of fabricating a `Selection` entry. Do not apply this exception to selections outside dig or copy all unselected options.
 
-## Completeness and data handling
+## Completeness
 
 Before saving, enumerate the cycle start, every user message, and the last user message and compare them with the retrieved thread history under the runtime condition below. Current context, compaction summaries, prior agent summaries, or the latest request alone are not substitutes. Do not impose a line or character limit or truncate long transcripts. The complete human messages support later analysis of how to reduce necessary interaction; agent work remains summarized.
-
-Apply [data handling](data-handling.md) before verbatim preservation. Assume the message has the repository remote's visibility. Replace secrets, confidential content, and unnecessary privacy-sensitive data with typed placeholders while preserving properties needed for analysis. Operational identifiers are not redacted merely for being identifiers.
 
 ## Save and retain history
 

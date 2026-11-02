@@ -28,9 +28,7 @@
 
 ## Data safety
 
-- Password、private key、access/refresh token、session cookie、認証header、credential入りURLなど、所持により認証、認可、復号、署名またはなりすましが可能な値は、rawまたは復元可能な形で表示、記録またはcommitしない。
-- Confidential contentとprivacy-sensitive dataはauthorizedなtask内で必要な範囲だけ扱い、無関係な外部service、public artifactまたはlogへ送らない。
-- 権限不足時は、IAM管理が依頼または承認済みでない限りidentity、credential、role、policyまたはscopeを変更・拡張せず、失敗したactionとresourceを示して停止する。詳細分類とsink別規則は必要時に `~/.agents/references/data-handling.md` を読む。
+- 権限不足時は、IAM管理が依頼または承認済みでない限りidentity、credential、role、policyまたはscopeを変更・拡張せず、失敗したactionとresourceを示して停止する。
 
 ## Human-facing commands
 

@@ -31,39 +31,7 @@ function rootSession(
   options: { completed?: boolean; start?: string; assistantText?: string; userText?: string } = {},
 ): string {
   const start = options.start ?? ROOT_START;
-  const userText = options.userText ?? [
-    "fix this with ghp_abcdefghijklmnopqrstuvwxyz123456",
-    "password is hunter2",
-    "token=token-value-123",
-    "example --password flag-secret",
-    "https://alice:hunter2@example.com/path",
-    `xoxb-${"1234567890"}-abcdefghijklmnop`,
-    "AKIAABCDEFGHIJKLMNOP",
-    "npm_abcdefghijklmnopqrstuvwxyz123456",
-    "eyJheader123.eyJpayload456.signature789",
-    "Bearer bearer-token-123",
-    "Bearer abcdefghijklmnopqrstuvwxyz",
-    "Bearer zyxwvutsrqponmlkjihgfedcba was rejected",
-    "Basic YWxpY2U6aHVudGVyMg==",
-    "Basic dXNlcjpwYXNz",
-    "Basic dXNlcjphYmNk was rejected",
-    "Cookie: session=private-cookie",
-    "prefix Cookie: session=embedded-cookie",
-    "Authorization: Digest username=alice, response=digest-secret",
-    '{"Authorization":"Digest username=alice, response=json-auth-secret"}',
-    'request={"password":"json-password","token":"json-token","Cookie":"json-cookie"}',
-    '{"password":"\\"escaped-json-secret"}',
-    'password = "correct horse battery staple"',
-    '--password "quoted flag secret"',
-    "session_cookie=session-cookie-secret",
-    "AWS_SECRET_ACCESS_KEY=aws-secret-access-key",
-    "GITHUB_TOKEN=github-field-token",
-    "DB_PASSWORD=db-password",
-    "https://example.com/login?client_secret=query-secret&x=1",
-    "https://example.com/login?X-Amz-Security-Token=aws-session-secret&x=1",
-    "https://example.com/file?X-Amz-Signature=private-signature",
-    `-----BEGIN ${"PRIVATE"} KEY-----\nfake-private-key\n-----END ${"PRIVATE"} KEY-----`,
-  ].join("\n");
+  const userText = options.userText ?? "password=synthetic-value";
   const lines = [
     record("session_meta", start, { id, cwd: "/repo", source: "vscode" }),
     record("response_item", "2026-08-10T00:00:01.000Z", {
@@ -83,7 +51,7 @@ function rootSession(
       content: [{
         type: "output_text",
         text: options.assistantText ??
-          "Using AGE-SECRET-KEY-1QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ",
+          "Synthetic response",
       }],
     }),
     record("response_item", "2026-08-10T00:00:03.000Z", {
@@ -131,50 +99,10 @@ Deno.test("collects completed roots without tool arguments or raw outputs", asyn
     const result = await collectSessionEvidence({ codexHome: home });
     assertEquals(result.sessions.length, 1);
     const evidence = serialized(result.sessions[0]);
-    assert(evidence.includes("[REDACTED_GITHUB_TOKEN]"));
-    assert(evidence.includes("[REDACTED_AGE_SECRET_KEY]"));
-    assertFalse(evidence.includes("ghp_abcdefghijklmnopqrstuvwxyz123456"));
+    assert(evidence.includes("password=synthetic-value"));
     assertFalse(evidence.includes("do-not-expose-command"));
     assertFalse(evidence.includes("raw-secret-output"));
-    assertFalse(evidence.includes("hunter2"));
-    assertFalse(evidence.includes("alice:"));
-    assertFalse(evidence.includes("xoxb-"));
-    assertFalse(evidence.includes("private-cookie"));
-    assertFalse(evidence.includes("private-signature"));
-    assertFalse(evidence.includes("embedded-cookie"));
-    assertFalse(evidence.includes("digest-secret"));
-    assertFalse(evidence.includes("json-auth-secret"));
-    assertFalse(evidence.includes("json-password"));
-    assertFalse(evidence.includes("json-token"));
-    assertFalse(evidence.includes("json-cookie"));
-    assertFalse(evidence.includes("escaped-json-secret"));
-    assertFalse(evidence.includes("correct horse battery staple"));
-    assertFalse(evidence.includes("quoted flag secret"));
-    assertFalse(evidence.includes("session-cookie-secret"));
-    assertFalse(evidence.includes("aws-secret-access-key"));
-    assertFalse(evidence.includes("github-field-token"));
-    assertFalse(evidence.includes("db-password"));
-    assertFalse(evidence.includes("query-secret"));
-    assertFalse(evidence.includes("aws-session-secret"));
-    assertFalse(evidence.includes("AKIAABCDEFGHIJKLMNOP"));
-    assertFalse(evidence.includes("npm_abcdefghijklmnopqrstuvwxyz123456"));
-    assertFalse(evidence.includes("eyJheader123.eyJpayload456.signature789"));
-    assertFalse(evidence.includes("bearer-token-123"));
-    assertFalse(evidence.includes("YWxpY2U6aHVudGVyMg=="));
-    assertFalse(evidence.includes("abcdefghijklmnopqrstuvwxyz"));
-    assertFalse(evidence.includes("zyxwvutsrqponmlkjihgfedcba"));
-    assertFalse(evidence.includes("dXNlcjpwYXNz"));
-    assertFalse(evidence.includes("dXNlcjphYmNk"));
-    assertFalse(evidence.includes("fake-private-key"));
-    assertFalse(evidence.includes("token-value-123"));
-    assertFalse(evidence.includes("flag-secret"));
-    assert(evidence.includes("password is [REDACTED]"));
-    assert(evidence.includes("token=[REDACTED]"));
-    assert(evidence.includes("--password [REDACTED]"));
-    assert(evidence.includes("Cookie: [REDACTED]"));
-    assertFalse(evidence.includes("Cookie: [REDACTED]]"));
     assertFalse(evidence.includes("AGENTS.md instructions"));
-    assert(result.sessions[0].redactedMessages > 0);
     assertEquals(result.sessions[0].tools, [{
       name: "exec",
       status: "completed",
@@ -219,7 +147,6 @@ Deno.test("retains operational identifiers and non-secret credential discussion"
     for (const value of operational.split("\n")) {
       assert(evidence.includes(value), `expected operational value to remain: ${value}`);
     }
-    assertEquals(result.sessions[0].redactedMessages, 0);
   });
 });
 
@@ -250,7 +177,6 @@ Deno.test("retains tail evidence and reports truncated or omitted messages", asy
     const result = await collectSessionEvidence({ codexHome: home });
     const evidence = result.sessions[0];
     assert(evidence.truncatedMessages > 0);
-    assertEquals(evidence.redactedMessages, 0);
     assert(
       evidence.omittedMessages > 0,
       `expected omitted messages: ${

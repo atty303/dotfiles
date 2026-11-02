@@ -18,7 +18,6 @@ interface MessageEvidence {
 interface SanitizedMessage {
   text: string;
   truncated: boolean;
-  redacted: boolean;
 }
 
 interface ToolEvidence {
@@ -37,7 +36,6 @@ export interface SessionEvidence {
   messages: MessageEvidence[];
   tools: ToolEvidence[];
   parseWarnings: number;
-  redactedMessages: number;
   truncatedMessages: number;
   omittedMessages: number;
 }
@@ -80,88 +78,6 @@ function asRecord(value: unknown): Record<string, unknown> {
   return isRecord(value) ? value : {};
 }
 
-function redactSecrets(text: string): { text: string; redacted: boolean } {
-  const redacted = text
-    .replace(
-      /-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----[\s\S]*?-----END (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----/g,
-      "[REDACTED_PRIVATE_KEY]",
-    )
-    .replace(/AGE-SECRET-KEY-[A-Z0-9-]+/g, "[REDACTED_AGE_SECRET_KEY]")
-    .replace(/\b(?:AKIA|ASIA)[A-Z0-9]{16}\b/g, "[REDACTED_AWS_ACCESS_KEY]")
-    .replace(/\bgh[pousr]_[A-Za-z0-9_]{20,}\b/g, "[REDACTED_GITHUB_TOKEN]")
-    .replace(/\bsk-[A-Za-z0-9_-]{20,}\b/g, "[REDACTED_API_KEY]")
-    .replace(/\bxox[baprs]-[A-Za-z0-9-]{10,}\b/g, "[REDACTED_SLACK_TOKEN]")
-    .replace(/\bglpat-[A-Za-z0-9_-]{20,}\b/g, "[REDACTED_GITLAB_TOKEN]")
-    .replace(/\bnpm_[A-Za-z0-9]{20,}\b/g, "[REDACTED_NPM_TOKEN]")
-    .replace(/\bAIza[A-Za-z0-9_-]{20,}\b/g, "[REDACTED_GOOGLE_API_KEY]")
-    .replace(/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g, "[REDACTED_JWT]")
-    .replace(/(["']?(?:proxy-)?authorization["']?\s*:\s*)"(?:\\.|[^"\\])*"/gi, '$1"[REDACTED]"')
-    .replace(/(["']?(?:proxy-)?authorization["']?\s*:\s*)'(?:\\.|[^'\\])*'/gi, "$1'[REDACTED]'")
-    .replace(/(\b(?:proxy-)?authorization\s*:\s*)[^\r\n]+/gi, "$1[REDACTED]")
-    .replace(
-      /\bBearer\s+([A-Za-z0-9._~+\/-]{8,}?=*)(?=$|\s|[.,;)}\]])/gim,
-      (match, value: string) =>
-        /^[A-Za-z]+$/.test(value) && value.length < 20 ? match : "Bearer [REDACTED]",
-    )
-    .replace(
-      /\bBasic\s+([A-Za-z0-9+/]{8,}={0,2})(?=$|\s|[.,;)}\]])/gim,
-      (match, value: string) => {
-        try {
-          return atob(value).includes(":") ? "Basic [REDACTED]" : match;
-        } catch {
-          return match;
-        }
-      },
-    )
-    .replace(/(https?:\/\/)[^/\s:@]+:[^@\s/]+@/gi, "$1[REDACTED]@")
-    .replace(
-      /([?&](?:x-(?:amz|goog)-(?:signature|security-token)|sig|signature|access_token|api_key|client_secret|password|token)=)[^&#\s]+/gi,
-      "$1[REDACTED]",
-    )
-    .replace(/(\b(?:cookie|set-cookie)\s*:\s*)(?=[^\r\n]*=)[^\r\n]+/gi, "$1[REDACTED]")
-    .replace(
-      /(["']?(?:(?:[A-Za-z0-9]+[_.-])*(?:api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|password|passphrase|refresh[_-]?token|session[_-]?cookie|cookie|secret|token))["']?\s*(?::|=)\s*)"(?:\\.|[^"\\])*"/gi,
-      '$1"[REDACTED]"',
-    )
-    .replace(
-      /(["']?(?:(?:[A-Za-z0-9]+[_.-])*(?:api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|password|passphrase|refresh[_-]?token|session[_-]?cookie|cookie|secret|token))["']?\s*(?::|=)\s*)'(?:\\.|[^'\\])*'/gi,
-      "$1'[REDACTED]'",
-    )
-    .replace(
-      /(\b(?:(?:[A-Za-z0-9]+[_.-])*(?:api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|password|passphrase|refresh[_-]?token|session[_-]?cookie|cookie|secret|token))\s*=\s*)([^\s#,'"}\[\]]+)/gi,
-      "$1[REDACTED]",
-    )
-    .replace(
-      /(\b(?:(?:[A-Za-z0-9]+[_.-])*(?:api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|password|passphrase|refresh[_-]?token|session[_-]?cookie|cookie|secret|token))\s*:\s*)([^\s#,'"}\[\]]+)(?=$|[.,;)}\]])/gim,
-      "$1[REDACTED]",
-    )
-    .replace(
-      /(\b(?:(?:[A-Za-z0-9]+[_.-])*(?:password|passphrase|api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|refresh[_-]?token|session[_-]?cookie))\s+is\s+)"(?:\\.|[^"\\])*"/gi,
-      '$1"[REDACTED]"',
-    )
-    .replace(
-      /(\b(?:(?:[A-Za-z0-9]+[_.-])*(?:password|passphrase|api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|refresh[_-]?token|session[_-]?cookie))\s+is\s+)'(?:\\.|[^'\\])*'/gi,
-      "$1'[REDACTED]'",
-    )
-    .replace(
-      /(\b(?:(?:[A-Za-z0-9]+[_.-])*(?:password|passphrase|api[_-]?key|access[_-]?key|client[_-]?secret|private[_-]?key|refresh[_-]?token|session[_-]?cookie))\s+is\s+)([^\s#,'"}\[\]]+)/gi,
-      "$1[REDACTED]",
-    )
-    .replace(
-      /(\B--(?:password|passphrase|client-secret|api-key|access-key|refresh-token|token|secret)(?:=|\s+))"(?:\\.|[^"\\])*"/gi,
-      '$1"[REDACTED]"',
-    )
-    .replace(
-      /(\B--(?:password|passphrase|client-secret|api-key|access-key|refresh-token|token|secret)(?:=|\s+))'(?:\\.|[^'\\])*'/gi,
-      "$1'[REDACTED]'",
-    )
-    .replace(
-      /(\B--(?:password|passphrase|client-secret|api-key|access-key|refresh-token|token|secret)(?:=|\s+))[^\s]+/gi,
-      "$1[REDACTED]",
-    );
-  return { text: redacted, redacted: redacted !== text };
-}
-
 function isInjectedContext(text: string): boolean {
   const trimmed = text.trimStart();
   return [
@@ -174,18 +90,16 @@ function isInjectedContext(text: string): boolean {
 
 function sanitizeMessage(text: string): SanitizedMessage | null {
   if (isInjectedContext(text)) return null;
-  const redaction = redactSecrets(text);
-  const sanitized = redaction.text.trim();
+  const sanitized = text.trim();
   if (!sanitized) return null;
   if (sanitized.length <= MAX_MESSAGE_LENGTH) {
-    return { text: sanitized, truncated: false, redacted: redaction.redacted };
+    return { text: sanitized, truncated: false };
   }
   const marker = "\n[TRUNCATED_MIDDLE]\n";
   const sideLength = Math.floor((MAX_MESSAGE_LENGTH - marker.length) / 2);
   return {
     text: `${sanitized.slice(0, sideLength)}${marker}${sanitized.slice(-sideLength)}`,
     truncated: true,
-    redacted: redaction.redacted,
   };
 }
 
@@ -319,7 +233,6 @@ async function parseSession(path: string): Promise<ParsedSession | null> {
   if (!completion || typeof completion.timestamp !== "string") return null;
 
   const messages: MessageEvidence[] = [];
-  let redactedMessages = 0;
   let truncatedMessages = 0;
   const toolCalls = new Map<string, ToolEvidence>();
 
@@ -336,7 +249,6 @@ async function parseSession(path: string): Promise<ParsedSession | null> {
         if (!raw || (part.type !== "input_text" && part.type !== "output_text")) continue;
         const sanitized = sanitizeMessage(raw);
         if (!sanitized) continue;
-        if (sanitized.redacted) redactedMessages++;
         if (sanitized.truncated) truncatedMessages++;
         messages.push({
           timestamp: typeof entry.timestamp === "string" ? entry.timestamp : startedAt,
@@ -384,7 +296,6 @@ async function parseSession(path: string): Promise<ParsedSession | null> {
     messages: boundedMessages.messages,
     tools: [...toolCalls.values()],
     parseWarnings,
-    redactedMessages,
     truncatedMessages,
     omittedMessages: boundedMessages.omittedMessages,
     lastTimestamp: timestamps.at(-1) ?? completion.timestamp,
