@@ -67,7 +67,7 @@ Closed-set triggerに該当しない既存contract内の局所修正、doc、単
 
 - Commit前に元の依頼とclosed setを読み直し、各項目を証拠、明示的な対象外または残作業へ対応付ける。Git stateとdiffを再確認し、release対象では開始時の提案が送信済みであることと、task全体の承認済みrelease要否・上限と予定するcommit群の影響を照合する。提案の送信漏れが判明したら直ちに送り、commitなしでできる残作業を進める。未承認、SemVerで基準releaseを確認できず影響が確定しない場合、または範囲外ならcommitを保留して残作業と必要な判断を示す。Commitできる場合は自分の変更だけを明示的にstageして論理単位でcommitする。未確定のまま残す明示指示がなければ、完了した変更はlocal commitへ確定する。
 - Commit messageは上記のrelease規則とrepository慣習に従い、目的、主要理由、範囲、user-visible effect、migrationおよび主要検証を自足的に記す。Release対象以外で慣習不明なら英語のConventional Commitsを使い、Codex co-author trailerを付ける。
-- Commitを作るtaskは最終commit前に [Git task evidence](../../references/git-task-evidence.md) をすべて読み、task全体のtranscriptを最終commit messageへ保存する。Codexではcomplete thread履歴の取得・照合が必須で、不能なら最終commitを保留しtaskを未完了とする。他runtimeは同等capabilityがなければskipと境界を明示できる。
+- 再取得が困難または不可能な証拠は、必要に応じてcommit messageの `## Evidence` に記載できる。
 
 ## Remote writes and completion
 
