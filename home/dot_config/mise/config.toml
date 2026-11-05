@@ -103,6 +103,7 @@ age = { version = "1.3.2", lazy = true }
   "macos/x64",
   "windows/x64",
 ] }
+entire = "0.12.2"
 "cargo:eza" = { "version" = "0.23.5", "lazy" = true, "lazy_bins" = ["eza"] }
 "fd" = { "version" = "10.5.0", "lazy" = true, "os" = [
   "linux/arm64",
