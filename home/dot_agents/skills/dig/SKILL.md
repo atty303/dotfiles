@@ -5,7 +5,7 @@ description: プラン、設計、技術的意思決定を設計ツリーとし�
 
 # Dig into Decisions
 
-- 実装に影響する決定、その理由、主要な棄却案だけをOSの一時ディレクトリ内のsession固有fileに記録する。`CODEX_THREAD_ID` があれば、file名を `dig-decisions-<CODEX_THREAD_ID>` とする。なければ一意なfile名を接頭辞 `dig-decisions-` で生成し、pathを会話に残す。異なるsessionの記録を共有しない。
+- 実装に影響する決定、その理由、主要な棄却案だけをOSの一時ディレクトリ内のsession固有fileに記録する。実行環境でcompaction後も再取得できるsession識別子を確認し、利用できれば接頭辞 `dig-decisions-` と識別子から同じpathを再導出する。例えば `CODEX_THREAD_ID` があれば、file名を `dig-decisions-<CODEX_THREAD_ID>` とする。利用できる識別子がなければ一意なfile名を同じ接頭辞で生成し、pathを会話に残す。異なるsessionの記録を共有しない。
 - 決定の確定・変更ごとに記録を更新し、次の質問を返す前に完了する。記録のための不要な調査や検証は行わない。書き込みに失敗したら、失敗を伝えて停止する。
 - Compaction後は記録を読み直す。Pathを見失った場合は接頭辞を使って一時ディレクトリを探索し、現在のsessionの記録と一意に確認できなければユーザーに確認する。記録が失われた場合は、その旨を伝え、決定を復元できないまま最終promptを作らない。
 - 対象を設計ツリーとして捉え、各判断に依存する後続判断を枝として管理する。
